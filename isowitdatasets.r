@@ -24,33 +24,8 @@ if(nData=="Glass") parvecfactor=c("Type")
 if(nData=="Glass") parvec=setdiff(names(DataSet),parvecfactor)
 
 
-#potem faktoryzujê na wszelki wypadek kolumny, które s± etykietami, maj± ju¿ zdyskretyzowane warto¶ci; ich wybór jest w wektorze parvec
-#DataSet<-factorto(DataSet, which(names(DataSet) %in% parvecfactor))
-#DataSet<-unfactorto(DataSet, which(names(DataSet) %in% parvec))
-indata<-DataSet
-varcon<-which(names(DataSet) %in% parvec)
-varcon <- as.vector(varcon)
-p <- dim(indata)[2]
-f <- p
-ft <- rep(0, f)
-for (i in 1:length(varcon)) {
-	ft[varcon[i]] = 1
-}
-for (i in 1:f) {
-	if (ft[i] > 0) {
-		if(!is.na(as.numeric(as.character(indata[1,i])))){
-			indata[, i] <- as.numeric(as.character(indata[, i]))
-		}
-		if(is.na(as.numeric(as.character(indata[1,i])))){
-			indata[, i] <- as.character(indata[, i])
-		}
-	}
-}
-
-for(i in 1:ncol(DataSet)){
-	if(i%in%which(names(DataSet) %in% parvec))
-		DataSet[,i]<-as.numeric(DataSet[,i])
-}
+#potem faktoryzujê na wszelki wypadek kolumny, które s± etykietami, maj± ju¿ zdyskretyzowane warto¶ci; ich wybór jest w wektorze parvecfactor
+DataSet<-factorto(DataSet, which(names(DataSet) %in% parvecfactor))
 
 #najpierw defaktoryzujê i oznaczam jako numeryczne kolumny z liczbami zmiennoprzecinkowymi i ca³kowitymi, tak na wszelki wypadek, gdyby csv ¼le siê wczyta³ (w przypadku zbiorów data() to tylko æwiczenie)
 DataSet<-defactor.numeric(DataSet, parvec)
