@@ -77,6 +77,7 @@ zapisz_pplot(nDataSets,paste(fname,"_",i,parvec[i],sep=""),wzorzec,wzorzec1,c('y
 }
 }
 
+#Funkcja disc2 wykonywana w funkcji disc.ef
 disc2<-function (x, k) 
 {
 	z = x

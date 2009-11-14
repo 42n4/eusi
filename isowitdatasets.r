@@ -9,7 +9,6 @@ mypathout<-paste(mypath,"obrazki/",sep="")
 
 source(paste(mypath,"isowitfunkcje.r",sep=""))
 
-
 nData<-"Glass"
 #wczytywanie zbioru treningowego o nazwie nData
 #assign(nData,read.csv(paste("file://",mypath,"meatDataEN.csv",sep=""),head=TRUE,sep=";",dec=",",na.strings=c("NA", "BD", "bd", "", "?")))
