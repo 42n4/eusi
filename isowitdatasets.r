@@ -40,8 +40,10 @@ DataSetzd<-disc.for.chosen(DataSetz,parvec,3)
 DataSetd<-disc.for.chosen(DataSet,parvec,3)
 
 
-#generujê z daisy ró¿nice miêdzy wierszami podanego zbioru i wprowadzam do isoMDS rzutuj±cego na dwa wymiary k=2 (jak siê pojawi± dwa takie same wiersze to wyrzuca b³±d, dlatego na samym pocz±tku usuwa³em wiersze z Glass
-parvecfact=c("Type")
+#generujê z daisy ró¿nice miêdzy wierszami podanego zbioru i wprowadzam do isoMDS rzutuj±cego na dwa wymiary k=2 
+#(jak siê pojawi± dwa takie same wiersze to wyrzuca b³±d, dlatego na samym pocz±tku usuwa³em wiersze z Glass)
+#parvecfact=c("Type")
+parvecfact=c()
 parvec=setdiff(names(DataSet),parvecfact)
 nDataSets<-KruskelMDS(DataSet, parvec, 2)
 
@@ -55,7 +57,8 @@ wzorzec1=DataSet$Type
 plotMDS.for.chosen(fname, nDataSets, DataSetd, parvec, wzorzec1) 
 
 
-parvecfact=c("Type")
+#parvecfact=c("Type")
+parvecfact=c()
 parvec=setdiff(names(DataSet),parvecfact)
 nDataSets<-KruskelMDS(DataSet, parvec, 2)
 
