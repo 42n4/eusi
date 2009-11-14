@@ -1,3 +1,5 @@
+Sys.setlocale("LC_NUMERIC","C")
+
 #lista pakietów z CRAN-u
 pkglist<-c("plyr","mlbench","boot","Hmisc","RWeka","ipred","klaR","ROCR","rpart","dprep","maptree","party","grid","lattice","latticeExtra","playwith","ada","randomForest","kknn","e1071","cluster","class","caret","fda","zoo","lattice","deal","RJDBC","cairoDevice")
 pkgcheck <- pkglist %in% row.names(installed.packages())
