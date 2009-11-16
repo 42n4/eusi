@@ -76,6 +76,3 @@ zapisz_rpart(t01,paste(mypathout,nData,"_rpart_nrd"))
 t01<-rpart(Type~RI+Na+Mg+Al+Si+K+Ca+Ba+Fe,data=DataSetzd)
 zapisz_rpart(t01,paste(mypathout,nData,"_rpart_zsd"))
 
-
-
-

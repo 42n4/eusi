@@ -51,7 +51,7 @@ return(indata)
 disc.for.chosen<-function (DataSet, parvec, levelnum)         
 {
 DataSetd<-DataSet
-DataSetd[names(DataSet) %in% parvec]<-disc.ef(DataSet[names(DataSet) %in% parvec], 1:length(parvec), levelnum)
+DataSetd[names(DataSet) %in% parvec]<-disc.ef(DataSet[names(DataSet) %in% parvec], which(names(DataSetz) %in% parvec), levelnum)
 DataSetd<-factorto(DataSetd, which(names(DataSetd) %in% parvec))
 return(DataSetd)
 }
@@ -135,8 +135,10 @@ zscore<-function (indata, varcon)        # Nastêpuje dyskretyzacja danych
 			{
 				fs<-fs[-which(is.na(x))]
 				x<-as.numeric(x[-which(is.na(x))])
+			} 
+			if (sum(x!=0) != 0) {
+            x<-(x-mean(x))/sd(x)
 			}
-            x <- (x-mean(x))/sd(x)
 			z[fs]=x
 			indata[, i]=z
         }
