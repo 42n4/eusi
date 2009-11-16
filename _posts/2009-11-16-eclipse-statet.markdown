@@ -28,7 +28,7 @@ git symbolic-ref HEAD refs/heads/gh-pages; rm .git/index; git clean -fdx; git pu
 
 Po tych komendach mo¿na git checkout master lub git checkout gh-pages prze³±czaæ siê miêdzy repozytoriami skryptów i strony projektu.
 
-Strona g³ówna u¿ytkownika znajduje siê w repozytorium username.github.com, gdy¿ najpierw zak³adamy sobie konto, a potem twprzymy w³asne repozytoria np.: takie jakiso lub w³a¶nie pwasiewi.github.com
+Strona g³ówna u¿ytkownika znajduje siê w repozytorium username.github.com, gdy¿ najpierw zak³adamy sobie konto, a potem twprzymy w³asne repozytoria np.: takie jak iso lub w³a¶nie np. pwasiewi.github.com
 
 Dla vim fanatyków polecam stronê z [Vim plugins.](http://www.catonmat.net/blog/vim-plugins-snipmate-vim/)
 
