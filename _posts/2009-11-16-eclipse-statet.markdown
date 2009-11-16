@@ -10,7 +10,7 @@ eclipse-3.6 -clean
 , które czy¶ci historiê z komputera, na którym kompilowano eclipse-sdk.
 Poprzez Help->Install New Software dopisujê strony update pluginów eclipse-sdk, najpierw [Egit](http://github.com/guides/using-the-egit-eclipse-plugin-with-github): http://www.jgit.org/updates, a potem [Statet](http://www.walware.de/goto/statet): http://download.walware.de/eclipse-3.5, po ka¿dym dopisaniu zaznaczam biblioteki i narzêdzia w lewym oknie i wykonujê Next, a nastêpnie update, czasami z zaznaczeniem licencji: I Agree.
 
-W katalogu roboczym eclipse (domy¶lnie /home/<user>/workspace) wykonujê:
+W katalogu roboczym eclipse (domy¶lnie /home/\<user\>/workspace) wykonujê:
 
 git clone git://github.com/pwasiewi/iso.git
 
