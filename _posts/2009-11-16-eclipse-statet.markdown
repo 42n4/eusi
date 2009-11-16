@@ -32,3 +32,4 @@ Strona g³ówna u¿ytkownika znajduje siê w repozytorium username.github.com, gdy¿ 
 
 Dla vim fanatyków polecam stronê z [Vim plugins.](http://www.catonmat.net/blog/vim-plugins-snipmate-vim/)
 
+Piotr W±siewicz
