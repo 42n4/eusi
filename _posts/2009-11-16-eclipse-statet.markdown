@@ -10,7 +10,7 @@ eclipse-3.6 -clean
 , które czy¶ci historiê z komputera, na którym kompilowano eclipse-sdk.
 Poprzez Help->Install New Software dopisujê strony update pluginów eclipse-sdk, najpierw [Egit](http://github.com/guides/using-the-egit-eclipse-plugin-with-github): http://www.jgit.org/updates, a potem [Statet](http://www.walware.de/goto/statet): http://download.walware.de/eclipse-3.5, po ka¿dym dopisaniu zaznaczam biblioteki i narzêdzia w lewym oknie i wykonujê Next, a nastêpnie update, czasami z zaznaczeniem licencji: I Agree.
 
-W katalogu roboczym eclipse (domy¶lnie /home/\<user\>/workspace) wykonujê:
+W katalogu roboczym eclipse (domy¶lnie /home/username/workspace) wykonujê:
 
 git clone git://github.com/pwasiewi/iso.git
 
@@ -28,7 +28,7 @@ git symbolic-ref HEAD refs/heads/gh-pages; rm .git/index; git clean -fdx; git pu
 
 Po tych komendach mo¿na git checkout master lub git checkout gh-pages prze³±czaæ siê miêdzy repozytoriami skryptów i strony projektu.
 
-Strona g³ówna u¿ytkownika znajduje siê w repozytorium <user>.github.com, gdy¿ najpierw zak³adamy sobie konto, a potem twprzymy w³asne repozytoria np.: takie jakiso lub w³a¶nie pwasiewi.github.com
+Strona g³ówna u¿ytkownika znajduje siê w repozytorium username.github.com, gdy¿ najpierw zak³adamy sobie konto, a potem twprzymy w³asne repozytoria np.: takie jakiso lub w³a¶nie pwasiewi.github.com
 
 Dla vim fanatyków polecam stronê z [Vim plugins.](http://www.catonmat.net/blog/vim-plugins-snipmate-vim/)
 
