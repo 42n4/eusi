@@ -3,7 +3,7 @@
 #te ¶cie¿ki mypath i mypathout musz± istnieæ w systemie
 #to ¶cie¿ka do plików wykonywalnych z R pow³oki za pomoc± source("...")
 #mypath<-"/media/disk/guest/"
-mypath<-"/home/pwas/workspace/pwasiewi/"
+mypath<-"/home/pwas/workspace/iso/"
 #to ¶cie¿ka do plików graficznych uzyskiwanych za pomoc± funkcji plot i innych
 mypathout<-paste(mypath,"obrazki/",sep="")
 
@@ -12,7 +12,7 @@ source(paste(mypath,"isowitfunkcje.r",sep=""))
 nData<-"Glass"
 #wczytywanie zbioru treningowego o nazwie nData
 #assign(nData,read.csv(paste("file://",mypath,"meatDataEN.csv",sep=""),head=TRUE,sep=";",dec=",",na.strings=c("NA", "BD", "bd", "", "?")))
-library(mlbench)
+#library(mlbench)
 data(list=nData)
 
 DataSet<-get(nData)
@@ -59,10 +59,10 @@ plotMDS.for.chosen(fname, nDataSets, DataSetd, parvec, wzorzec1)
 #parvecfact=c("Type")
 if(nData=="Glass") parvecfact=c()
 parvec=setdiff(names(DataSet),parvecfact)
-nDataSets<-KruskelMDS(DataSet, parvec, 2)
+nDataSets<-KruskelMDS(DataSetz, parvec, 2)
 
 if(nData=="Glass") parvec<-names(DataSet)
-fname<-paste(mypathout,nData,"_norm_zscdis",sep="")
+fname<-paste(mypathout,nData,"_zesc_zscdis",sep="")
 wzorzec1=DataSet$Type
 plotMDS.for.chosen(fname, nDataSets, DataSetzd, parvec, wzorzec1) 
 
@@ -71,6 +71,10 @@ zapisz_rpart(t01,paste(mypathout,nData,"_rpart_nrm"))
 t01<-rpart(Type~RI+Na+Mg+Al+Si+K+Ca+Ba+Fe,data=DataSetz)
 zapisz_rpart(t01,paste(mypathout,nData,"_rpart_zsc"))
 
+t01<-rpart(Type~RI+Na+Mg+Al+Si+K+Ca+Ba+Fe,data=DataSetd)
+zapisz_rpart(t01,paste(mypathout,nData,"_rpart_nrd"))
+t01<-rpart(Type~RI+Na+Mg+Al+Si+K+Ca+Ba+Fe,data=DataSetzd)
+zapisz_rpart(t01,paste(mypathout,nData,"_rpart_zsd"))
 
 
 
