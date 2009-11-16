@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Statet plugin Eclipse - instalacja</title>
+  </head>
+
+  <body>
+    <h1>Statet plugin Eclipse - instalacja</h1>
+
+    <p>Instalujê pakiet eclipse-sdk z wszystkimi zale¿no¶ciami np. na gentoo emerge eclipse-sdk. Nastêpnie z katalogu /usr/lib64/eclipse-3.6 usuwam zawarto¶æ i kopiujê tam z <a href='http://www.mirrorservice.org/sites/download.eclipse.org/eclipseMirror/eclipse/downloads/drops/'>mirrora Eclipse</a> wersjê eclipse-sdk 3.5 np. <a href='http://www.mirrorservice.org/sites/download.eclipse.org/eclipseMirror/eclipse/downloads/drops/R-3.5.1-200909170800/eclipse-SDK-3.5.1-linux-gtk-x86_64.tar.gz'>dla linux 64-bit</a>. Po przekopiowaniu zawarto¶ci pakietu do katalogu /usr/lib64/eclipse-3.6,umieszczam (je¶li nie mam) skrypt eclipse-3.6 z UBI w /usr/local/bin i wykonujê polecenie:</p>
+
+<p>eclipse-3.6 -clean</p>
+
+<p>, które czy¶ci historiê z komputera, na którym kompilowano eclipse-sdk. Poprzez Help-&gt;Install New Software dopisujê strony update pluginów eclipse-sdk, najpierw <a href='http://github.com/guides/using-the-egit-eclipse-plugin-with-github'>Egit</a>: http://www.jgit.org/updates, a potem <a href='http://www.walware.de/goto/statet'>Statet</a>: http://download.walware.de/eclipse-3.5, po ka¿dym dopisaniu zaznaczam biblioteki i narzêdzia w lewym oknie i wykonujê Next, a nastêpnie update, czasami z zaznaczeniem licencji: I Agree.</p>
+
+<p>W katalogu roboczym eclipse (domy¶lnie /home/username/workspace) wykonujê:</p>
+
+<p>git clone git://github.com/pwasiewi/iso.git</p>
+
+<p>Uzyskujê katalog iso ze skryptami, nastêpnie uruchamiam New-&gt;R-Project i nazywam go tak samo jak poprzedni katalog czyli iso. Po przycisku Finish pokazuj± siê w folderze projektu iso sklonowane wcze¶niej pliki. Jeszcze dodajê do Windows-&gt;Preferences-&gt;StatET-&gt;Run/Debug-&gt;R-environment katalog &#8220;/usr/lib64/R&#8221; oraz &#8220;64bit&#8221;. Po zdefiniowaniu w Run-&gt;Run Configurations-&gt;Rconsole new environment i uruchomieniu go uzyskujê w konsoli na dole R-shell oraz mogê zaznaczaj±c tekst mysz± poprzez Ctrl-R Ctrl-R wykonywaæ go w tej konsoli lub te¿ wykonywaæ ca³e skrypty. Resztê udogodnieñ mo¿na doczytaæ w <a href='http://www.splusbook.com/Rintro/R_Eclipse_StatET.pdf'>manualu StatET</a>.</p>
+
+<p>Dodatkowe kursy jêzyka R na <a href='http://www.splusbook.com/Rintro/RCourseMaterial.html'>stronie R cources</a> oraz wstêp po polsku <a href='http://cran.r-project.org/doc/contrib/Komsta-Wprowadzenie.pdf'>w publikacji Komsty</a>.</p>
+
+<p>Na temat git <a href='http://progit.org/book/'>wolnodostêpna ksi±¿ka ProGit book</a> oraz filmy <a href='http://www.youtube.com/watch?v=4XpnKHJAok8'>Linus on Git</a> oraz <a href='http://video.linuxfoundation.org/video/1516'>Git intro</a>, z tym, ¿e ten ostatni najlepiej w Youtube siê prezentuje i trzeba siê pogodziæ z za bardzo skompresowanym d¼wiêkiem.</p>
+
+<p>Dodatkowo polecam <a href='http://blog.envylabs.com/2009/08/publishing-a-blog-with-github-pages-and-jekyll/'>opis wykonania strony na GitHubie</a> z list± komend ¶ci±gaj±cych stronê www projektu po wykonaniu jej automatycznie przyciskiem na GitHubie:</p>
+
+<p>git clone git://github.com/pwasiewi/iso.git; cd iso; git symbolic-ref HEAD refs/heads/gh-pages; rm .git/index; git clean -fdx; git pull origin gh-pages</p>
+
+<p>Po tych komendach mo¿na git checkout master lub git checkout gh-pages prze³±czaæ siê miêdzy repozytoriami skryptów i strony projektu.</p>
+
+<p>Strona g³ówna u¿ytkownika znajduje siê w repozytorium username.github.com, gdy¿ najpierw zak³adamy sobie konto, a potem twprzymy w³asne repozytoria np.: takie jak iso lub w³a¶nie np. pwasiewi.github.com</p>
+
+<p>Dla vim fanatyków polecam stronê z <a href='http://www.catonmat.net/blog/vim-plugins-snipmate-vim/'>Vim plugins.</a></p>
+  </body>
+</html>
+
