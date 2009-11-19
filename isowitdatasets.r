@@ -66,13 +66,22 @@ fname<-paste(mypathout,nData,"_zesc_zscdis",sep="")
 wzorzec1=DataSet$Type
 plotMDS.for.chosen(fname, nDataSets, DataSetzd, parvec, wzorzec1) 
 
-t01<-rpart(Type~RI+Na+Mg+Al+Si+K+Ca+Ba+Fe,data=DataSet)
+if(nData=="Glass") parvecfact=c("Type")
+parvec=setdiff(names(DataSet),parvecfact)
+t01<-evalwithattr(rpart,"Type",parvec,DataSet)
 zapisz_rpart(t01,paste(mypathout,nData,"_rpart_nrm"))
-t01<-rpart(Type~RI+Na+Mg+Al+Si+K+Ca+Ba+Fe,data=DataSetz)
+t01<-evalwithattr(rpart,"Type",parvec,DataSetz)
 zapisz_rpart(t01,paste(mypathout,nData,"_rpart_zsc"))
-
-t01<-rpart(Type~RI+Na+Mg+Al+Si+K+Ca+Ba+Fe,data=DataSetd)
+t01<-evalwithattr(rpart,"Type",parvec,DataSetd)
 zapisz_rpart(t01,paste(mypathout,nData,"_rpart_nrd"))
-t01<-rpart(Type~RI+Na+Mg+Al+Si+K+Ca+Ba+Fe,data=DataSetzd)
+t01<-evalwithattr(rpart,"Type",parvec,DataSetzd)
 zapisz_rpart(t01,paste(mypathout,nData,"_rpart_zsd"))
+
+
+#etykiety <- sample(1:nrow(DataSet), round(nrow(DataSet)*0.5))
+#t01<-evalwithattr(rpart,"Type",parvec,DataSet)
+#oceny1=predict(t01,newdata=DataSet[-etykiety,which(names(DataSet)%in%parvec)])
+#oceny2=predict(t01,newdata=DataSet[-etykiety,which(names(DataSet)%in%parvec)],"class")
+#table(predicted=oceny2, real=DataSet[-etykiety,which(names(DataSet)%in%c("Type"))])
+#pred1<-prediction(oceny1,DataSet[-etykiety,which(names(DataSet)%in%c("Type"))])
 

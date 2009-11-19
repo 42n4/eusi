@@ -26,6 +26,21 @@ for(i in biolist)
 #Funkcje podstawowe niezbêdne do normalnego odzyskiwania wiedzy
 #############################################################################
 
+#Funkcja evalwithattr wywo³uje podan± funkcjê z wyj¶ciowym atrybutem output i 
+#wej¶ciowymi atrybutami parvec oraz zbiorem danych
+evalwithattr<-function(oFunction,output,parvec,oData)
+{
+	tmp=paste(deparse(substitute(oFunction)),"(",output,"~")
+	j=0
+	for(i in parvec){
+		j=j+1
+		if(j==1) tmp<-paste(tmp,i)
+		else 	 tmp<-paste(tmp,"+",i)
+	}
+	tmp<-paste(tmp,",data=",deparse(substitute(oData)),")",sep="")
+	return(eval(parse(text=tmp)))
+}
+
 #Funkcja defactor.numeric najpierw defaktoryzuje, a potem oznacza jako numeryczne kolumny z liczbami zmiennoprzecinkowymi i ca³kowitymi, tak na wszelki wypadek, gdyby csv ¼le siê wczyta³ (w przypadku zbiorów data() to tylko æwiczenie)
 defactor.numeric<-function (DataSet, parvec)         
 {
@@ -99,6 +114,8 @@ disc2<-function (x, k)
 	return(z)
 }
 
+#Funkcja disc.ef z pakietu dprep zmieniona (pomija nulle), 
+#gdy¿ w tym pakiecie prawie wszystkie funkcje wymagaj± zmian 
 disc.ef<-function (indata, varcon, k)        # Nastêpuje dyskretyzacja danych
 {
     indata = as.matrix(indata)
@@ -116,6 +133,8 @@ disc.ef<-function (indata, varcon, k)        # Nastêpuje dyskretyzacja danych
     indata
 }
 
+#Funkcja zscore zeskoruje dane ca³kowite lub zmiennoprzecinkowe 
+#czyli odejmuje ¶redni± i dzieli przez standardowe odchylenie
 zscore<-function (indata, varcon)        # Nastêpuje dyskretyzacja danych
 {
 #    indata = as.matrix(indata)
@@ -146,7 +165,7 @@ zscore<-function (indata, varcon)        # Nastêpuje dyskretyzacja danych
     indata
 }
 
-
+#Funkcja factorto faktoryzuje dane wej¶ciowe z domy¶lnymi poziomami
 factorto<-function (indata, varcon)  
 {
 	varcon <- as.vector(varcon)
@@ -164,6 +183,7 @@ factorto<-function (indata, varcon)
     indata
 }
 
+#Funkcja unfactorto defaktoryzuje dane wej¶ciowe z ustalonymi poziomami
 unfactorto<-function (indata, varcon)  
 {
 	varcon <- as.vector(varcon)
@@ -194,6 +214,7 @@ zmianana<- function (kolumna_wyjatek, wartoscNA)
  	return (x)
 }
 
+#Funkcja z4na3 zamienia przedzia³y 1,2,3,4 na 1,2,2,3
 z4na3<-function (indata, varcon)
 {
     indata = as.matrix(indata)
@@ -214,6 +235,7 @@ z4na3<-function (indata, varcon)
     indata
 }
 
+#Funkcja zapisz_pplot zapisuje wykres rzutu wielowymiarowego w pliku jpeg
 zapisz_pplot = function (npointszds,fname,wzorzec1,wzorzec2,co,pc,scex)
 {
 	jpeg(file=paste(fname,".jpg",sep=""),width = 1200, height = 1000, quality = 55, bg = "white")
@@ -222,6 +244,7 @@ zapisz_pplot = function (npointszds,fname,wzorzec1,wzorzec2,co,pc,scex)
 	dev.off()
 }
 
+#Funkcja zapisz_weka zapisuje wykres drzewa uzyskanego procedurami RWeka w pliku png
 zapisz_weka = function (drzewo, fname)
 {
 	#dotname=paste(fname,".dot",sep="")
@@ -231,6 +254,7 @@ zapisz_weka = function (drzewo, fname)
 	system(paste("dot -Tpng ",dotname," > ",pngname,sep=""))
 }
 
+#Funkcja zapisz_rpart zapisuje wykres drzewa uzyskanego procedurami rpart w pliku jpeg
 zapisz_rpart = function (drzewo, fname)
 {
     jpeg(file=paste(fname,".jpg",sep=""),width = 1200, height = 1000, quality = 55, bg = "white")
@@ -241,6 +265,7 @@ zapisz_rpart = function (drzewo, fname)
     dev.off()
 }
 
+#Funkcja hier2jpg zapisuje dendogram w pliku jpeg
 hier2jpg<-function(inmethod,indata,fname){
 indatanum<-indata[, sapply(indata, class) == "numeric"]
 cc <- cor(indatanum, use="pairwise", method=inmethod)
@@ -258,7 +283,7 @@ title(main=paste("Variable Correlation Clusters ",as.character(substitute(indata
 dev.off()
 }
 
-
+#Funkcja latt2jpg zapisuje lattice w pliku jpeg
 latt2jpg<-function(indata, gvec, fname){
 dat<-indata[, sapply(indata, class) == "numeric"]
 jpeg(file=paste("/media/disk/guest/obrazki/",fname,".jpg",sep=""),width = 1200, height = 1000, quality = 55, bg = "white")
