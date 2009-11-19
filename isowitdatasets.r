@@ -66,8 +66,8 @@ fname<-paste(mypathout,nData,"_zesc_zscdis",sep="")
 wzorzec1=DataSet$Type
 plotMDS.for.chosen(fname, nDataSets, DataSetzd, parvec, wzorzec1) 
 
-if(nData=="Glass") parvecfact=c("Type")
-parvec=setdiff(names(DataSet),parvecfact)
+if(nData=="Glass") parvecout=c("Type")
+parvec=setdiff(names(DataSet),parvecout)
 t01<-evalwithattr(rpart,"Type",parvec,DataSet)
 zapisz_rpart(t01,paste(mypathout,nData,"_rpart_nrm"))
 t01<-evalwithattr(rpart,"Type",parvec,DataSetz)
