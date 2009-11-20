@@ -1,5 +1,5 @@
 ols <- function( y, x ){ 
-size <- length(x) # number of ovservations 
+size <- length(x) # number of observations 
 xmean <- mean(x) 
 ymean <- mean(y) 
 Sxx <- sum( (x-xmean)^2 ) 
