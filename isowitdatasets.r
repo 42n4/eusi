@@ -77,7 +77,18 @@ zapisz_rpart(t01,paste(mypathout,nData,"_rpart_nrd"))
 t01<-evalwithattr(rpart,"Type",parvec,DataSetzd)
 zapisz_rpart(t01,paste(mypathout,nData,"_rpart_zsd"))
 
+if(nData=="Glass") parvecout=c("Type","RI")
+parvec=setdiff(names(DataSet),parvecout)
+perm<-get("permutations","package:gtools")(8,1,parvec)
+lb<-c()
+for(i in 1:nrow(perm)){
+m01<-evalwithattr(lm,"RI",as.vector(perm[i,]),DataSet);
+an<-anova(lm(RI~1,DataSet),m01);
+if(qf(0.99,1,m01$df)<an$F[2]) lb<-c(lb, i);
+}
+perm[lb]
 
+#get("permutations","package:gtools")(9,9,parvec)
 #etykiety <- sample(1:nrow(DataSet), round(nrow(DataSet)*0.5))
 #t01<-evalwithattr(rpart,"Type",parvec,DataSet)
 #oceny1=predict(t01,newdata=DataSet[-etykiety,which(names(DataSet)%in%parvec)])
