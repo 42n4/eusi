@@ -52,6 +52,10 @@ my<-lm(y~x)
 #the same values of 
 o
 summary(my)
+smy<-summary(my)
+names(smy)
+fmy<-summary(my)["fstatistic"]
+1-pf(fmy$fstatistic[["value"]],fmy$fstatistic[["numdf"]],fmy$fstatistic[["dendf"]])
 an<-anova(lm(y~1),my)
 #F statistic value
 an$F[2]
