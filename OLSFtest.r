@@ -52,4 +52,11 @@ my<-lm(y~x)
 #the same values of 
 o
 summary(my)
-anova(lm(y~1),my)
+an<-anova(lm(y~1),my)
+#F statistic value
+an$F[2]
+#degrees of freedom
+my$df
+1-pf(an$F[2],1,my$df)
+qf(0.95,1,my$df)
+

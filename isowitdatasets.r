@@ -87,6 +87,10 @@ an<-anova(lm(RI~1,DataSet),m01);
 if(qf(0.99,1,m01$df)<an$F[2]) lb<-c(lb, i);
 }
 perm[lb]
+mintervals<-cut(m01$fitted.values,4)
+mresid<-m01$residuals
+lt<-levene.test(mresid,factor(mintervals))
+bp<-bptest(RI~Si,data=DataSet)
 
 #get("permutations","package:gtools")(9,9,parvec)
 #etykiety <- sample(1:nrow(DataSet), round(nrow(DataSet)*0.5))
