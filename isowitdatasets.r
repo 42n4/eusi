@@ -79,18 +79,35 @@ zapisz_rpart(t01,paste(mypathout,nData,"_rpart_zsd"))
 
 if(nData=="Glass") parvecout=c("Type","RI")
 parvec=setdiff(names(DataSet),parvecout)
+moutput<-"RI"
 perm<-get("permutations","package:gtools")(8,1,parvec)
-lb<-c()
+lb<-c(); ibest<-0; br2<-0
 for(i in 1:nrow(perm)){
-m01<-evalwithattr(lm,"RI",as.vector(perm[i,]),DataSet);
+m01<-evalwithattr(lm,moutput,as.vector(perm[i,]),DataSet);
 an<-anova(lm(RI~1,DataSet),m01);
-if(qf(0.99,1,m01$df)<an$F[2]) lb<-c(lb, i);
-}
-perm[lb]
+sm01<-summary(m01)
 mintervals<-cut(m01$fitted.values,4)
-mresid<-m01$residuals
-lt<-levene.test(mresid,factor(mintervals))
+lt<-levene.test(m01$residuals,factor(mintervals))
+mintervals<-cut(m01$fitted.values,3)
+lt<-levene.test(m01$residuals,factor(mintervals))
+if(qf(0.99,1,m01$df)<an$F[2] && sm01$r.squared > br2 && lt$"Pr(>F)"[1]<0.05 && qf(0.95,lt$Df[1],lt$Df[2]) < lt$"F value"[1]){
+	br2<-sm01$r.squared
+	lb<-c(lb, i)
+	ibest<-i
+}
+}
+#najlepsza regresja liniowa bez logarytmów jedna zmienna niezale¿na
+ibest
+perm[lb]
+i<-ibest
+m01<-evalwithattr(lm,moutput,as.vector(perm[i,]),DataSet);
+sm01<-summary(m01)
+sm01
+plot(eval(parse(text=paste(moutput,"~",perm[i,]))),data=DataSet)
+abline(lsfit(eval(parse(text=paste("DataSet$",perm[i,]))), eval(parse(text=paste("DataSet$",moutput)))), col="red", lwd=3)
+
 bp<-bptest(RI~Si,data=DataSet)
+rs2<-summary(m01)[c("r.squared", "adj.r.squared")] 
 
 #get("permutations","package:gtools")(9,9,parvec)
 #etykiety <- sample(1:nrow(DataSet), round(nrow(DataSet)*0.5))
