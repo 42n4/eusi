@@ -31,7 +31,7 @@ for(i in biolist)
 #parvec - wektor zmiennych wej¶ciowych niezale¿nych dla modelu,
 #numvar - ile zmiennych z parvec ma wzi±æ udzia³ w permutacji zmiennych niezale¿nych
 lmwithattr<-function (DataSet, moutput, parvec, numvar){
-	perm<-get("permutations","package:gtools")(length(parvec),numvar,parvec)
+	perm<-get("combinations","package:gtools")(length(parvec),numvar,parvec)
 	lb<-c(); ibest<-0; br2<-0
 	for(i in 1:nrow(perm)){
 		m01<-evalwithattr(lm,moutput,paste(perm[i,],collapse="+"),DataSet);

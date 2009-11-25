@@ -84,7 +84,7 @@ if(nData=="Glass") moutput<-"RI"
 
 #najlepsza regresja liniowa bez logarytmów i innych - jedna zmienna niezale¿na
 numvar<-1
-perm<-get("permutations","package:gtools")(length(parvec),numvar,parvec)
+perm<-get("combinations","package:gtools")(length(parvec),numvar,parvec)
 ilist<-lmwithattr(DataSet,moutput,parvec,numvar)
 i<-ilist[[1]]; lb<-ilist[[2]]
 if(numvar<10)mnv<-paste("m0",numvar,sep="")else mnv<-paste("m",numvar,sep="")
@@ -94,8 +94,8 @@ assign(smnv,summary(get(mnv)))
 get(smnv)
 plot(eval(parse(text=paste(moutput,"~",perm[i,]))),data=DataSet)
 abline(lsfit(eval(parse(text=paste("DataSet$",perm[i,]))), eval(parse(text=paste("DataSet$",moutput)))), col="red", lwd=3)
-bp<-bptest(RI~Si,data=DataSet)
-rs2<-summary(m01)[c("r.squared", "adj.r.squared")] 
+#bp<-bptest(RI~Si,data=DataSet)
+#rs2<-summary(m01)[c("r.squared", "adj.r.squared")] 
 Vif(m01)
 #vif(m01)
 
@@ -106,7 +106,7 @@ Vif(m01)
 #na s³abszych
 #for(numvar in 2:3){
 for(numvar in 2:3){
-	perm<-get("permutations","package:gtools")(length(parvec),numvar,parvec)
+	perm<-get("combinations","package:gtools")(length(parvec),numvar,parvec)
 	ilist<-lmwithattr(DataSet,moutput,parvec,numvar)
 	if(numvar<10)lbnv<-paste("lb0",numvar,sep="")else lbnv<-paste("lb",numvar,sep="")
 	i<-ilist[[1]]; assign(lbnv,ilist[[2]]);
