@@ -1,7 +1,7 @@
 Sys.setlocale("LC_NUMERIC","C")
 
 #lista pakietów z CRAN-u
-pkglist<-c("car","lmtest","gregmisc","foreign","plyr","mlbench","boot","Hmisc","RWeka","ipred","klaR","ROCR","rpart","dprep","maptree","party","grid","lattice","latticeExtra","playwith","ada","randomForest","kknn","e1071","cluster","class","caret","fda","zoo","lattice","deal","RJDBC","cairoDevice")
+pkglist<-c("splines","betareg","ellipse","nlme","MASS","leaps","car","lmtest","gregmisc","foreign","plyr","mlbench","boot","Hmisc","RWeka","ipred","klaR","ROCR","rpart","dprep","maptree","party","grid","lattice","latticeExtra","playwith","ada","randomForest","kknn","e1071","cluster","class","caret","fda","zoo","lattice","deal","RJDBC","cairoDevice")
 pkgcheck <- pkglist %in% row.names(installed.packages())
 for(i in pkglist[!pkgcheck]){
 	install.packages(i,depend=TRUE)
@@ -25,6 +25,55 @@ for(i in biolist)
 #############################################################################
 #Funkcje podstawowe niezbêdne do normalnego odzyskiwania wiedzy
 #############################################################################
+
+#Funkcja lmwithattr znajduje najlepsz± liniow± regresjê dla parametrów
+#moutput - wyj¶cie modelu zmienna zale¿na np. "RI", 
+#parvec - wektor zmiennych wej¶ciowych niezale¿nych dla modelu,
+#numvar - ile zmiennych z parvec ma wzi±æ udzia³ w permutacji zmiennych niezale¿nych
+lmwithattr<-function (DataSet, moutput, parvec, numvar){
+	perm<-get("permutations","package:gtools")(length(parvec),numvar,parvec)
+	lb<-c(); ibest<-0; br2<-0
+	for(i in 1:nrow(perm)){
+		m01<-evalwithattr(lm,moutput,paste(perm[i,],collapse="+"),DataSet);
+		an<-anova(lm(RI~1,DataSet),m01);
+		sm01<-summary(m01)
+		mintervals<-cut(m01$fitted.values,4)
+		lt<-levene.test(m01$residuals,factor(mintervals))
+		mintervals<-cut(m01$fitted.values,3)
+		lt<-levene.test(m01$residuals,factor(mintervals))
+		if(qf(0.99,1,m01$df)<an$F[2] && sm01$r.squared > br2 && lt$"Pr(>F)"[1]<0.05 && qf(0.95,lt$Df[1],lt$Df[2]) < lt$"F value"[1]){
+			br2<-sm01$r.squared
+			lb<-c(lb, i)
+			ibest<-i
+		}
+	}
+	return (list(ibest,lb))
+}
+
+#Metoda funkcja Vif okre¶la stopieñ korelacji zmiennych niezale¿nych, 
+#podaje warto¶ci takie same jak vif z pakietu car, a jest prostsza i dzia³a dla jednej zmiennej (podaje 1) 
+Vif <- function(object, ...)
+	UseMethod("Vif")
+
+Vif.default <- function(object, ...)
+	stop("No default method for Vif.  Sorry.")
+
+Vif.lm <- function(object, ...) {       
+	V <- summary(object)$cov.unscaled
+	Vi <- crossprod(model.matrix(object))
+	nam <- names(coef(object))
+	if(k <- match("(Intercept)", nam, nomatch = F)) {
+		v1 <- diag(V)[-k]
+		v2 <- (diag(Vi)[-k] - Vi[k, -k]^2/Vi[k,k])
+		nam <- nam[-k]
+	} else {
+		v1 <- diag(V)
+		v2 <- diag(Vi)
+		warning("No intercept term detected.  Results may
+						surprise.")
+	}
+	structure(v1*v2, names = nam)
+}
 
 #Funkcja evalwithattr wywo³uje podan± funkcjê z wyj¶ciowym atrybutem output i 
 #wej¶ciowymi atrybutami parvec oraz zbiorem danych
@@ -55,41 +104,41 @@ defactor.numeric<-function (DataSet, parvec)
 #Funkcja zscore.for.integer zetskoruje wybrane kolumny z liczbami zmiennoprzecinkowymi i ca³kowitymi po kolumnie zdyskretyzowanej (etykiecie) integercolumnforzscore dla poszczególnych jej warto¶ci
 zscore.for.integer<-function (DataSet, parvec, integercolumnforzscore)         
 {
-indata<-DataSet
-for(i in c(sort(unique(DataSet[[integercolumnforzscore]])))){
-indata[(indata[[integercolumnforzscore]]==i),]=zscore(indata[(indata[[integercolumnforzscore]]==i),],which(names(indata) %in% parvec))
-}
-return(indata)
+	indata<-DataSet
+	for(i in c(sort(unique(DataSet[[integercolumnforzscore]])))){
+		indata[(indata[[integercolumnforzscore]]==i),]=zscore(indata[(indata[[integercolumnforzscore]]==i),],which(names(indata) %in% parvec))
+	}
+	return(indata)
 }
 
 #Funkcja discret.for.chosen dyskretyzujê atrybuty (kolumny) z parvec na levelnum poziomów
 disc.for.chosen<-function (DataSet, parvec, levelnum)         
 {
-DataSetd<-DataSet
-DataSetd[names(DataSet) %in% parvec]<-disc.ef(DataSet[names(DataSet) %in% parvec], which(names(DataSetz) %in% parvec), levelnum)
-DataSetd<-factorto(DataSetd, which(names(DataSetd) %in% parvec))
-return(DataSetd)
+	DataSetd<-DataSet
+	DataSetd[names(DataSet) %in% parvec]<-disc.ef(DataSet[names(DataSet) %in% parvec], which(names(DataSetz) %in% parvec), levelnum)
+	DataSetd<-factorto(DataSetd, which(names(DataSetd) %in% parvec))
+	return(DataSetd)
 }
 
 #Funkcja KruskelMDS generuje z daisy ró¿nice miêdzy wierszami podanego zbioru i wprowadza do isoMDS rzutuj±cego na wymiary k=dimnum (jak siê pojawi± dwa takie same wiersze to wyrzuca b³±d, dlatego na samym pocz±tku usuwa³em wiersze z Glass
 KruskelMDS<-function (DataSet, parvec, dimnum)         
 {
-return(isoMDS(daisy(DataSet[,which(names(DataSet)%in%parvec)]),k=dimnum))
+	return(isoMDS(daisy(DataSet[,which(names(DataSet)%in%parvec)]),k=dimnum))
 }
 
 plotMDS.for.chosen<-function (fname, nDataSets, DataSet, parvec, wzorzec1)         
 {
-DataSet1<-DataSet[,which(names(DataSet)%in%parvec)]
-for(i in which(names(DataSet1)%in%parvec)){
-wzorzec=DataSet1[,i]
-#wzorzec1=2
-if(i < 10){
-zapisz_pplot(nDataSets,paste(fname,"_0",i,parvec[i],sep=""),wzorzec,wzorzec1,c('yellow','black','green','red','blue','cyan','magenta','pink'),c(17,16,15,18,20,9,10,12),3.5)
-#zapisz_pplot(nDataSets,paste(fname,"_0",i,parvec[i],sep=""),wzorzec,2,c('yellow','black','green','red','blue','cyan','magenta','pink'),c(17,16,15,18,20,9,10,12),wzorzec1)
-}else{
-zapisz_pplot(nDataSets,paste(fname,"_",i,parvec[i],sep=""),wzorzec,wzorzec1,c('yellow','black','green','red','blue','cyan','magenta','pink'),c(17,16,15,18,20,9,10,12),3.5)
-}
-}
+	DataSet1<-DataSet[,which(names(DataSet)%in%parvec)]
+	for(i in which(names(DataSet1)%in%parvec)){
+		wzorzec=DataSet1[,i]
+		#wzorzec1=2
+		if(i < 10){
+			zapisz_pplot(nDataSets,paste(fname,"_0",i,parvec[i],sep=""),wzorzec,wzorzec1,c('yellow','black','green','red','blue','cyan','magenta','pink'),c(17,16,15,18,20,9,10,12),3.5)
+			#zapisz_pplot(nDataSets,paste(fname,"_0",i,parvec[i],sep=""),wzorzec,2,c('yellow','black','green','red','blue','cyan','magenta','pink'),c(17,16,15,18,20,9,10,12),wzorzec1)
+		}else{
+			zapisz_pplot(nDataSets,paste(fname,"_",i,parvec[i],sep=""),wzorzec,wzorzec1,c('yellow','black','green','red','blue','cyan','magenta','pink'),c(17,16,15,18,20,9,10,12),3.5)
+		}
+	}
 }
 
 #Funkcja disc2 wykonywana w funkcji disc.ef
@@ -267,35 +316,35 @@ zapisz_rpart = function (drzewo, fname)
 
 #Funkcja hier2jpg zapisuje dendogram w pliku jpeg
 hier2jpg<-function(inmethod,indata,fname){
-indatanum<-indata[, sapply(indata, class) == "numeric"]
-cc <- cor(indatanum, use="pairwise", method=inmethod)
-# Generate hierarchical cluster of variables.
-hc <- hclust(dist(cc), "ave")
-# Generate the dendrogram.
-dn <- as.dendrogram(hc)
-# Now draw the dendrogram.
-#op <- par(mar = c(3, 4, 3, 2.86))
-jpeg(file=paste("/media/disk/guest/obrazki/",fname,".jpg",sep=""),width = 1200, height = 1000, quality = 55, bg = "white")
-par(mar=c(9,9,9,9))
-plot(dn, horiz = TRUE, nodePar = list(col = 3:2, cex = c(2.0, 0.75), pch = 21:22, bg=  c("light blue", "black"), lab.cex = 3.75, cex.main = 1.8, cex.axis = 1.2,  lab.col = "tomato"), edgePar = list(col = "gray", lwd = 2))
-title(main=paste("Variable Correlation Clusters ",as.character(substitute(indata)),"using",inmethod),cex.main=2)
-#par(op)
-dev.off()
+	indatanum<-indata[, sapply(indata, class) == "numeric"]
+	cc <- cor(indatanum, use="pairwise", method=inmethod)
+	# Generate hierarchical cluster of variables.
+	hc <- hclust(dist(cc), "ave")
+	# Generate the dendrogram.
+	dn <- as.dendrogram(hc)
+	# Now draw the dendrogram.
+	#op <- par(mar = c(3, 4, 3, 2.86))
+	jpeg(file=paste("/media/disk/guest/obrazki/",fname,".jpg",sep=""),width = 1200, height = 1000, quality = 55, bg = "white")
+	par(mar=c(9,9,9,9))
+	plot(dn, horiz = TRUE, nodePar = list(col = 3:2, cex = c(2.0, 0.75), pch = 21:22, bg=  c("light blue", "black"), lab.cex = 3.75, cex.main = 1.8, cex.axis = 1.2,  lab.col = "tomato"), edgePar = list(col = "gray", lwd = 2))
+	title(main=paste("Variable Correlation Clusters ",as.character(substitute(indata)),"using",inmethod),cex.main=2)
+	#par(op)
+	dev.off()
 }
 
 #Funkcja latt2jpg zapisuje lattice w pliku jpeg
 latt2jpg<-function(indata, gvec, fname){
-dat<-indata[, sapply(indata, class) == "numeric"]
-jpeg(file=paste("/media/disk/guest/obrazki/",fname,".jpg",sep=""),width = 1200, height = 1000, quality = 55, bg = "white")
-## Assuming that the data are attached and any
-## customised style settings are in place; save with
-## myStyle <- trellis.par.get(); then restore with
-## trellis.par.set(myStyle)
-fvec=as.character(substitute(gvec))
-print(marginal.plot(dat, data = dat, groups = gvec, par.settings = list(cex=2.6), auto.key = list(lines = TRUE, title = paste("Variable Plots by ",fvec[3]), cex.title = 3, columns = 2)))
-opar <- trellis.par.set(list(plot.symbol = list( cex = 2.6), dot.symbol = list( cex = 2.6), par.main = list( cex = 2.6), par.sub.text = list( cex = 2.6), par.xlab.text = list( cex = 2.6), plot.line = list(), plot.polygon = list(), superpose.symbol = list(cex = 2.6), superpose.line = list(), superpose.polygon = list()))
-#latticeStyleToBasePar()
-on.exit(trellis.par.set(opar))
-dev.off()
+	dat<-indata[, sapply(indata, class) == "numeric"]
+	jpeg(file=paste("/media/disk/guest/obrazki/",fname,".jpg",sep=""),width = 1200, height = 1000, quality = 55, bg = "white")
+	## Assuming that the data are attached and any
+	## customised style settings are in place; save with
+	## myStyle <- trellis.par.get(); then restore with
+	## trellis.par.set(myStyle)
+	fvec=as.character(substitute(gvec))
+	print(marginal.plot(dat, data = dat, groups = gvec, par.settings = list(cex=2.6), auto.key = list(lines = TRUE, title = paste("Variable Plots by ",fvec[3]), cex.title = 3, columns = 2)))
+	opar <- trellis.par.set(list(plot.symbol = list( cex = 2.6), dot.symbol = list( cex = 2.6), par.main = list( cex = 2.6), par.sub.text = list( cex = 2.6), par.xlab.text = list( cex = 2.6), plot.line = list(), plot.polygon = list(), superpose.symbol = list(cex = 2.6), superpose.line = list(), superpose.polygon = list()))
+	#latticeStyleToBasePar()
+	on.exit(trellis.par.set(opar))
+	dev.off()
 }
 
