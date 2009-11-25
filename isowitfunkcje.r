@@ -32,7 +32,7 @@ for(i in biolist)
 #i oblicza dla nich regresje i wybiera najlepsz± dla ka¿dego n, wraca listê najlepszych obiektów z kolejnych iteracji  
 #w lb<n> mamy wybierane po kolei kolejne zestawy na najlepsz± regresjê 
 #w m<n> najlepszy model dla n, w sm<n> summary(m<n>), dla n=1 rysuje plot regresji
-permregres<-function (mDataSet, moutput, parvec, nleven, alpha){
+permregres<-function (fname, mDataSet, moutput, parvec, nleven, alpha){
 	l<-list()
 	for(numvar in 1:length(parvec)){
 		ilist<-lmwithattr(mDataSet,moutput,parvec,numvar,nleven,alpha)
@@ -58,8 +58,15 @@ permregres<-function (mDataSet, moutput, parvec, nleven, alpha){
 			l[[smnv]]<-get(smnv)
 		}
 		if(numvar==1){
+			jpeg(file=paste(fname,numvar,"_1.jpg",sep=""),width = 1200, height = 1000, quality = 55, bg = "white")
+			par(lwd=4)
 			plot(eval(parse(text=paste(moutput,"~",varvec))),data=mDataSet)
 			abline(lsfit(eval(parse(text=paste("mDataSet$",varvec))), eval(parse(text=paste("mDataSet$",moutput)))), col="red", lwd=3)
+			dev.off()
+			jpeg(file=paste(fname,numvar,"_2.jpg",sep=""),width = 1200, height = 1000, quality = 55, bg = "white")
+			par(mfrow=c(2,2))
+			plot(get(mnv))
+			dev.off()
 		}
 	}
 	return (l)
@@ -346,6 +353,7 @@ z4na3<-function (indata, varcon)
     indata
 }
 
+
 #Funkcja zapisz_pplot zapisuje wykres rzutu wielowymiarowego w pliku jpeg
 zapisz_pplot = function (npointszds,fname,wzorzec1,wzorzec2,co,pc,scex)
 {
@@ -374,6 +382,20 @@ zapisz_rpart = function (drzewo, fname)
    # plot(drzewo,uniform=T,branch=0.3,compress=T,margin=0.02)
    # text(drzewo,all=T,use.n=T, fancy=T)
     dev.off()
+}
+
+#próba napisania uniwersalej funkcji write2jpg
+write2jpg <- function(object, ...)
+	UseMethod("write2jpg")
+
+write2jpg.default <- function(object, ...)
+	stop("No default method for write2jpg.  Sorry.")
+
+write2jpg.lm <- function(object, ...) {       
+	jpeg(file=paste(fname,".jpg",sep=""),width = 1200, height = 1000, quality = 55, bg = "white")
+	par(lwd=4)
+	
+	dev.off()
 }
 
 #Funkcja hier2jpg zapisuje dendogram w pliku jpeg

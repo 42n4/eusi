@@ -103,36 +103,36 @@ alpha<-0.1
 nleven<--1; 
 #wybieramy dane normalne
 mDataSet<-DataSet
-nobp<-permregres(mDataSet, moutput, parvec, nleven, alpha)
+nobp<-permregres(paste(mypathout,nData,"_lmno_nobp"),mDataSet, moutput, parvec, nleven, alpha)
 #wybieramy dane zeskorowane
 mDataSet<-DataSetz
-zebp<-permregres(mDataSet, moutput, parvec, nleven, alpha)
+zebp<-permregres(paste(mypathout,nData,"_lmno_zebp"),mDataSet, moutput, parvec, nleven, alpha)
 #wybieramy dane zeskalowane i zcentrowane
 mDataSet<-DataSetm
 #skalowanie likwiduje intercept wspó³czynnik przesuniêcia prostej
-msbp<-permregres(mDataSet, moutput, parvec, nleven, alpha)
+msbp<-permregres(paste(mypathout,nData,"_lmno_msbp"),mDataSet, moutput, parvec, nleven, alpha)
 
 ##########################################################################################################
 #dla nleven > 0 levena ilo¶æ przedzia³ów, dla nleven < 0 bptest, dla nleven == 0 brak testów wariancji
 #brak testów wariancji
 nleven<-0; 
 mDataSet<-DataSet
-nona<-permregres(mDataSet, moutput, parvec, nleven, alpha)
+nono<-permregres(paste(mypathout,nData,"_lmno_nono"),mDataSet, moutput, parvec, nleven, alpha)
 mDataSet<-DataSetz
-zena<-permregres(mDataSet, moutput, parvec, nleven, alpha)
+zeno<-permregres(paste(mypathout,nData,"_lmno_zeno"),mDataSet, moutput, parvec, nleven, alpha)
 mDataSet<-DataSetm
-msna<-permregres(mDataSet, moutput, parvec, nleven, alpha)
+msno<-permregres(paste(mypathout,nData,"_lmno_msno"),mDataSet, moutput, parvec, nleven, alpha)
 
 ##########################################################################################################
 #dla nleven > 0 levena ilo¶æ przedzia³ów, dla nleven < 0 bptest, dla nleven == 0 brak testów wariancji
 #brak testów wariancji
 nleven<-3; 
 mDataSet<-DataSet
-nolt<-permregres(mDataSet, moutput, parvec, nleven, alpha)
+nolt<-permregres(paste(mypathout,nData,"_lmno_nolt"),mDataSet, moutput, parvec, nleven, alpha)
 mDataSet<-DataSetz
-zelt<-permregres(mDataSet, moutput, parvec, nleven, alpha)
+zelt<-permregres(paste(mypathout,nData,"_lmno_zelt"),mDataSet, moutput, parvec, nleven, alpha)
 mDataSet<-DataSetm
-mslt<-permregres(mDataSet, moutput, parvec, nleven, alpha)
+mslt<-permregres(paste(mypathout,nData,"_lmno_mslt"),mDataSet, moutput, parvec, nleven, alpha)
 
 
 #bp<-bptest(RI~Si,data=DataSet)
