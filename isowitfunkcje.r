@@ -30,20 +30,26 @@ for(i in biolist)
 
 #Funkcja permregres liczy permutacje zmiennych niezale¿nych dla n=1 do n równego ilo¶æ wszystkich zmiennych 
 #i oblicza dla nich regresje i wybiera najlepsz± dla ka¿dego n, wraca listê najlepszych obiektów z kolejnych iteracji  
-#w lb<n> mamy wybierane po kolei kolejne zestawy na najepsz± regresjê 
-#w m<n> najlepszy model dla n, w sm<n> summary(m<n>)
-permregres<-function (mDataSet, moutput, parvec){
+#w lb<n> mamy wybierane po kolei kolejne zestawy na najlepsz± regresjê 
+#w m<n> najlepszy model dla n, w sm<n> summary(m<n>), dla n=1 rysuje plot regresji
+permregres<-function (mDataSet, moutput, parvec, nleven, alpha){
 	l<-list()
-	for(numvar in 1:(length(parvec)-1)){
-		perm<-get("combinations","package:gtools")(length(parvec),numvar,parvec)
-		ilist<-lmwithattr(mDataSet,moutput,parvec,numvar)
+	for(numvar in 1:length(parvec)){
+		ilist<-lmwithattr(mDataSet,moutput,parvec,numvar,nleven,alpha)
 		i<-ilist[[1]]; 
+		if(numvar<length(parvec)){
+			perm<-get("combinations","package:gtools")(length(parvec),numvar,parvec)
+			varplus<-paste(perm[i,],collapse="+")
+			varvec<-perm[i,]
+		}else{
+			varplus<-parvec; varvec<-parvec
+		}
 		if(i){
 			if(numvar<10)mnv<-paste("m0",numvar,sep="")else mnv<-paste("m",numvar,sep="")
 			if(numvar<10)smnv<-paste("sm0",numvar,sep="")else smnv<-paste("sm",numvar,sep="")
 			if(numvar<10)lbnv<-paste("lb0",numvar,sep="")else lbnv<-paste("lb",numvar,sep="")
 			assign(lbnv,ilist[[2]]);
-			assign(mnv,evalwithattr(lm,moutput,paste(perm[i,],collapse="+"),mDataSet));
+			assign(mnv,evalwithattr(lm,moutput,varplus,mDataSet));
 			assign(smnv,summary(get(mnv)))
 			get(smnv)
 			Vif(get(mnv))
@@ -52,8 +58,8 @@ permregres<-function (mDataSet, moutput, parvec){
 			l[[smnv]]<-get(smnv)
 		}
 		if(numvar==1){
-			plot(eval(parse(text=paste(moutput,"~",perm[i,]))),data=mDataSet)
-			abline(lsfit(eval(parse(text=paste("mDataSet$",perm[i,]))), eval(parse(text=paste("mDataSet$",moutput)))), col="red", lwd=3)
+			plot(eval(parse(text=paste(moutput,"~",varvec))),data=mDataSet)
+			abline(lsfit(eval(parse(text=paste("mDataSet$",varvec))), eval(parse(text=paste("mDataSet$",moutput)))), col="red", lwd=3)
 		}
 	}
 	return (l)
@@ -64,16 +70,34 @@ permregres<-function (mDataSet, moutput, parvec){
 #moutput - wyj¶cie modelu zmienna zale¿na np. "RI", 
 #parvec - wektor zmiennych wej¶ciowych niezale¿nych dla modelu,
 #numvar - ile zmiennych z parvec ma wzi±æ udzia³ w permutacji zmiennych niezale¿nych
-lmwithattr<-function (DataSet, moutput, parvec, numvar){
-	perm<-get("combinations","package:gtools")(length(parvec),numvar,parvec)
-	lb<-c(); ibest<-0; br2<-0
-	for(i in 1:nrow(perm)){
-		m01<-evalwithattr(lm,moutput,paste(perm[i,],collapse="+"),DataSet);
+lmwithattr<-function (DataSet, moutput, parvec, numvar,nleven,alpha){
+	if(numvar<length(parvec)){
+		perm<-get("combinations","package:gtools")(length(parvec),numvar,parvec)
+		rowperm<-nrow(perm)
+	}
+	else{
+		perm<-parvec
+		rowperm<-1
+	}
+	lb<-c(); ibest<-0; br2<-0;
+	for(i in 1:rowperm){
+		if(numvar<length(parvec))
+			varplus<-paste(perm[i,],collapse="+")
+		else
+			varplus<-paste(parvec,collapse="+")
+		m01<-evalwithattr(lm,moutput,varplus,DataSet);
 		an<-anova(lm(RI~1,DataSet),m01);
 		sm01<-summary(m01)
-		mintervals<-cut(m01$fitted.values,4)
-		lt<-levene.test(m01$residuals,factor(mintervals))
-		if(qf(0.99,1,m01$df)<an$F[2] && sm01$r.squared > br2 && lt$"Pr(>F)"[1]<0.05 && qf(0.95,lt$Df[1],lt$Df[2]) < lt$"F value"[1]){
+		if(nleven>0){
+			mintervals<-cut(m01$fitted.values,nleven)
+			lt<-levene.test(m01$residuals,factor(mintervals))
+		}
+		if(nleven<0)
+			bp<-evalwithattr(bptest,moutput,varplus,DataSet)
+		#levene pominiêty dla nleven=0, dla nleven < 0 bptest
+		if((nleven==0 && qf(0.99,1,m01$df)<an$F[2] && sm01$r.squared > br2) 
+  			|| (nleven < 0 && qf(0.99,1,m01$df)<an$F[2] && sm01$r.squared > br2 && bp$p.value > alpha)
+			|| (nleven > 0 && qf(0.99,1,m01$df)<an$F[2] && sm01$r.squared > br2 && lt$"Pr(>F)"[1] > alpha && qf(1-alpha,lt$Df[1],lt$Df[2]) > lt$"F value"[1])){
 			br2<-sm01$r.squared
 			lb<-c(lb, i)
 			ibest<-i
@@ -112,13 +136,8 @@ Vif.lm <- function(object, ...) {
 evalwithattr<-function(oFunction,output,parvec,oData)
 {
 	tmp=paste(deparse(substitute(oFunction)),"(",output,"~")
-	j=0
-	for(i in parvec){
-		j=j+1
-		if(j==1) tmp<-paste(tmp,i)
-		else 	 tmp<-paste(tmp,"+",i)
-	}
-	tmp<-paste(tmp,",data=",deparse(substitute(oData)),")",sep="")
+	parvec<-paste(parvec,collapse="+")
+	tmp<-paste(tmp,parvec,",data=",deparse(substitute(oData)),")",sep="")
 	return(eval(parse(text=tmp)))
 }
 

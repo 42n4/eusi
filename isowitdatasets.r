@@ -86,43 +86,53 @@ zapisz_rpart(t01,paste(mypathout,nData,"_rpart_nrd"))
 t01<-evalwithattr(rpart,"Type",parvec,DataSetzd)
 zapisz_rpart(t01,paste(mypathout,nData,"_rpart_zsd"))
 
+##########################################################################################################
+
 #zbiór zmiennych niezale¿nych (teoretycznie)
 if(nData=="Glass") parvecout=c("Type","RI")
 parvec=setdiff(names(DataSet),parvecout)
 #wybieramy zmienn± zale¿n±
 if(nData=="Glass") moutput<-"RI"
+
+##########################################################################################################
+#alpha to krytyczna warto¶æ prawdopodobieñstwa p dla statystyk bp i f 
+alpha<-0.1
+##########################################################################################################
+#dla nleven > 0 levena ilo¶æ przedzia³ów, dla nleven < 0 bptest, dla nleven == 0 brak testów wariancji
+#bptest
+nleven<--1; 
 #wybieramy dane normalne
 mDataSet<-DataSet
-#najlepsza regresja liniowa bez logarytmów i innych - jedna,dwie,trzy itd. zmienne niezale¿ne w permutacjach
-#okazuje siê, ¿e r2 dla powy¿ej 3 zmiennych nie zwiêksza siê znacz±co dla zbioru Glass
-#dla numvar=1 rysuje wykres punktów i regresji
-n<-permregres(mDataSet, moutput, parvec)
-
-#zbiór zmiennych niezale¿nych (teoretycznie)
-if(nData=="Glass") parvecout=c("Type","RI")
-parvec=setdiff(names(DataSet),parvecout)
-#wybieramy zmienn± zale¿n±
-if(nData=="Glass") moutput<-"RI"
+nobp<-permregres(mDataSet, moutput, parvec, nleven, alpha)
 #wybieramy dane zeskorowane
 mDataSet<-DataSetz
-#najlepsza regresja liniowa bez logarytmów i innych - jedna,dwie,trzy itd. zmienne niezale¿ne w permutacjach
-#okazuje siê, ¿e dla danych zeskorowanych r2 dla powy¿ej 4 zmiennych nie zwiêksza siê znacz±co dla zbioru Glass
-#zatem jest poprawa w stosunku do normalnych danych
-#dla numvar=1 rysuje wykres punktów i regresji
-z<-permregres(mDataSet, moutput, parvec)
-
-#zbiór zmiennych niezale¿nych (teoretycznie)
-if(nData=="Glass") parvecout=c("Type","RI")
-parvec=setdiff(names(DataSet),parvecout)
-#wybieramy zmienn± zale¿n±
-if(nData=="Glass") moutput<-"RI"
+zebp<-permregres(mDataSet, moutput, parvec, nleven, alpha)
 #wybieramy dane zeskalowane i zcentrowane
 mDataSet<-DataSetm
-#najlepsza regresja liniowa bez logarytmów i innych - jedna,dwie,trzy itd. zmienne niezale¿ne w permutacjach
-#okazuje siê, ¿e dla danych zeskorowanych r2 dla powy¿ej 4 zmiennych nie zwiêksza siê znacz±co dla zbioru Glass
-#zatem jest poprawa w stosunku do normalnych danych
-#dla numvar=1 rysuje wykres punktów i regresji
-ms<-permregres(mDataSet, moutput, parvec)
+#skalowanie likwiduje intercept wspó³czynnik przesuniêcia prostej
+msbp<-permregres(mDataSet, moutput, parvec, nleven, alpha)
+
+##########################################################################################################
+#dla nleven > 0 levena ilo¶æ przedzia³ów, dla nleven < 0 bptest, dla nleven == 0 brak testów wariancji
+#brak testów wariancji
+nleven<-0; 
+mDataSet<-DataSet
+nona<-permregres(mDataSet, moutput, parvec, nleven, alpha)
+mDataSet<-DataSetz
+zena<-permregres(mDataSet, moutput, parvec, nleven, alpha)
+mDataSet<-DataSetm
+msna<-permregres(mDataSet, moutput, parvec, nleven, alpha)
+
+##########################################################################################################
+#dla nleven > 0 levena ilo¶æ przedzia³ów, dla nleven < 0 bptest, dla nleven == 0 brak testów wariancji
+#brak testów wariancji
+nleven<-3; 
+mDataSet<-DataSet
+nolt<-permregres(mDataSet, moutput, parvec, nleven, alpha)
+mDataSet<-DataSetz
+zelt<-permregres(mDataSet, moutput, parvec, nleven, alpha)
+mDataSet<-DataSetm
+mslt<-permregres(mDataSet, moutput, parvec, nleven, alpha)
 
 
 #bp<-bptest(RI~Si,data=DataSet)
