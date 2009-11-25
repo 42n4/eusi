@@ -1,7 +1,9 @@
 Sys.setlocale("LC_NUMERIC","C")
 
 #lista pakietów z CRAN-u
-pkglist<-c("gRain","splines","betareg","ellipse","nlme","MASS","leaps","car","lmtest","gregmisc","foreign","plyr","mlbench","boot","Hmisc","RWeka","ipred","klaR","ROCR","rpart","dprep","maptree","party","grid","lattice","latticeExtra","playwith","ada","randomForest","kknn","e1071","cluster","class","caret","fda","zoo","lattice","deal","RJDBC","cairoDevice")
+#naprawiæ pakier gRain
+#pkglist<-c("gRain","splines","betareg","ellipse","nlme","MASS","leaps","car","lmtest","gregmisc","foreign","plyr","mlbench","boot","Hmisc","RWeka","ipred","klaR","ROCR","rpart","dprep","maptree","party","grid","lattice","latticeExtra","playwith","ada","randomForest","kknn","e1071","cluster","class","caret","fda","zoo","lattice","deal","RJDBC","cairoDevice")
+pkglist<-c("splines","betareg","ellipse","nlme","MASS","leaps","car","lmtest","gregmisc","foreign","plyr","mlbench","boot","Hmisc","RWeka","ipred","klaR","ROCR","rpart","dprep","maptree","party","grid","lattice","latticeExtra","playwith","ada","randomForest","kknn","e1071","cluster","class","caret","fda","zoo","lattice","deal","RJDBC","cairoDevice")
 pkgcheck <- pkglist %in% row.names(installed.packages())
 for(i in pkglist[!pkgcheck]){
 	install.packages(i,depend=TRUE)
@@ -26,6 +28,38 @@ for(i in biolist)
 #Funkcje podstawowe niezbêdne do normalnego odzyskiwania wiedzy
 #############################################################################
 
+#Funkcja permregres liczy permutacje zmiennych niezale¿nych dla n=1 do n równego ilo¶æ wszystkich zmiennych 
+#i oblicza dla nich regresje i wybiera najlepsz± dla ka¿dego n, wraca listê najlepszych obiektów z kolejnych iteracji  
+#w lb<n> mamy wybierane po kolei kolejne zestawy na najepsz± regresjê 
+#w m<n> najlepszy model dla n, w sm<n> summary(m<n>)
+permregres<-function (mDataSet, moutput, parvec){
+	l<-list()
+	for(numvar in 1:(length(parvec)-1)){
+		perm<-get("combinations","package:gtools")(length(parvec),numvar,parvec)
+		ilist<-lmwithattr(mDataSet,moutput,parvec,numvar)
+		i<-ilist[[1]]; 
+		if(i){
+			if(numvar<10)mnv<-paste("m0",numvar,sep="")else mnv<-paste("m",numvar,sep="")
+			if(numvar<10)smnv<-paste("sm0",numvar,sep="")else smnv<-paste("sm",numvar,sep="")
+			if(numvar<10)lbnv<-paste("lb0",numvar,sep="")else lbnv<-paste("lb",numvar,sep="")
+			assign(lbnv,ilist[[2]]);
+			assign(mnv,evalwithattr(lm,moutput,paste(perm[i,],collapse="+"),mDataSet));
+			assign(smnv,summary(get(mnv)))
+			get(smnv)
+			Vif(get(mnv))
+			l[[lbnv]]<-get(lbnv)
+			l[[mnv]]<-get(mnv)
+			l[[smnv]]<-get(smnv)
+		}
+		if(numvar==1){
+			plot(eval(parse(text=paste(moutput,"~",perm[i,]))),data=mDataSet)
+			abline(lsfit(eval(parse(text=paste("mDataSet$",perm[i,]))), eval(parse(text=paste("mDataSet$",moutput)))), col="red", lwd=3)
+		}
+	}
+	return (l)
+}
+
+
 #Funkcja lmwithattr znajduje najlepsz± liniow± regresjê dla parametrów
 #moutput - wyj¶cie modelu zmienna zale¿na np. "RI", 
 #parvec - wektor zmiennych wej¶ciowych niezale¿nych dla modelu,
@@ -38,8 +72,6 @@ lmwithattr<-function (DataSet, moutput, parvec, numvar){
 		an<-anova(lm(RI~1,DataSet),m01);
 		sm01<-summary(m01)
 		mintervals<-cut(m01$fitted.values,4)
-		lt<-levene.test(m01$residuals,factor(mintervals))
-		mintervals<-cut(m01$fitted.values,3)
 		lt<-levene.test(m01$residuals,factor(mintervals))
 		if(qf(0.99,1,m01$df)<an$F[2] && sm01$r.squared > br2 && lt$"Pr(>F)"[1]<0.05 && qf(0.95,lt$Df[1],lt$Df[2]) < lt$"F value"[1]){
 			br2<-sm01$r.squared
@@ -100,6 +132,17 @@ defactor.numeric<-function (DataSet, parvec)
 	}
  	return (DataSet)
 }
+
+#Funkcja scale.numeric skaluje wybrane numeryczne kolumny z liczbami zmiennoprzecinkowymi i ca³kowitymi
+#z paramerami CENTER=TRUE mean=0, a dla SCALE=TRUE sd=1
+scale_for<-function (DataSet, parvec, CENTER, SCALE)         
+{
+	mtemp<-DataSet[parvec]
+	mtemp<-as.data.frame(scale(mtemp,center=CENTER,scale=SCALE))
+	DataSet[parvec]<-mtemp
+	return (DataSet)
+}
+
 
 #Funkcja zscore.for.integer zetskoruje wybrane kolumny z liczbami zmiennoprzecinkowymi i ca³kowitymi po kolumnie zdyskretyzowanej (etykiecie) integercolumnforzscore dla poszczególnych jej warto¶ci
 zscore.for.integer<-function (DataSet, parvec, integercolumnforzscore)         

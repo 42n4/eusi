@@ -29,6 +29,15 @@ DataSet<-factorto(DataSet, which(names(DataSet) %in% parvecfactor))
 #najpierw defaktoryzujê i oznaczam jako numeryczne kolumny z liczbami zmiennoprzecinkowymi i ca³kowitymi, tak na wszelki wypadek, gdyby csv ¼le siê wczyta³ (w przypadku zbiorów data() to tylko æwiczenie)
 DataSet<-defactor.numeric(DataSet, parvec)
 
+#skaluje wszystkie zmiennoprzecinkowe atrybuty do mean=0 i sd=1
+DataSetms<-scale_for(DataSet,parvec,TRUE,TRUE)
+
+#skaluje wszystkie zmiennoprzecinkowe atrybuty do sd=1
+DataSets<-scale_for(DataSet,parvec,FALSE,TRUE)
+
+#skaluje wszystkie zmiennoprzecinkowe atrybuty do mean=0
+DataSetm<-scale_for(DataSet,parvec,TRUE,FALSE)
+
 #zetskorujê wybrane kolumny z liczbami zmiennoprzecinkowymi i ca³kowitymi
 DataSetz<-zscore.for.integer(DataSet,parvec,c("Type"))
 
@@ -77,35 +86,47 @@ zapisz_rpart(t01,paste(mypathout,nData,"_rpart_nrd"))
 t01<-evalwithattr(rpart,"Type",parvec,DataSetzd)
 zapisz_rpart(t01,paste(mypathout,nData,"_rpart_zsd"))
 
+#zbiór zmiennych niezale¿nych (teoretycznie)
 if(nData=="Glass") parvecout=c("Type","RI")
 parvec=setdiff(names(DataSet),parvecout)
+#wybieramy zmienn± zale¿n±
 if(nData=="Glass") moutput<-"RI"
-
+#wybieramy dane normalne
+mDataSet<-DataSet
 #najlepsza regresja liniowa bez logarytmów i innych - jedna,dwie,trzy itd. zmienne niezale¿ne w permutacjach
 #okazuje siê, ¿e r2 dla powy¿ej 3 zmiennych nie zwiêksza siê znacz±co dla zbioru Glass
 #dla numvar=1 rysuje wykres punktów i regresji
-for(numvar in 1:(length(parvec)-1)){
-	perm<-get("combinations","package:gtools")(length(parvec),numvar,parvec)
-	ilist<-lmwithattr(DataSet,moutput,parvec,numvar)
-	if(numvar<10)lbnv<-paste("lb0",numvar,sep="")else lbnv<-paste("lb",numvar,sep="")
-	i<-ilist[[1]]; assign(lbnv,ilist[[2]]);
-	if(i){
-		if(numvar<10)mnv<-paste("m0",numvar,sep="")else mnv<-paste("m",numvar,sep="")
-		if(numvar<10)smnv<-paste("sm0",numvar,sep="")else smnv<-paste("sm",numvar,sep="")
-		assign(mnv,evalwithattr(lm,moutput,paste(perm[i,],collapse="+"),DataSet));
-		assign(smnv,summary(get(mnv)))
-		get(smnv)
-		Vif(get(mnv))
-	}
-	if(numvar==1){
-		plot(eval(parse(text=paste(moutput,"~",perm[i,]))),data=DataSet)
-		abline(lsfit(eval(parse(text=paste("DataSet$",perm[i,]))), eval(parse(text=paste("DataSet$",moutput)))), col="red", lwd=3)
-	}
-}
+n<-permregres(mDataSet, moutput, parvec)
+
+#zbiór zmiennych niezale¿nych (teoretycznie)
+if(nData=="Glass") parvecout=c("Type","RI")
+parvec=setdiff(names(DataSet),parvecout)
+#wybieramy zmienn± zale¿n±
+if(nData=="Glass") moutput<-"RI"
+#wybieramy dane zeskorowane
+mDataSet<-DataSetz
+#najlepsza regresja liniowa bez logarytmów i innych - jedna,dwie,trzy itd. zmienne niezale¿ne w permutacjach
+#okazuje siê, ¿e dla danych zeskorowanych r2 dla powy¿ej 4 zmiennych nie zwiêksza siê znacz±co dla zbioru Glass
+#zatem jest poprawa w stosunku do normalnych danych
+#dla numvar=1 rysuje wykres punktów i regresji
+z<-permregres(mDataSet, moutput, parvec)
+
+#zbiór zmiennych niezale¿nych (teoretycznie)
+if(nData=="Glass") parvecout=c("Type","RI")
+parvec=setdiff(names(DataSet),parvecout)
+#wybieramy zmienn± zale¿n±
+if(nData=="Glass") moutput<-"RI"
+#wybieramy dane zeskalowane i zcentrowane
+mDataSet<-DataSetm
+#najlepsza regresja liniowa bez logarytmów i innych - jedna,dwie,trzy itd. zmienne niezale¿ne w permutacjach
+#okazuje siê, ¿e dla danych zeskorowanych r2 dla powy¿ej 4 zmiennych nie zwiêksza siê znacz±co dla zbioru Glass
+#zatem jest poprawa w stosunku do normalnych danych
+#dla numvar=1 rysuje wykres punktów i regresji
+ms<-permregres(mDataSet, moutput, parvec)
+
+
 #bp<-bptest(RI~Si,data=DataSet)
 #rs2<-summary(m01)[c("r.squared", "adj.r.squared")] 
-
-
 #get("permutations","package:gtools")(9,9,parvec)
 #etykiety <- sample(1:nrow(DataSet), round(nrow(DataSet)*0.5))
 #t01<-evalwithattr(rpart,"Type",parvec,DataSet)
