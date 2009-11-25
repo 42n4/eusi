@@ -82,16 +82,14 @@ lmwithattr<-function (DataSet, moutput, parvec, numvar,nleven,alpha){
 		perm<-get("combinations","package:gtools")(length(parvec),numvar,parvec)
 		rowperm<-nrow(perm)
 	}
-	else{
-		perm<-parvec
+	else
 		rowperm<-1
-	}
 	lb<-c(); ibest<-0; br2<-0;
 	for(i in 1:rowperm){
 		if(numvar<length(parvec))
-			varplus<-paste(perm[i,],collapse="+")
+			varplus<-perm[i,]
 		else
-			varplus<-paste(parvec,collapse="+")
+			varplus<-parvec
 		m01<-evalwithattr(lm,moutput,varplus,DataSet);
 		an<-anova(lm(RI~1,DataSet),m01);
 		sm01<-summary(m01)
