@@ -105,17 +105,19 @@ Vif(m01)
 #for(numvar in 2:5){
 #na s³abszych
 #for(numvar in 2:3){
-for(numvar in 2:3){
+for(numvar in 2:(length(parvec)-1)){
 	perm<-get("combinations","package:gtools")(length(parvec),numvar,parvec)
 	ilist<-lmwithattr(DataSet,moutput,parvec,numvar)
 	if(numvar<10)lbnv<-paste("lb0",numvar,sep="")else lbnv<-paste("lb",numvar,sep="")
 	i<-ilist[[1]]; assign(lbnv,ilist[[2]]);
-	if(numvar<10)mnv<-paste("m0",numvar,sep="")else mnv<-paste("m",numvar,sep="")
-	if(numvar<10)smnv<-paste("sm0",numvar,sep="")else smnv<-paste("sm",numvar,sep="")
-	assign(mnv,evalwithattr(lm,moutput,paste(perm[i,],collapse="+"),DataSet));
-	assign(smnv,summary(get(mnv)))
-	get(smnv)
-	Vif(get(mnv))
+	if(i){
+		if(numvar<10)mnv<-paste("m0",numvar,sep="")else mnv<-paste("m",numvar,sep="")
+		if(numvar<10)smnv<-paste("sm0",numvar,sep="")else smnv<-paste("sm",numvar,sep="")
+		assign(mnv,evalwithattr(lm,moutput,paste(perm[i,],collapse="+"),DataSet));
+		assign(smnv,summary(get(mnv)))
+		get(smnv)
+		Vif(get(mnv))
+	}
 	#vif(get(mnv))
 }
 
