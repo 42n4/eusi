@@ -81,31 +81,10 @@ if(nData=="Glass") parvecout=c("Type","RI")
 parvec=setdiff(names(DataSet),parvecout)
 if(nData=="Glass") moutput<-"RI"
 
-
-#najlepsza regresja liniowa bez logarytmów i innych - jedna zmienna niezale¿na
-numvar<-1
-perm<-get("combinations","package:gtools")(length(parvec),numvar,parvec)
-ilist<-lmwithattr(DataSet,moutput,parvec,numvar)
-i<-ilist[[1]]; lb<-ilist[[2]]
-if(numvar<10)mnv<-paste("m0",numvar,sep="")else mnv<-paste("m",numvar,sep="")
-if(numvar<10)smnv<-paste("sm0",numvar,sep="")else smnv<-paste("sm",numvar,sep="")
-assign(mnv,evalwithattr(lm,moutput,paste(perm[i,],collapse="+"),DataSet));
-assign(smnv,summary(get(mnv)))
-get(smnv)
-plot(eval(parse(text=paste(moutput,"~",perm[i,]))),data=DataSet)
-abline(lsfit(eval(parse(text=paste("DataSet$",perm[i,]))), eval(parse(text=paste("DataSet$",moutput)))), col="red", lwd=3)
-#bp<-bptest(RI~Si,data=DataSet)
-#rs2<-summary(m01)[c("r.squared", "adj.r.squared")] 
-Vif(m01)
-#vif(m01)
-
-#najlepsza regresja liniowa bez logarytmów i innych - dwie,trzy itd. zmienne niezale¿ne w permutacjach
-#okazuje siê, ¿e r2 dla powy¿ej 3 zmiennych nie zwiêksza siê dla zbioru Glass
-#na mocniejszych komputerach 
-#for(numvar in 2:5){
-#na s³abszych
-#for(numvar in 2:3){
-for(numvar in 2:(length(parvec)-1)){
+#najlepsza regresja liniowa bez logarytmów i innych - jedna,dwie,trzy itd. zmienne niezale¿ne w permutacjach
+#okazuje siê, ¿e r2 dla powy¿ej 3 zmiennych nie zwiêksza siê znacz±co dla zbioru Glass
+#dla numvar=1 rysuje wykres punktów i regresji
+for(numvar in 1:(length(parvec)-1)){
 	perm<-get("combinations","package:gtools")(length(parvec),numvar,parvec)
 	ilist<-lmwithattr(DataSet,moutput,parvec,numvar)
 	if(numvar<10)lbnv<-paste("lb0",numvar,sep="")else lbnv<-paste("lb",numvar,sep="")
@@ -118,8 +97,13 @@ for(numvar in 2:(length(parvec)-1)){
 		get(smnv)
 		Vif(get(mnv))
 	}
-	#vif(get(mnv))
+	if(numvar==1){
+		plot(eval(parse(text=paste(moutput,"~",perm[i,]))),data=DataSet)
+		abline(lsfit(eval(parse(text=paste("DataSet$",perm[i,]))), eval(parse(text=paste("DataSet$",moutput)))), col="red", lwd=3)
+	}
 }
+#bp<-bptest(RI~Si,data=DataSet)
+#rs2<-summary(m01)[c("r.squared", "adj.r.squared")] 
 
 
 #get("permutations","package:gtools")(9,9,parvec)
