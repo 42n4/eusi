@@ -1,4 +1,8 @@
-#zbiór do zajêæ ISO
+# skrypt do zajêæ ISO WIT Kruskal, lm, rpart
+# TODO: test, testowaæ
+# Licence LGPL  
+# Author: Piotr W±siewicz
+########################################################################################################
 
 #te ¶cie¿ki mypath i mypathout musz± istnieæ w systemie
 #to ¶cie¿ka do plików wykonywalnych z R pow³oki za pomoc± source("...")

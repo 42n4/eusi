@@ -1,3 +1,9 @@
+# zbiór funkcji do zajêæ ISO WIT lm with NA 
+# TODO: test, testowaæ
+# Licence LGPL 
+# Author: Piotr W±siewicz
+########################################################################################################
+
 x=rnorm(100,0,1)
 zee=c(rep(0,50),rep(1,50))
 z=c(zee[0:80],rep(NA,20))

@@ -1,3 +1,9 @@
+# zbiór funkcji do zajêæ ISO WIT testy wariancji bptest oraz levene.test
+# TODO: test, testowaæ
+# Licence LGPL
+# Author: Piotr W±siewicz
+########################################################################################################
+
 help(bptest)
 ## generate a regressor
 x <- rep(c(-1,1), 50)

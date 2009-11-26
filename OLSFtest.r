@@ -1,3 +1,9 @@
+# zbiór funkcji do zajêæ ISO WIT ordinary least squares 
+# TODO: test, testowaæ
+# Licence LGPL 
+# Author: Piotr W±siewicz
+########################################################################################################
+
 ols <- function( y, x ){ 
 size <- length(x) # number of observations 
 xmean <- mean(x) 

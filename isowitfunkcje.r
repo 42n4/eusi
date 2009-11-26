@@ -1,3 +1,9 @@
+# zbiór funkcji do zajêæ ISO WIT 
+# TODO: test, testowaæ
+# Licence LGPL  
+# Author: Piotr W±siewicz
+########################################################################################################
+
 Sys.setlocale("LC_NUMERIC","C")
 
 #lista pakietów z CRAN-u
@@ -47,7 +53,6 @@ permregres<-function (fname, mDataSet, moutput, parvec, nleven=-1, alpha=0.01, S
 			if(Spline==TRUE) varplus<-paste("bs(",varvec,")",sep="") else varplus<-varvec
 			varplus<-paste(varplus,collapse="+")
 		}
-		#cat(paste("2:",moutput,"~",varplus)," n:",numvar," length:",n," Spline:",Spline,"\n")
 		if(i){
 			if(numvar<10)mnv<-paste("m0",numvar,sep="")else mnv<-paste("m",numvar,sep="")
 			if(numvar<10)smnv<-paste("sm0",numvar,sep="")else smnv<-paste("sm",numvar,sep="")
