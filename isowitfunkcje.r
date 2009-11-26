@@ -50,9 +50,10 @@ permregres<-function (fname, mDataSet, moutput, parvec, nleven=-1, alpha=0.01, S
 		if(numvar<n){
 			perm<-get("combinations","package:gtools")(length(parvec),numvar,parvec)
 			varvec<-perm[i,]
-			if(Spline==TRUE) varplus<-paste("bs(",varvec,")",sep="") else varplus<-varvec
-			varplus<-paste(varplus,collapse="+")
 		}
+		else varvec<-parvec
+		if(Spline==TRUE) varplus<-paste("bs(",varvec,")",sep="") else varplus<-varvec
+		varplus<-paste(varplus,collapse="+")			
 		if(i){
 			if(numvar<10)mnv<-paste("m0",numvar,sep="")else mnv<-paste("m",numvar,sep="")
 			if(numvar<10)smnv<-paste("sm0",numvar,sep="")else smnv<-paste("sm",numvar,sep="")
@@ -68,21 +69,19 @@ permregres<-function (fname, mDataSet, moutput, parvec, nleven=-1, alpha=0.01, S
 			if(numvar==1){
 				jpeg(file=paste(fname,numvar,"_1.jpg",sep=""),width = 1200, height = 1000, quality = 55, bg = "white")
 				par(lwd=4)
-				#if(!Spline){
-					vartemp<-eval(parse(text=paste("mDataSet$",varvec,sep="")))
-					rangetemp<-seq(min(vartemp),max(vartemp),length.out=213)
-					plot(eval(parse(text=paste(moutput,"~",varvec))),data=mDataSet,main=paste(moutput,"~",varplus))
-					dframetemp<-as.data.frame(rangetemp)
-					names(dframetemp)<-varvec
-					lines(rangetemp,predict(get(mnv),newdata=dframetemp), col="red", lwd=3)
-					#cat(paste("3:",moutput,"~",varvec)," n:",numvar," mnv:",mnv," varvec:",paste("mDataSet$",varvec,sep=""),"\n")
-					dev.off()
-				#}	
-				jpeg(file=paste(fname,numvar,"_2.jpg",sep=""),width = 1200, height = 1000, quality = 55, bg = "white")
-				par(mfrow=c(2,2))
-				plot(get(mnv),main=paste(moutput,"~",varplus))
+				vartemp<-eval(parse(text=paste("mDataSet$",varvec,sep="")))
+				rangetemp<-seq(min(vartemp),max(vartemp),length.out=213)
+				plot(eval(parse(text=paste(moutput,"~",varvec))),data=mDataSet,main=paste(moutput,"~",varplus))
+				dframetemp<-as.data.frame(rangetemp)
+				names(dframetemp)<-varvec
+				lines(rangetemp,predict(get(mnv),newdata=dframetemp), col="red", lwd=3)
+				#cat(paste("3:",moutput,"~",varvec)," n:",numvar," mnv:",mnv," varvec:",paste("mDataSet$",varvec,sep=""),"\n")
 				dev.off()
 			}
+			jpeg(file=paste(fname,numvar,"_2.jpg",sep=""),width = 1200, height = 1000, quality = 55, bg = "white")
+			par(mfrow=c(2,2))
+			plot(get(mnv),main=paste(moutput,"~",varplus))
+			dev.off()
 		}
 	}
 	return (l)
