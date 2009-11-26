@@ -78,13 +78,13 @@ plotMDS.for.chosen(fname, nDataSets, DataSetzd, parvec, wzorzec1)
 if(nData=="Glass") parvecout=c("Type")
 parvec=setdiff(names(DataSet),parvecout)
 t01<-evalwithattr(rpart,"Type",parvec,DataSet)
-zapisz_rpart(t01,paste(mypathout,nData,"_rpart_nrm"))
+zapisz_rpart(t01,paste(mypathout,nData,"_rpart_nrm",sep=""))
 t01<-evalwithattr(rpart,"Type",parvec,DataSetz)
-zapisz_rpart(t01,paste(mypathout,nData,"_rpart_zsc"))
+zapisz_rpart(t01,paste(mypathout,nData,"_rpart_zsc",sep=""))
 t01<-evalwithattr(rpart,"Type",parvec,DataSetd)
-zapisz_rpart(t01,paste(mypathout,nData,"_rpart_nrd"))
+zapisz_rpart(t01,paste(mypathout,nData,"_rpart_nrd",sep=""))
 t01<-evalwithattr(rpart,"Type",parvec,DataSetzd)
-zapisz_rpart(t01,paste(mypathout,nData,"_rpart_zsd"))
+zapisz_rpart(t01,paste(mypathout,nData,"_rpart_zsd",sep=""))
 
 ##########################################################################################################
 
@@ -96,6 +96,49 @@ if(nData=="Glass") moutput<-"RI"
 
 ##########################################################################################################
 #alpha to krytyczna warto¶æ prawdopodobieñstwa p dla statystyk bp i f 
+alpha<-0.1;
+##########################################################################################################
+#dla nleven > 0 le vena ilo¶æ przedzia³ów, dla nleven < 0 bptest, dla nleven == 0 brak testów wariancji
+#bptest
+nleven<--1; 
+#wybieramy dane normalne
+mDataSet<-DataSet
+lmabc_nobp<-permregres(paste(mypathout,nData,"_lmabc_nobp",sep=""),mDataSet, moutput, parvec, nleven, alpha)
+#wybieramy dane zeskorowane
+mDataSet<-DataSetz
+lmabc_zebp<-permregres(paste(mypathout,nData,"_lmabc_zebp",sep=""),mDataSet, moutput, parvec, nleven, alpha)
+#wybieramy dane zeskalowane i zcentrowane
+mDataSet<-DataSetm
+#skalowanie likwiduje intercept wspó³czynnik przesuniêcia prostej
+lmabc_msbp<-permregres(paste(mypathout,nData,"_lmabc_msbp",sep=""),mDataSet, moutput, parvec, nleven, alpha)
+
+##########################################################################################################
+#dla nleven > 0 levena ilo¶æ przedzia³ów, dla nleven < 0 bptest, dla nleven == 0 brak testów wariancji
+#brak testów wariancji
+nleven<-0; 
+mDataSet<-DataSet
+lmabc_nono<-permregres(paste(mypathout,nData,"_lmabc_nono",sep=""),mDataSet, moutput, parvec, nleven, alpha)
+mDataSet<-DataSetz
+lmabc_zeno<-permregres(paste(mypathout,nData,"_lmabc_zeno",sep=""),mDataSet, moutput, parvec, nleven, alpha)
+mDataSet<-DataSetm
+lmabc_msno<-permregres(paste(mypathout,nData,"_lmabc_msno",sep=""),mDataSet, moutput, parvec, nleven, alpha)
+
+##########################################################################################################
+#dla nleven > 0 levena ilo¶æ przedzia³ów, dla nleven < 0 bptest, dla nleven == 0 brak testów wariancji
+#brak testów wariancji
+nleven<-5; 
+mDataSet<-DataSet
+lmabc_nolt<-permregres(paste(mypathout,nData,"_lmabc_nolt",sep=""),mDataSet, moutput, parvec, nleven, alpha)
+mDataSet<-DataSetz
+lmabc_zelt<-permregres(paste(mypathout,nData,"_lmabc_zelt",sep=""),mDataSet, moutput, parvec, nleven, alpha)
+mDataSet<-DataSetm
+lmabc_mslt<-permregres(paste(mypathout,nData,"_lmabc_mslt",sep=""),mDataSet, moutput, parvec, nleven, alpha)
+
+##########################################################################################################
+#Teraz u¿yjemy splinów czyli y~bs(x1)+bs(x2)+...
+SPLINE<-TRUE;
+##########################################################################################################
+#alpha to krytyczna warto¶æ prawdopodobieñstwa p dla statystyk bp i f 
 alpha<-0.1
 ##########################################################################################################
 #dla nleven > 0 levena ilo¶æ przedzia³ów, dla nleven < 0 bptest, dla nleven == 0 brak testów wariancji
@@ -103,36 +146,36 @@ alpha<-0.1
 nleven<--1; 
 #wybieramy dane normalne
 mDataSet<-DataSet
-nobp<-permregres(paste(mypathout,nData,"_lmno_nobp"),mDataSet, moutput, parvec, nleven, alpha)
+lmbsp_nobp<-permregres(paste(mypathout,nData,"_lmbsp_nobp",sep=""),mDataSet, moutput, parvec, nleven, alpha, SPLINE)
 #wybieramy dane zeskorowane
 mDataSet<-DataSetz
-zebp<-permregres(paste(mypathout,nData,"_lmno_zebp"),mDataSet, moutput, parvec, nleven, alpha)
+lmbsp_zebp<-permregres(paste(mypathout,nData,"_lmbsp_zebp",sep=""),mDataSet, moutput, parvec, nleven, alpha, SPLINE)
 #wybieramy dane zeskalowane i zcentrowane
 mDataSet<-DataSetm
 #skalowanie likwiduje intercept wspó³czynnik przesuniêcia prostej
-msbp<-permregres(paste(mypathout,nData,"_lmno_msbp"),mDataSet, moutput, parvec, nleven, alpha)
+lmbsp_msbp<-permregres(paste(mypathout,nData,"_lmbsp_msbp",sep=""),mDataSet, moutput, parvec, nleven, alpha, SPLINE)
 
 ##########################################################################################################
 #dla nleven > 0 levena ilo¶æ przedzia³ów, dla nleven < 0 bptest, dla nleven == 0 brak testów wariancji
 #brak testów wariancji
 nleven<-0; 
 mDataSet<-DataSet
-nono<-permregres(paste(mypathout,nData,"_lmno_nono"),mDataSet, moutput, parvec, nleven, alpha)
+lmbsp_nono<-permregres(paste(mypathout,nData,"_lmbsp_nono",sep=""),mDataSet, moutput, parvec, nleven, alpha, SPLINE)
 mDataSet<-DataSetz
-zeno<-permregres(paste(mypathout,nData,"_lmno_zeno"),mDataSet, moutput, parvec, nleven, alpha)
+lmbsp_zeno<-permregres(paste(mypathout,nData,"_lmbsp_zeno",sep=""),mDataSet, moutput, parvec, nleven, alpha, SPLINE)
 mDataSet<-DataSetm
-msno<-permregres(paste(mypathout,nData,"_lmno_msno"),mDataSet, moutput, parvec, nleven, alpha)
+lmbsp_msno<-permregres(paste(mypathout,nData,"_lmbsp_msno",sep=""),mDataSet, moutput, parvec, nleven, alpha, SPLINE)
 
 ##########################################################################################################
 #dla nleven > 0 levena ilo¶æ przedzia³ów, dla nleven < 0 bptest, dla nleven == 0 brak testów wariancji
-#brak testów wariancji
-nleven<-3; 
+#leven
+nleven<-5; 
 mDataSet<-DataSet
-nolt<-permregres(paste(mypathout,nData,"_lmno_nolt"),mDataSet, moutput, parvec, nleven, alpha)
+lmbsp_nolt<-permregres(paste(mypathout,nData,"_lmbsp_nolt",sep=""),mDataSet, moutput, parvec, nleven, alpha, SPLINE)
 mDataSet<-DataSetz
-zelt<-permregres(paste(mypathout,nData,"_lmno_zelt"),mDataSet, moutput, parvec, nleven, alpha)
+lmbsp_zelt<-permregres(paste(mypathout,nData,"_lmbsp_zelt",sep=""),mDataSet, moutput, parvec, nleven, alpha, SPLINE)
 mDataSet<-DataSetm
-mslt<-permregres(paste(mypathout,nData,"_lmno_mslt"),mDataSet, moutput, parvec, nleven, alpha)
+lmbsp_mslt<-permregres(paste(mypathout,nData,"_lmbsp_mslt",sep=""),mDataSet, moutput, parvec, nleven, alpha, SPLINE)
 
 
 #bp<-bptest(RI~Si,data=DataSet)

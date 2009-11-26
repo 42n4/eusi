@@ -25,48 +25,59 @@ for(i in biolist)
 { library(i, character.only = TRUE);}
 
 #############################################################################
-#Funkcje podstawowe niezbêdne do normalnego odzyskiwania wiedzy
+#Funkcje podstawowe zalecane do procesu odkrywania wiedzy
 #############################################################################
 
 #Funkcja permregres liczy permutacje zmiennych niezale¿nych dla n=1 do n równego ilo¶æ wszystkich zmiennych 
 #i oblicza dla nich regresje i wybiera najlepsz± dla ka¿dego n, wraca listê najlepszych obiektów z kolejnych iteracji  
 #w lb<n> mamy wybierane po kolei kolejne zestawy na najlepsz± regresjê 
 #w m<n> najlepszy model dla n, w sm<n> summary(m<n>), dla n=1 rysuje plot regresji
-permregres<-function (fname, mDataSet, moutput, parvec, nleven, alpha){
+permregres<-function (fname, mDataSet, moutput, parvec, nleven=-1, alpha=0.01, Spline=FALSE){
 	l<-list()
+	n<-length(parvec)
+	varvec<-parvec
+	varplus<-paste(parvec,collapse="+")
 	for(numvar in 1:length(parvec)){
-		ilist<-lmwithattr(mDataSet,moutput,parvec,numvar,nleven,alpha)
+		ilist<-lmwithattr(mDataSet,moutput,parvec,numvar,nleven,alpha,Spline)
 		i<-ilist[[1]]; 
-		if(numvar<length(parvec)){
+		#cat(paste("1:",moutput,"~",varplus)," n:",numvar," length:",n," Spline:",Spline,"\n")
+		if(numvar<n){
 			perm<-get("combinations","package:gtools")(length(parvec),numvar,parvec)
-			varplus<-paste(perm[i,],collapse="+")
 			varvec<-perm[i,]
-		}else{
-			varplus<-parvec; varvec<-parvec
+			if(Spline==TRUE) varplus<-paste("bs(",varvec,")",sep="") else varplus<-varvec
+			varplus<-paste(varplus,collapse="+")
 		}
+		#cat(paste("2:",moutput,"~",varplus)," n:",numvar," length:",n," Spline:",Spline,"\n")
 		if(i){
 			if(numvar<10)mnv<-paste("m0",numvar,sep="")else mnv<-paste("m",numvar,sep="")
 			if(numvar<10)smnv<-paste("sm0",numvar,sep="")else smnv<-paste("sm",numvar,sep="")
 			if(numvar<10)lbnv<-paste("lb0",numvar,sep="")else lbnv<-paste("lb",numvar,sep="")
 			assign(lbnv,ilist[[2]]);
-			assign(mnv,evalwithattr(lm,moutput,varplus,mDataSet));
+			assign(mnv,evalwithattr(lm,moutput,varvec,mDataSet,Spline));
 			assign(smnv,summary(get(mnv)))
 			get(smnv)
 			Vif(get(mnv))
 			l[[lbnv]]<-get(lbnv)
 			l[[mnv]]<-get(mnv)
 			l[[smnv]]<-get(smnv)
-		}
-		if(numvar==1){
-			jpeg(file=paste(fname,numvar,"_1.jpg",sep=""),width = 1200, height = 1000, quality = 55, bg = "white")
-			par(lwd=4)
-			plot(eval(parse(text=paste(moutput,"~",varvec))),data=mDataSet)
-			abline(lsfit(eval(parse(text=paste("mDataSet$",varvec))), eval(parse(text=paste("mDataSet$",moutput)))), col="red", lwd=3)
-			dev.off()
-			jpeg(file=paste(fname,numvar,"_2.jpg",sep=""),width = 1200, height = 1000, quality = 55, bg = "white")
-			par(mfrow=c(2,2))
-			plot(get(mnv))
-			dev.off()
+			if(numvar==1){
+				jpeg(file=paste(fname,numvar,"_1.jpg",sep=""),width = 1200, height = 1000, quality = 55, bg = "white")
+				par(lwd=4)
+				#if(!Spline){
+					vartemp<-eval(parse(text=paste("mDataSet$",varvec,sep="")))
+					rangetemp<-seq(min(vartemp),max(vartemp),length.out=213)
+					plot(eval(parse(text=paste(moutput,"~",varvec))),data=mDataSet,main=paste(moutput,"~",varplus))
+					dframetemp<-as.data.frame(rangetemp)
+					names(dframetemp)<-varvec
+					lines(rangetemp,predict(get(mnv),newdata=dframetemp), col="red", lwd=3)
+					#cat(paste("3:",moutput,"~",varvec)," n:",numvar," mnv:",mnv," varvec:",paste("mDataSet$",varvec,sep=""),"\n")
+					dev.off()
+				#}	
+				jpeg(file=paste(fname,numvar,"_2.jpg",sep=""),width = 1200, height = 1000, quality = 55, bg = "white")
+				par(mfrow=c(2,2))
+				plot(get(mnv),main=paste(moutput,"~",varplus))
+				dev.off()
+			}
 		}
 	}
 	return (l)
@@ -77,20 +88,17 @@ permregres<-function (fname, mDataSet, moutput, parvec, nleven, alpha){
 #moutput - wyj¶cie modelu zmienna zale¿na np. "RI", 
 #parvec - wektor zmiennych wej¶ciowych niezale¿nych dla modelu,
 #numvar - ile zmiennych z parvec ma wzi±æ udzia³ w permutacji zmiennych niezale¿nych
-lmwithattr<-function (DataSet, moutput, parvec, numvar,nleven,alpha){
+lmwithattr<-function (DataSet, moutput, parvec, numvar, nleven=-1, alpha=0.01, Spline=FALSE){
 	if(numvar<length(parvec)){
 		perm<-get("combinations","package:gtools")(length(parvec),numvar,parvec)
 		rowperm<-nrow(perm)
 	}
-	else
-		rowperm<-1
+	else rowperm<-1
 	lb<-c(); ibest<-0; br2<-0;
 	for(i in 1:rowperm){
-		if(numvar<length(parvec))
-			varplus<-perm[i,]
-		else
-			varplus<-parvec
-		m01<-evalwithattr(lm,moutput,varplus,DataSet);
+		if(numvar<length(parvec)) 	varplus<-perm[i,]
+		else 						varplus<-parvec
+		m01<-evalwithattr(lm,moutput,varplus,DataSet,Spline);
 		an<-anova(lm(RI~1,DataSet),m01);
 		sm01<-summary(m01)
 		if(nleven>0){
@@ -109,6 +117,17 @@ lmwithattr<-function (DataSet, moutput, parvec, numvar,nleven,alpha){
 		}
 	}
 	return (list(ibest,lb))
+}
+
+#Funkcja evalwithattr wywo³uje podan± funkcjê z wyj¶ciowym atrybutem output i 
+#wej¶ciowymi atrybutami parvec oraz zbiorem danych
+evalwithattr<-function(oFunction,output,parvec,oData,Spline=FALSE)
+{
+	tmp=paste(deparse(substitute(oFunction)),"(",output,"~")
+	if(Spline==TRUE) parvec<-paste("bs(",parvec,")",sep="")
+	parvec<-paste(parvec,collapse="+")
+	tmp<-paste(tmp,parvec,",data=",deparse(substitute(oData)),")",sep="")
+	return(eval(parse(text=tmp)))
 }
 
 #Metoda funkcja Vif okre¶la stopieñ korelacji zmiennych niezale¿nych, 
@@ -134,16 +153,6 @@ Vif.lm <- function(object, ...) {
 						surprise.")
 	}
 	structure(v1*v2, names = nam)
-}
-
-#Funkcja evalwithattr wywo³uje podan± funkcjê z wyj¶ciowym atrybutem output i 
-#wej¶ciowymi atrybutami parvec oraz zbiorem danych
-evalwithattr<-function(oFunction,output,parvec,oData)
-{
-	tmp=paste(deparse(substitute(oFunction)),"(",output,"~")
-	parvec<-paste(parvec,collapse="+")
-	tmp<-paste(tmp,parvec,",data=",deparse(substitute(oData)),")",sep="")
-	return(eval(parse(text=tmp)))
 }
 
 #Funkcja defactor.numeric najpierw defaktoryzuje, a potem oznacza jako numeryczne kolumny z liczbami zmiennoprzecinkowymi i ca³kowitymi, tak na wszelki wypadek, gdyby csv ¼le siê wczyta³ (w przypadku zbiorów data() to tylko æwiczenie)
