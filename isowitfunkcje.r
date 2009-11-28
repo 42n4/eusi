@@ -36,8 +36,9 @@ for(i in biolist)
 
 #Funkcja prederror zwraca warto¶ci predykcji klasyfikatora, tablicê rezultatów i rzeczywistych warto¶ci, 
 #oraz b³±d klasyfikatora, na wej¶ciu dane testowe, ale nie treningowe wykorzystane do konstrukcji klasyfikatora
-prederror<-function(classimod,paroutputree,parvectree,DataSet){
-	predvalues=predict(classimod,newdata=DataSet[,parvectree],"class")
+prederror<-function(classimod,paroutputree,parvectree,DataSet,EvalString="DEFAULT"){
+	if(EvalString=="DEFAULT") predvalues=predict(classimod,newdata=DataSet[,parvectree],"class")
+	else predvalues=predict(classimod,DataSet[,parvectree])
 	tabresults=table(predicted=predvalues, real=DataSet[,paroutputree])
 	prederr<-1-sum(diag(tabresults))/sum(tabresults)
 	l<-list()
@@ -52,28 +53,28 @@ prederror<-function(classimod,paroutputree,parvectree,DataSet){
 #i oblicza dla nich regresje i wybiera najlepsz± dla ka¿dego n, wraca listê najlepszych obiektów z kolejnych iteracji  
 #w lb<n> mamy wybierane po kolei kolejne zestawy na najlepsz± regresjê 
 #w m<n> najlepszy model dla n, w sm<n> summary(m<n>), dla n=1 rysuje plot regresji
-permregres<-function (fname, mDataSet, moutput, parvec, nleven=-1, alpha=0.01, Spline=FALSE){
+permregres<-function (fname, mDataSet, moutput, parvec, nleven=-1, alpha=0.01, EvalString="DEFAULT"){
 	l<-list()
 	n<-length(parvec)
 	varvec<-parvec
 	varplus<-paste(parvec,collapse="+")
 	for(numvar in 1:length(parvec)){
-		ilist<-lmwithattr(mDataSet,moutput,parvec,numvar,nleven,alpha,Spline)
+		ilist<-lmwithattr(mDataSet,moutput,parvec,numvar,nleven,alpha,EvalString)
 		i<-ilist[[1]]; 
-		#cat(paste("1:",moutput,"~",varplus)," n:",numvar," length:",n," Spline:",Spline,"\n")
+		#cat(paste("1:",moutput,"~",varplus)," n:",numvar," length:",n," EvalString:",EvalString,"\n")
 		if(numvar<n){
 			perm<-get("combinations","package:gtools")(length(parvec),numvar,parvec)
 			varvec<-perm[i,]
 		}
 		else varvec<-parvec
-		if(Spline==TRUE) varplus<-paste("bs(",varvec,")",sep="") else varplus<-varvec
+		if(EvalString=="SPLINE") varplus<-paste("bs(",varvec,")",sep="") else varplus<-varvec
 		varplus<-paste(varplus,collapse="+")			
 		if(i){
 			if(numvar<10)mnv<-paste("m0",numvar,sep="")else mnv<-paste("m",numvar,sep="")
 			if(numvar<10)smnv<-paste("sm0",numvar,sep="")else smnv<-paste("sm",numvar,sep="")
 			if(numvar<10)lbnv<-paste("lb0",numvar,sep="")else lbnv<-paste("lb",numvar,sep="")
 			assign(lbnv,ilist[[2]]);
-			assign(mnv,evalwithattr(lm,moutput,varvec,mDataSet,Spline));
+			assign(mnv,evalwithattr(lm,moutput,varvec,mDataSet,EvalString));
 			assign(smnv,summary(get(mnv)))
 			get(smnv)
 			Vif(get(mnv))
@@ -106,7 +107,7 @@ permregres<-function (fname, mDataSet, moutput, parvec, nleven=-1, alpha=0.01, S
 #moutput - wyj¶cie modelu zmienna zale¿na np. "RI", 
 #parvec - wektor zmiennych wej¶ciowych niezale¿nych dla modelu,
 #numvar - ile zmiennych z parvec ma wzi±æ udzia³ w permutacji zmiennych niezale¿nych
-lmwithattr<-function (DataSet, moutput, parvec, numvar, nleven=-1, alpha=0.01, Spline=FALSE){
+lmwithattr<-function (DataSet, moutput, parvec, numvar, nleven=-1, alpha=0.01, EvalString="DEFAULT"){
 	if(numvar<length(parvec)){
 		perm<-get("combinations","package:gtools")(length(parvec),numvar,parvec)
 		rowperm<-nrow(perm)
@@ -116,7 +117,7 @@ lmwithattr<-function (DataSet, moutput, parvec, numvar, nleven=-1, alpha=0.01, S
 	for(i in 1:rowperm){
 		if(numvar<length(parvec)) 	varplus<-perm[i,]
 		else 						varplus<-parvec
-		m01<-evalwithattr(lm,moutput,varplus,DataSet,Spline);
+		m01<-evalwithattr(lm,moutput,varplus,DataSet,EvalString);
 		an<-anova(lm(RI~1,DataSet),m01);
 		sm01<-summary(m01)
 		if(nleven>0){
@@ -139,12 +140,16 @@ lmwithattr<-function (DataSet, moutput, parvec, numvar, nleven=-1, alpha=0.01, S
 
 #Funkcja evalwithattr wywo³uje podan± funkcjê z wyj¶ciowym atrybutem output i 
 #wej¶ciowymi atrybutami parvec oraz zbiorem danych
-evalwithattr<-function(oFunction,output,parvec,oData,Spline=FALSE)
+evalwithattr<-function(oFunction,output,parvec,oData,EvalString="DEFAULT")
 {
 	tmp=paste(deparse(substitute(oFunction)),"(",output,"~")
-	if(Spline==TRUE) parvec<-paste("bs(",parvec,")",sep="")
+	if(EvalString=="SPLINE")  
+		parvec<-paste("bs(",parvec,")",sep="")
 	parvec<-paste(parvec,collapse="+")
-	tmp<-paste(tmp,parvec,",data=",deparse(substitute(oData)),")",sep="")
+	if(EvalString=="DEFAULT" || EvalString=="SPLINE") 
+		tmp<-paste(tmp,parvec,",data=",deparse(substitute(oData)),")",sep="")
+	else
+		tmp<-paste(tmp,parvec,",data=",deparse(substitute(oData)),",",EvalString,")",sep="")
 	return(eval(parse(text=tmp)))
 }
 

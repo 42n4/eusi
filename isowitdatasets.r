@@ -145,8 +145,32 @@ zapisz_weka(vmod[[2]],paste(mypathout,nData,"_wkJ48_zsc",sep=""))
 zapisz_weka(vmod[[3]],paste(mypathout,nData,"_wkJ48_nrd",sep=""))
 zapisz_weka(vmod[[4]],paste(mypathout,nData,"_wkJ48_zsd",sep=""))
 verr
+##########################################################################################################
+#generujemy svm dla parvectree
+verr<-c();vmod<-list()
+parvectree=setdiff(names(DataSet),parvecnotree)
+etykiety <- sample(1:nrow(DataSet), round(nrow(DataSet)*0.5))
+svmextra<-'kernel="linear"'
+#svmextra<-'kernel="sigmoid"'
+#svmextra<-'kernel="polynomial"'
+#svmextra<-'kernel="radial"'
+classific<-evalwithattr(svm,paroutputree,parvectree,DataSet[etykiety,],svmextra)
+lres<-prederror(classific,paroutputree,parvectree,DataSet[-etykiety,],svmextra)
+vmod[[1]]<-classific;verr<-c(verr,lres$perror)
+classific<-evalwithattr(svm,paroutputree,parvectree,DataSetz[etykiety,],svmextra)
+lres<-prederror(classific,paroutputree,parvectree,DataSetz[-etykiety,],svmextra)
+vmod[[2]]<-classific;verr<-c(verr,lres$perror)
+classific<-evalwithattr(svm,paroutputree,parvectree,DataSetd[etykiety,],svmextra)
+lres<-prederror(classific,paroutputree,parvectree,DataSetd[-etykiety,],svmextra)
+vmod[[3]]<-classific;verr<-c(verr,lres$perror)
+classific<-evalwithattr(svm,paroutputree,parvectree,DataSetzd[etykiety,],svmextra)
+lres<-prederror(classific,paroutputree,parvectree,DataSetzd[-etykiety,],svmextra)
+vmod[[4]]<-classific;verr<-c(verr,lres$perror)
+verr
+
 
 ##########################################################################################################
+#REGRESJA LINIOWA
 #w mparvec zmienne niezale¿ne do regresji
 mparvec=setdiff(names(DataSet),parvecnolm)
 
@@ -192,7 +216,7 @@ lmabc_mslt<-permregres(paste(mypathout,nData,"_lmabc_mslt",sep=""),mDataSet, mou
 
 ##########################################################################################################
 #Teraz u¿yjemy splinów czyli y~bs(x1)+bs(x2)+...
-SPLINE<-TRUE;
+SPLINE<-"SPLINE";
 ##########################################################################################################
 #alpha to krytyczna warto¶æ prawdopodobieñstwa p dla statystyk bp i f 
 alpha<-0.1
