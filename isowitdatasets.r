@@ -16,6 +16,7 @@ dir.create(mypathout, showWarnings = TRUE, recursive = TRUE, mode = "0755")
 
 source(paste(mypath,"isowitfunkcje.r",sep=""))
 
+##########################################################################################################
 nData<-"Glass"
 #wczytywanie zbioru treningowego o nazwie nData
 #assign(nData,read.csv(paste("file://",mypath,"meatDataEN.csv",sep=""),head=TRUE,sep=";",dec=",",na.strings=c("NA", "BD", "bd", "", "?")))
@@ -24,6 +25,7 @@ data(list=nData)
 
 DataSet<-get(nData)
 
+##########################################################################################################
 #operacje kosmetyczne poprawiaj±ce dane, przystosowuj±ce
 #usuwanie takich samych wierszy ze zbioru Glass, a dok³adnie jednego z nich
 #(jak siê pojawi± dwa takie same wiersze to wyrzuca b³±d isoMDS, 
@@ -31,6 +33,7 @@ DataSet<-get(nData)
 if(nData=="Glass") DataSet<-DataSet[-c(40),]
 
 
+##########################################################################################################
 #te atrybuty, co s± faktorami, zmiennymi jako¶ciowymi z kategoriami, etykietami
 if(nData=="Glass") parvecfactor=c("Type")
 #w parnokruskal to co zostanie nie wys³ane do isoMDS(daisy) np. parnokruskal=c("Type")
@@ -38,6 +41,8 @@ if(nData=="Glass") parnokruskal=c()
 #atrybuty w plotMDS do kolorowania powsta³ych punktów 
 if(nData=="Glass") parvecol<-names(DataSet)
 #zmienne, które nie wchodz± do drzewa m.in. jego li¶cie, target, cel optymalizacji drzewa
+if(nData=="Glass") parvecnotree=c("Type")
+#li¶æ drzewa, etykieta
 if(nData=="Glass") paroutputree=c("Type")
 #zmienne zale¿ne i inne zbêdne w regresji
 if(nData=="Glass") parvecnolm=c("Type","RI")
@@ -45,6 +50,7 @@ if(nData=="Glass") parvecnolm=c("Type","RI")
 if(nData=="Glass") moutput<-"RI"
 
 
+##########################################################################################################
 #te atrybuty, które s± zmiennymi ilo¶ciowymi
 parvec=setdiff(names(DataSet),parvecfactor)
 
@@ -72,13 +78,14 @@ DataSetzd<-disc.for.chosen(DataSetz,parvec,3)
 #dyskretyzujê tak¿e nie zeskorowane warto¶ci zwyk³ego zbioru wczytanego na pocz±tku
 DataSetd<-disc.for.chosen(DataSet,parvec,3)
 
+##########################################################################################################
 #Kruskal dla normalnych danych
 #generujê z daisy ró¿nice miêdzy wierszami podanego zbioru i wprowadzam do isoMDS rzutuj±cego na dwa wymiary k=2 
 parveckruskal=setdiff(names(DataSet),parnokruskal)
 nDataSets<-KruskelMDS(DataSet, parveckruskal, 2)
 
 # uzyskany zbiór punktów kolorujê ró¿nymi atrybutami podstawianymi do wzorzec i uzyskujê wizualizacjê cech
-fname<-paste(mypathout,nData,"_norm_nrmdis",sep="")
+fname<-paste(mypathout,nData,"_MDSnorm_nrmdis",sep="")
 wzorzec1=DataSet$Type
 #pdm=1:length(unique(DataSet$Type))
 #org=sort(unique(DataSet$Type))
@@ -89,20 +96,55 @@ plotMDS.for.chosen(fname, nDataSets, DataSetd, parvecol, wzorzec1)
 parveckruskal=setdiff(names(DataSet),parnokruskal)
 nDataSets<-KruskelMDS(DataSetz, parveckruskal, 2)
 
-fname<-paste(mypathout,nData,"_zesc_zscdis",sep="")
+fname<-paste(mypathout,nData,"_MDSzesc_zscdis",sep="")
 wzorzec1=DataSet$Type
 plotMDS.for.chosen(fname, nDataSets, DataSetzd, parvecol, wzorzec1) 
 
+
+##########################################################################################################
 #generujemy drzewa rpart dla parvectree
-parvectree=setdiff(names(DataSet),paroutputree)
-t01<-evalwithattr(rpart,"Type",parvectree,DataSet)
-zapisz_rpart(t01,paste(mypathout,nData,"_rpart_nrm",sep=""))
-t01<-evalwithattr(rpart,"Type",parvectree,DataSetz)
-zapisz_rpart(t01,paste(mypathout,nData,"_rpart_zsc",sep=""))
-t01<-evalwithattr(rpart,"Type",parvectree,DataSetd)
-zapisz_rpart(t01,paste(mypathout,nData,"_rpart_nrd",sep=""))
-t01<-evalwithattr(rpart,"Type",parvectree,DataSetzd)
-zapisz_rpart(t01,paste(mypathout,nData,"_rpart_zsd",sep=""))
+verr<-c();vmod<-list()
+parvectree=setdiff(names(DataSet),parvecnotree)
+etykiety <- sample(1:nrow(DataSet), round(nrow(DataSet)*0.8))
+classific<-evalwithattr(rpart,paroutputree,parvectree,DataSet[etykiety,])
+lres<-prederror(classific,paroutputree,parvectree,DataSet[-etykiety,])
+vmod[[1]]<-classific;verr<-c(verr,lres$perror)
+classific<-evalwithattr(rpart,"Type",parvectree,DataSetz[etykiety,])
+lres<-prederror(classific,paroutputree,parvectree,DataSetz[-etykiety,])
+vmod[[2]]<-classific;verr<-c(verr,lres$perror)
+classific<-evalwithattr(rpart,"Type",parvectree,DataSetd[etykiety,])
+lres<-prederror(classific,paroutputree,parvectree,DataSetd[-etykiety,])
+vmod[[3]]<-classific;verr<-c(verr,lres$perror)
+classific<-evalwithattr(rpart,"Type",parvectree,DataSetzd[etykiety,])
+lres<-prederror(classific,paroutputree,parvectree,DataSetzd[-etykiety,])
+vmod[[4]]<-classific;verr<-c(verr,lres$perror)
+zapisz_rpart(vmod[[1]],paste(mypathout,nData,"_rpart_nrm",sep=""))
+zapisz_rpart(vmod[[2]],paste(mypathout,nData,"_rpart_zsc",sep=""))
+zapisz_rpart(vmod[[3]],paste(mypathout,nData,"_rpart_nrd",sep=""))
+zapisz_rpart(vmod[[4]],paste(mypathout,nData,"_rpart_zsd",sep=""))
+verr
+##########################################################################################################
+#generujemy drzewa J48 dla parvectree
+verr<-c();vmod<-list()
+parvectree=setdiff(names(DataSet),parvecnotree)
+etykiety <- sample(1:nrow(DataSet), round(nrow(DataSet)*0.8))
+classific<-evalwithattr(J48,paroutputree,parvectree,DataSet[etykiety,])
+lres<-prederror(classific,paroutputree,parvectree,DataSet[-etykiety,])
+vmod[[1]]<-classific;verr<-c(verr,lres$perror)
+classific<-evalwithattr(J48,"Type",parvectree,DataSetz[etykiety,])
+lres<-prederror(classific,paroutputree,parvectree,DataSetz[-etykiety,])
+vmod[[2]]<-classific;verr<-c(verr,lres$perror)
+classific<-evalwithattr(J48,"Type",parvectree,DataSetd[etykiety,])
+lres<-prederror(classific,paroutputree,parvectree,DataSetd[-etykiety,])
+vmod[[3]]<-classific;verr<-c(verr,lres$perror)
+classific<-evalwithattr(J48,"Type",parvectree,DataSetzd[etykiety,])
+lres<-prederror(classific,paroutputree,parvectree,DataSetzd[-etykiety,])
+vmod[[4]]<-classific;verr<-c(verr,lres$perror)
+zapisz_weka(vmod[[1]],paste(mypathout,nData,"_wkJ48_nrm",sep=""))
+zapisz_weka(vmod[[2]],paste(mypathout,nData,"_wkJ48_zsc",sep=""))
+zapisz_weka(vmod[[3]],paste(mypathout,nData,"_wkJ48_nrd",sep=""))
+zapisz_weka(vmod[[4]],paste(mypathout,nData,"_wkJ48_zsd",sep=""))
+verr
 
 ##########################################################################################################
 #w mparvec zmienne niezale¿ne do regresji

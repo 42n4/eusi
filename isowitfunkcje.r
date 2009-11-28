@@ -34,6 +34,20 @@ for(i in biolist)
 #Funkcje podstawowe zalecane do procesu odkrywania wiedzy
 #############################################################################
 
+#Funkcja prederror zwraca warto¶ci predykcji klasyfikatora, tablicê rezultatów i rzeczywistych warto¶ci, 
+#oraz b³±d klasyfikatora, na wej¶ciu dane testowe, ale nie treningowe wykorzystane do konstrukcji klasyfikatora
+prederror<-function(classimod,paroutputree,parvectree,DataSet){
+	predvalues=predict(classimod,newdata=DataSet[,parvectree],"class")
+	tabresults=table(predicted=predvalues, real=DataSet[,paroutputree])
+	prederr<-1-sum(diag(tabresults))/sum(tabresults)
+	l<-list()
+	l[["pvalues"]]<-predvalues
+	l[["table"]]<-tabresults
+	l[["perror"]]<-prederr
+	l
+}
+
+
 #Funkcja permregres liczy permutacje zmiennych niezale¿nych dla n=1 do n równego ilo¶æ wszystkich zmiennych 
 #i oblicza dla nich regresje i wybiera najlepsz± dla ka¿dego n, wraca listê najlepszych obiektów z kolejnych iteracji  
 #w lb<n> mamy wybierane po kolei kolejne zestawy na najlepsz± regresjê 
@@ -71,7 +85,7 @@ permregres<-function (fname, mDataSet, moutput, parvec, nleven=-1, alpha=0.01, S
 				par(lwd=4)
 				vartemp<-eval(parse(text=paste("mDataSet$",varvec,sep="")))
 				rangetemp<-seq(min(vartemp),max(vartemp),length.out=213)
-				plot(eval(parse(text=paste(moutput,"~",varvec))),data=mDataSet,main=paste(moutput,"~",varplus))
+				plot(eval(parse(text=paste(moutput,"~",varvec))),data=mDataSet,main=paste(moutput,"~",varplus), pch=1.0, cex.lab=1.5)
 				dframetemp<-as.data.frame(rangetemp)
 				names(dframetemp)<-varvec
 				lines(rangetemp,predict(get(mnv),newdata=dframetemp), col="red", lwd=3)
@@ -80,7 +94,7 @@ permregres<-function (fname, mDataSet, moutput, parvec, nleven=-1, alpha=0.01, S
 			}
 			jpeg(file=paste(fname,numvar,"_2.jpg",sep=""),width = 1200, height = 1000, quality = 55, bg = "white")
 			par(mfrow=c(2,2))
-			plot(get(mnv),main=paste(moutput,"~",varplus))
+			plot(get(mnv),main=paste(moutput,"~",varplus), pch=1.0, cex.lab=1.5)
 			dev.off()
 		}
 	}
