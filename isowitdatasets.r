@@ -79,6 +79,18 @@ DataSetzd<-disc.for.chosen(DataSetz,parvec,3)
 DataSetd<-disc.for.chosen(DataSet,parvec,3)
 
 ##########################################################################################################
+#korelacje miêdzy atrybutami
+#for(cormethod in c("pearson","kendall","spearman")){
+for(cormethod in c("pearson")){
+	hier2jpg(cormethod,DataSet,paste(mypathout,nData,"_hiercor_",cormethod,"_norm",sep=""))
+	hier2jpg(cormethod,DataSetz,paste(mypathout,nData,"_hiercor_",cormethod,"_zesc",sep=""))
+}
+latt2jpg(DataSet,DataSet$Type,paste(mypathout,nData,"_lattcor_norm",sep=""))
+latt2jpg(DataSetz,DataSet$Type,paste(mypathout,nData,"_lattcor_zesc",sep=""))
+#pairs
+
+
+##########################################################################################################
 #Kruskal dla normalnych danych
 #generujê z daisy ró¿nice miêdzy wierszami podanego zbioru i wprowadzam do isoMDS rzutuj±cego na dwa wymiary k=2 
 parveckruskal=setdiff(names(DataSet),parnokruskal)
@@ -106,18 +118,18 @@ plotMDS.for.chosen(fname, nDataSets, DataSetzd, parvecol, wzorzec1)
 verr<-c();vmod<-list()
 parvectree=setdiff(names(DataSet),parvecnotree)
 etykiety <- sample(1:nrow(DataSet), round(nrow(DataSet)*0.8))
-classific<-evalwithattr(rpart,paroutputree,parvectree,DataSet[etykiety,])
-lres<-prederror(classific,paroutputree,parvectree,DataSet[-etykiety,])
-vmod[[1]]<-classific;verr<-c(verr,lres$perror)
-classific<-evalwithattr(rpart,"Type",parvectree,DataSetz[etykiety,])
-lres<-prederror(classific,paroutputree,parvectree,DataSetz[-etykiety,])
-vmod[[2]]<-classific;verr<-c(verr,lres$perror)
-classific<-evalwithattr(rpart,"Type",parvectree,DataSetd[etykiety,])
-lres<-prederror(classific,paroutputree,parvectree,DataSetd[-etykiety,])
-vmod[[3]]<-classific;verr<-c(verr,lres$perror)
-classific<-evalwithattr(rpart,"Type",parvectree,DataSetzd[etykiety,])
-lres<-prederror(classific,paroutputree,parvectree,DataSetzd[-etykiety,])
-vmod[[4]]<-classific;verr<-c(verr,lres$perror)
+classifier<-evalwithattr(rpart,paroutputree,parvectree,DataSet[etykiety,])
+lres<-prederror(classifier,paroutputree,parvectree,DataSet[-etykiety,])
+vmod[[1]]<-classifier;verr<-c(verr,lres$perror)
+classifier<-evalwithattr(rpart,"Type",parvectree,DataSetz[etykiety,])
+lres<-prederror(classifier,paroutputree,parvectree,DataSetz[-etykiety,])
+vmod[[2]]<-classifier;verr<-c(verr,lres$perror)
+classifier<-evalwithattr(rpart,"Type",parvectree,DataSetd[etykiety,])
+lres<-prederror(classifier,paroutputree,parvectree,DataSetd[-etykiety,])
+vmod[[3]]<-classifier;verr<-c(verr,lres$perror)
+classifier<-evalwithattr(rpart,"Type",parvectree,DataSetzd[etykiety,])
+lres<-prederror(classifier,paroutputree,parvectree,DataSetzd[-etykiety,])
+vmod[[4]]<-classifier;verr<-c(verr,lres$perror)
 zapisz_rpart(vmod[[1]],paste(mypathout,nData,"_rpart_nrm",sep=""))
 zapisz_rpart(vmod[[2]],paste(mypathout,nData,"_rpart_zsc",sep=""))
 zapisz_rpart(vmod[[3]],paste(mypathout,nData,"_rpart_nrd",sep=""))
@@ -128,18 +140,18 @@ verr
 verr<-c();vmod<-list()
 parvectree=setdiff(names(DataSet),parvecnotree)
 etykiety <- sample(1:nrow(DataSet), round(nrow(DataSet)*0.8))
-classific<-evalwithattr(J48,paroutputree,parvectree,DataSet[etykiety,])
-lres<-prederror(classific,paroutputree,parvectree,DataSet[-etykiety,])
-vmod[[1]]<-classific;verr<-c(verr,lres$perror)
-classific<-evalwithattr(J48,"Type",parvectree,DataSetz[etykiety,])
-lres<-prederror(classific,paroutputree,parvectree,DataSetz[-etykiety,])
-vmod[[2]]<-classific;verr<-c(verr,lres$perror)
-classific<-evalwithattr(J48,"Type",parvectree,DataSetd[etykiety,])
-lres<-prederror(classific,paroutputree,parvectree,DataSetd[-etykiety,])
-vmod[[3]]<-classific;verr<-c(verr,lres$perror)
-classific<-evalwithattr(J48,"Type",parvectree,DataSetzd[etykiety,])
-lres<-prederror(classific,paroutputree,parvectree,DataSetzd[-etykiety,])
-vmod[[4]]<-classific;verr<-c(verr,lres$perror)
+classifier<-evalwithattr(J48,paroutputree,parvectree,DataSet[etykiety,])
+lres<-prederror(classifier,paroutputree,parvectree,DataSet[-etykiety,])
+vmod[[1]]<-classifier;verr<-c(verr,lres$perror)
+classifier<-evalwithattr(J48,"Type",parvectree,DataSetz[etykiety,])
+lres<-prederror(classifier,paroutputree,parvectree,DataSetz[-etykiety,])
+vmod[[2]]<-classifier;verr<-c(verr,lres$perror)
+classifier<-evalwithattr(J48,"Type",parvectree,DataSetd[etykiety,])
+lres<-prederror(classifier,paroutputree,parvectree,DataSetd[-etykiety,])
+vmod[[3]]<-classifier;verr<-c(verr,lres$perror)
+classifier<-evalwithattr(J48,"Type",parvectree,DataSetzd[etykiety,])
+lres<-prederror(classifier,paroutputree,parvectree,DataSetzd[-etykiety,])
+vmod[[4]]<-classifier;verr<-c(verr,lres$perror)
 zapisz_weka(vmod[[1]],paste(mypathout,nData,"_wkJ48_nrm",sep=""))
 zapisz_weka(vmod[[2]],paste(mypathout,nData,"_wkJ48_zsc",sep=""))
 zapisz_weka(vmod[[3]],paste(mypathout,nData,"_wkJ48_nrd",sep=""))
@@ -149,28 +161,78 @@ verr
 #generujemy svm dla parvectree
 verr<-c();vmod<-list()
 parvectree=setdiff(names(DataSet),parvecnotree)
-etykiety <- sample(1:nrow(DataSet), round(nrow(DataSet)*0.5))
+etykiety <- sample(1:nrow(DataSet), round(nrow(DataSet)*0.7))
 svmextra<-'kernel="linear"'
 #svmextra<-'kernel="sigmoid"'
 #svmextra<-'kernel="polynomial"'
 #svmextra<-'kernel="radial"'
-classific<-evalwithattr(svm,paroutputree,parvectree,DataSet[etykiety,],svmextra)
-lres<-prederror(classific,paroutputree,parvectree,DataSet[-etykiety,],svmextra)
-vmod[[1]]<-classific;verr<-c(verr,lres$perror)
-classific<-evalwithattr(svm,paroutputree,parvectree,DataSetz[etykiety,],svmextra)
-lres<-prederror(classific,paroutputree,parvectree,DataSetz[-etykiety,],svmextra)
-vmod[[2]]<-classific;verr<-c(verr,lres$perror)
-classific<-evalwithattr(svm,paroutputree,parvectree,DataSetd[etykiety,],svmextra)
-lres<-prederror(classific,paroutputree,parvectree,DataSetd[-etykiety,],svmextra)
-vmod[[3]]<-classific;verr<-c(verr,lres$perror)
-classific<-evalwithattr(svm,paroutputree,parvectree,DataSetzd[etykiety,],svmextra)
-lres<-prederror(classific,paroutputree,parvectree,DataSetzd[-etykiety,],svmextra)
-vmod[[4]]<-classific;verr<-c(verr,lres$perror)
+classifier<-evalwithattr(svm,paroutputree,parvectree,DataSet[etykiety,],svmextra)
+lres<-prederror(classifier,paroutputree,parvectree,DataSet[-etykiety,],svmextra)
+vmod[[1]]<-classifier;verr<-c(verr,lres$perror)
+classifier<-evalwithattr(svm,paroutputree,parvectree,DataSetz[etykiety,],svmextra)
+lres<-prederror(classifier,paroutputree,parvectree,DataSetz[-etykiety,],svmextra)
+vmod[[2]]<-classifier;verr<-c(verr,lres$perror)
+classifier<-evalwithattr(svm,paroutputree,parvectree,DataSetd[etykiety,],svmextra)
+lres<-prederror(classifier,paroutputree,parvectree,DataSetd[-etykiety,],svmextra)
+vmod[[3]]<-classifier;verr<-c(verr,lres$perror)
+classifier<-evalwithattr(svm,paroutputree,parvectree,DataSetzd[etykiety,],svmextra)
+lres<-prederror(classifier,paroutputree,parvectree,DataSetzd[-etykiety,],svmextra)
+vmod[[4]]<-classifier;verr<-c(verr,lres$perror)
 verr
 
+##########################################################################################################
+#ipredknn
+verr<-c();vmod<-list()
+parvectree=setdiff(names(DataSet),parvecnotree)
+etykiety <- sample(1:nrow(DataSet), round(nrow(DataSet)*0.7))
+mDataSet<-DataSet[etykiety,]
+classifier <- evalwithattr(ipredknn,paroutputree,parvectree,mDataSet)
+lres<-prederror(classifier,paroutputree,parvectree,DataSet[-etykiety,])
+vmod[[1]]<-classifier;verr<-c(verr,lres$perror)
+mDataSet<-DataSetz[etykiety,]
+classifier <- evalwithattr(ipredknn,paroutputree,parvectree,mDataSet)
+lres<-prederror(classifier,paroutputree,parvectree,DataSetz[-etykiety,])
+vmod[[2]]<-classifier;verr<-c(verr,lres$perror)
+mDataSet<-DataSetd[etykiety,]
+classifier <- evalwithattr(ipredknn,paroutputree,parvectree,mDataSet)
+lres<-prederror(classifier,paroutputree,parvectree,DataSetd[-etykiety,])
+vmod[[3]]<-classifier;verr<-c(verr,lres$perror)
+mDataSet<-DataSetzd[etykiety,]
+classifier <- evalwithattr(ipredknn,paroutputree,parvectree,mDataSet)
+lres<-prederror(classifier,paroutputree,parvectree,DataSetzd[-etykiety,])
+vmod[[4]]<-classifier;verr<-c(verr,lres$perror)
+verr
+
+##########################################################################################################
+#lda
+verr<-c();vmod<-list()
+evalstr<-"LDA"
+parvectree=setdiff(names(DataSet),parvecnotree)
+etykiety <- sample(1:nrow(DataSet), round(nrow(DataSet)*0.7))
+mDataSet<-DataSet[etykiety,]
+classifier <- evalwithattr(lda,paroutputree,parvectree,mDataSet)
+lres<-prederror(classifier,paroutputree,parvectree,DataSet[-etykiety,],evalstr)
+vmod[[1]]<-classifier;verr<-c(verr,lres$perror)
+mDataSet<-DataSetz[etykiety,]
+classifier <- evalwithattr(lda,paroutputree,parvectree,mDataSet)
+lres<-prederror(classifier,paroutputree,parvectree,DataSetz[-etykiety,],evalstr)
+vmod[[2]]<-classifier;verr<-c(verr,lres$perror)
+mDataSet<-DataSetd[etykiety,]
+classifier <- evalwithattr(lda,paroutputree,parvectree,mDataSet)
+lres<-prederror(classifier,paroutputree,parvectree,DataSetd[-etykiety,],evalstr)
+vmod[[3]]<-classifier;verr<-c(verr,lres$perror)
+mDataSet<-DataSetzd[etykiety,]
+classifier <- evalwithattr(lda,paroutputree,parvectree,mDataSet)
+lres<-prederror(classifier,paroutputree,parvectree,DataSetzd[-etykiety,],evalstr)
+vmod[[4]]<-classifier;verr<-c(verr,lres$perror)
+verr
+
+##########################################################################################################
+#NaiveBayes,qda
 
 ##########################################################################################################
 #REGRESJA LINIOWA
+nFunction="lm"
 #w mparvec zmienne niezale¿ne do regresji
 mparvec=setdiff(names(DataSet),parvecnolm)
 
@@ -183,88 +245,83 @@ alpha<-0.1;
 nleven<--1; 
 #wybieramy dane normalne
 mDataSet<-DataSet
-lmabc_nobp<-permregres(paste(mypathout,nData,"_lmabc_nobp",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
+lmabc_nobp<-permbesteval("lm", paste(mypathout,nData,"_lmabc_nobp",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
 #wybieramy dane zeskorowane
 mDataSet<-DataSetz
-lmabc_zebp<-permregres(paste(mypathout,nData,"_lmabc_zebp",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
+lmabc_zebp<-permbesteval("lm", paste(mypathout,nData,"_lmabc_zebp",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
 #wybieramy dane zeskalowane i zcentrowane
-mDataSet<-DataSetm
+#mDataSet<-DataSetm
 #skalowanie likwiduje intercept wspó³czynnik przesuniêcia prostej
-lmabc_msbp<-permregres(paste(mypathout,nData,"_lmabc_msbp",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
+#lmabc_msbp<-permbesteval("lm", paste(mypathout,nData,"_lmabc_msbp",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
 
 ##########################################################################################################
 #dla nleven > 0 levena ilo¶æ przedzia³ów, dla nleven < 0 bptest, dla nleven == 0 brak testów wariancji
 #brak testów wariancji
 nleven<-0; 
 mDataSet<-DataSet
-lmabc_nono<-permregres(paste(mypathout,nData,"_lmabc_nono",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
+lmabc_nono<-permbesteval("lm", paste(mypathout,nData,"_lmabc_nono",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
 mDataSet<-DataSetz
-lmabc_zeno<-permregres(paste(mypathout,nData,"_lmabc_zeno",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
-mDataSet<-DataSetm
-lmabc_msno<-permregres(paste(mypathout,nData,"_lmabc_msno",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
+lmabc_zeno<-permbesteval("lm", paste(mypathout,nData,"_lmabc_zeno",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
+#mDataSet<-DataSetm
+#lmabc_msno<-permbesteval("lm", paste(mypathout,nData,"_lmabc_msno",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
 
 ##########################################################################################################
 #dla nleven > 0 levena ilo¶æ przedzia³ów, dla nleven < 0 bptest, dla nleven == 0 brak testów wariancji
 #brak testów wariancji
 nleven<-5; 
 mDataSet<-DataSet
-lmabc_nolt<-permregres(paste(mypathout,nData,"_lmabc_nolt",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
+lmabc_nolt<-permbesteval("lm", paste(mypathout,nData,"_lmabc_nolt",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
 mDataSet<-DataSetz
-lmabc_zelt<-permregres(paste(mypathout,nData,"_lmabc_zelt",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
-mDataSet<-DataSetm
-lmabc_mslt<-permregres(paste(mypathout,nData,"_lmabc_mslt",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
+lmabc_zelt<-permbesteval("lm", paste(mypathout,nData,"_lmabc_zelt",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
+#mDataSet<-DataSetm
+#lmabc_mslt<-permbesteval("lm", paste(mypathout,nData,"_lmabc_mslt",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
 
 ##########################################################################################################
 #Teraz u¿yjemy splinów czyli y~bs(x1)+bs(x2)+...
 SPLINE<-"SPLINE";
 ##########################################################################################################
-#alpha to krytyczna warto¶æ prawdopodobieñstwa p dla statystyk bp i f 
-alpha<-0.1
-##########################################################################################################
-#dla nleven > 0 levena ilo¶æ przedzia³ów, dla nleven < 0 bptest, dla nleven == 0 brak testów wariancji
 #bptest
 nleven<--1; 
-#wybieramy dane normalne
 mDataSet<-DataSet
-lmbsp_nobp<-permregres(paste(mypathout,nData,"_lmbsp_nobp",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
-#wybieramy dane zeskorowane
+lmbsp_nobp<-permbesteval("lm", paste(mypathout,nData,"_lmbsp_nobp",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
 mDataSet<-DataSetz
-lmbsp_zebp<-permregres(paste(mypathout,nData,"_lmbsp_zebp",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
-#wybieramy dane zeskalowane i zcentrowane
-mDataSet<-DataSetm
-#skalowanie likwiduje intercept wspó³czynnik przesuniêcia prostej
-lmbsp_msbp<-permregres(paste(mypathout,nData,"_lmbsp_msbp",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
+lmbsp_zebp<-permbesteval("lm", paste(mypathout,nData,"_lmbsp_zebp",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
+#mDataSet<-DataSetm
+#lmbsp_msbp<-permbesteval("lm", paste(mypathout,nData,"_lmbsp_msbp",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
 
 ##########################################################################################################
 #dla nleven > 0 levena ilo¶æ przedzia³ów, dla nleven < 0 bptest, dla nleven == 0 brak testów wariancji
 #brak testów wariancji
 nleven<-0; 
 mDataSet<-DataSet
-lmbsp_nono<-permregres(paste(mypathout,nData,"_lmbsp_nono",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
+lmbsp_nono<-permbesteval("lm", paste(mypathout,nData,"_lmbsp_nono",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
 mDataSet<-DataSetz
-lmbsp_zeno<-permregres(paste(mypathout,nData,"_lmbsp_zeno",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
-mDataSet<-DataSetm
-lmbsp_msno<-permregres(paste(mypathout,nData,"_lmbsp_msno",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
+lmbsp_zeno<-permbesteval("lm", paste(mypathout,nData,"_lmbsp_zeno",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
+#mDataSet<-DataSetm
+#lmbsp_msno<-permbesteval("lm", paste(mypathout,nData,"_lmbsp_msno",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
 
 ##########################################################################################################
 #dla nleven > 0 levena ilo¶æ przedzia³ów, dla nleven < 0 bptest, dla nleven == 0 brak testów wariancji
 #leven
 nleven<-5; 
 mDataSet<-DataSet
-lmbsp_nolt<-permregres(paste(mypathout,nData,"_lmbsp_nolt",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
+lmbsp_nolt<-permbesteval("lm", paste(mypathout,nData,"_lmbsp_nolt",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
 mDataSet<-DataSetz
-lmbsp_zelt<-permregres(paste(mypathout,nData,"_lmbsp_zelt",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
-mDataSet<-DataSetm
-lmbsp_mslt<-permregres(paste(mypathout,nData,"_lmbsp_mslt",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
+lmbsp_zelt<-permbesteval("lm", paste(mypathout,nData,"_lmbsp_zelt",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
+#mDataSet<-DataSetm
+#lmbsp_mslt<-permbesteval("lm", paste(mypathout,nData,"_lmbsp_mslt",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
 
+##########################################################################################################
+#REGRESJA LOGISTYCZNA
+nFunction="polr"
+etykiety <- sample(1:nrow(DataSet), round(nrow(DataSet)*0.9))
+parvectree=setdiff(names(DataSet),parvecnotree)
+evalstr<-"Hess=TRUE"
+mDataSet<-DataSetd[etykiety,]
+polra_nodi<-permbesteval("polr", paste(mypathout,nData,"_polra_nodi",sep=""),mDataSet, paroutputree, parvectree, nleven, alpha, evalstr)
+mDataSet<-DataSetzd[etykiety,]
+polra_zedi<-permbesteval("polr", paste(mypathout,nData,"_polra_zedi",sep=""),mDataSet, paroutputree, parvectree, nleven, alpha, evalstr)
 
-#bp<-bptest(RI~Si,data=DataSet)
-#rs2<-summary(m01)[c("r.squared", "adj.r.squared")] 
-#get("permutations","package:gtools")(9,9,mparvec)
-#etykiety <- sample(1:nrow(DataSet), round(nrow(DataSet)*0.5))
-#t01<-evalwithattr(rpart,"Type",mparvec,DataSet)
-#oceny1=predict(t01,newdata=DataSet[-etykiety,which(names(DataSet)%in%mparvec)])
-#oceny2=predict(t01,newdata=DataSet[-etykiety,which(names(DataSet)%in%mparvec)],"class")
-#table(predicted=oceny2, real=DataSet[-etykiety,which(names(DataSet)%in%c("Type"))])
-#pred1<-prediction(oceny1,DataSet[-etykiety,which(names(DataSet)%in%c("Type"))])
-
+#prederror(regression,paroutputree,mparvec,DataSetzd[-etykiety,],evalstr)
+#nFunction<-"polr"; fname<-paste(mypathout,nData,"_polra_nodi",sep=""); moutput<-paroutputree;parvec<-parvectree; EvalString<-evalstr;
+#nFunction="lm";fname<-paste(mypathout,nData,"_lmbsp_zelt",sep="");mDataSet<-DataSetz

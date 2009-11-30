@@ -6,7 +6,7 @@
 #Ksi±¿ka po polsku: Daniel Larose "Metody i modele eksploracji danych" PWN 2006
 #po angielsku: http://cran.r-project.org/doc/contrib/Faraway-PRA.pdf
 #Regresja liniowa: zasada KISS - Keep It Simple, Stupid
-#y~x <=> y=a+bx+e
+#y~x <=> y=B0+B1x+e
 #zak³ócenia e maj±
 #rozk³ad normalny
 #s± niezale¿ne
