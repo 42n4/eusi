@@ -58,7 +58,7 @@ prederror<-function(classimod,paroutputree,parvectree,DataSet,EvalString="DEFAUL
 #i oblicza dla nich funkcje get(nFunction) i wybiera najlepsz± dla ka¿dego n, wraca listê najlepszych obiektów z kolejnych iteracji  
 #w lb<n> mamy wybierane po kolei kolejne zestawy na najlepsz± regresjê 
 #w m<n> najlepszy model dla n, w sm<n> summary(m<n>), dla n=1 rysuje plot regresji
-permbesteval<-function (nFunc, fname, mDataSet, moutput, parvec, nleven=-1, alpha=0.01, EvalString="DEFAULT"){
+permbesteval<-function (nFunction, fname, mDataSet, moutput, parvec, nleven=-1, alpha=0.01, EvalString="DEFAULT"){
 	l<-list()
 	n<-length(parvec)
 	varvec<-parvec
@@ -159,7 +159,9 @@ lmwithattr<-function (DataSet, moutput, parvec, numvar, nleven=-1, alpha=0.01, E
 		if(numvar==length(parvec))	varplus<-parvec;
 		m01<-try(evalwithattr(lm,moutput,varplus,DataSet,EvalString),TRUE);
 		if(!inherits(m01, "try-error")){
-			an<-anova(lm(RI~1,DataSet),m01);
+			tmp=paste("anova(",deparse(substitute(lm)),"(",moutput,"~1,DataSet),m01)",sep="")
+			#an<-anova(lm(RI~1),m01);
+			an<-eval(parse(text=tmp))
 			sm01<-summary(m01)
 			if(nleven>0){
 				mintervals<-cut(m01$fitted.values,nleven)
@@ -246,7 +248,7 @@ scale_for<-function (DataSet, parvec, CENTER, SCALE)
 zscore.for.integer<-function (DataSet, parvec, integercolumnforzscore)         
 {
 	indata<-DataSet
-	for(i in c(sort(unique(DataSet[[integercolumnforzscore]])))){
+	for(i in sort(unique(DataSet[[integercolumnforzscore]]))){
 		indata[(indata[[integercolumnforzscore]]==i),]=zscore(indata[(indata[[integercolumnforzscore]]==i),],which(names(indata) %in% parvec))
 	}
 	return(indata)
@@ -256,7 +258,8 @@ zscore.for.integer<-function (DataSet, parvec, integercolumnforzscore)
 disc.for.chosen<-function (DataSet, parvec, levelnum)         
 {
 	DataSetd<-DataSet
-	DataSetd[names(DataSet) %in% parvec]<-disc.ef(DataSet[names(DataSet) %in% parvec], which(names(DataSetz) %in% parvec), levelnum)
+	#DataSetd[names(DataSet) %in% parvec]<-disc.ef(DataSet[names(DataSet) %in% parvec], which(names(DataSetz) %in% parvec), levelnum)
+	DataSetd<-disc.ef(DataSet, which(names(DataSet) %in% parvec), levelnum)
 	DataSetd<-factorto(DataSetd, which(names(DataSetd) %in% parvec))
 	return(DataSetd)
 }

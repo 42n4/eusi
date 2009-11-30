@@ -17,7 +17,9 @@ dir.create(mypathout, showWarnings = TRUE, recursive = TRUE, mode = "0755")
 source(paste(mypath,"isowitfunkcje.r",sep=""))
 
 ##########################################################################################################
-nData<-"Glass"
+#nData<-"Glass"
+#nData<-"nihills"
+nData<-"photocar"
 #wczytywanie zbioru treningowego o nazwie nData
 #assign(nData,read.csv(paste("file://",mypath,"meatDataEN.csv",sep=""),head=TRUE,sep=";",dec=",",na.strings=c("NA", "BD", "bd", "", "?")))
 #library(mlbench)
@@ -48,7 +50,40 @@ if(nData=="Glass") paroutputree=c("Type")
 if(nData=="Glass") parvecnolm=c("Type","RI")
 #wybieramy zmienn± zale¿n±, target dla regresji, zwykle zmiennoprzecinkowy
 if(nData=="Glass") moutput<-"RI"
+##########################################################################################################
+#te atrybuty, co s± faktorami, zmiennymi jako¶ciowymi z kategoriami, etykietami
+if(nData=="nihills") parvecfactor=c()
+#w parnokruskal to co zostanie nie wys³ane do isoMDS(daisy) np. parnokruskal=c("Type")
+if(nData=="nihills") parnokruskal=c()
+#atrybuty w plotMDS do kolorowania powsta³ych punktów 
+if(nData=="nihills") parvecol<-names(DataSet)
+#zmienne, które nie wchodz± do drzewa m.in. jego li¶cie, target, cel optymalizacji drzewa
+if(nData=="nihills") parvecnotree=c('time')
+#li¶æ drzewa, etykieta
+if(nData=="nihills") paroutputree=c('time')
+#zmienne zale¿ne i inne zbêdne w regresji
+if(nData=="nihills") parvecnolm=c("time")
+#wybieramy zmienn± zale¿n±, target dla regresji, zwykle zmiennoprzecinkowy
+if(nData=="nihills") moutput<-"time"
 
+##########################################################################################################
+#te atrybuty, co s± faktorami, zmiennymi jako¶ciowymi z kategoriami, etykietami
+if(nData=="photocar") parvecfactor=c("group","event","tumor")
+#atrybut pojedyñczy do zescorowania po jego dyskretnych warto¶ciach
+if(nData=="photocar") vecfactorzesc=c("group")
+#w parnokruskal to co zostanie nie wys³ane do isoMDS(daisy) np. parnokruskal=c("Type")
+if(nData=="photocar") parnokruskal=c()
+#atrybuty w plotMDS do kolorowania powsta³ych punktów 
+if(nData=="photocar") parvecol<-names(DataSet)
+#zmienne, które nie wchodz± do drzewa m.in. jego li¶cie, target, cel optymalizacji drzewa
+if(nData=="photocar") parvecnotree=c("group")
+#li¶æ drzewa, etykieta
+if(nData=="photocar") paroutputree=c("group")
+#zmienne zale¿ne i inne zbêdne w regresji
+#if(nData=="photocar") parvecnolm=c("time","group","tumor","event")
+if(nData=="photocar") parvecnolm=c("time")
+#wybieramy zmienn± zale¿n±, target dla regresji, zwykle zmiennoprzecinkowy
+if(nData=="photocar") moutput<-"time"
 
 ##########################################################################################################
 #te atrybuty, które s± zmiennymi ilo¶ciowymi
@@ -70,23 +105,30 @@ DataSets<-scale_for(DataSet,parvec,FALSE,TRUE)
 DataSetm<-scale_for(DataSet,parvec,TRUE,FALSE)
 
 #zetskorujê wybrane kolumny z liczbami zmiennoprzecinkowymi i ca³kowitymi
-DataSetz<-zscore.for.integer(DataSet,parvec,c("Type"))
+DataSetz<-zscore.for.integer(DataSet,parvec,vecfactorzesc)
 
 #dyskretyzujê kolumny poprzednio zeskorowane
 DataSetzd<-disc.for.chosen(DataSetz,parvec,3)
 
 #dyskretyzujê tak¿e nie zeskorowane warto¶ci zwyk³ego zbioru wczytanego na pocz±tku
 DataSetd<-disc.for.chosen(DataSet,parvec,3)
+for(i in 1:ncol(DataSetd))
+	DataSetd[,i]<-factor(DataSetd[,i])	
+
+#DataSetd<-factorto(DataSetd, 1:ncol(DataSetd))
+#indata<-DataSet;varcon<-which(names(DataSet) %in% parvec);k<-levelnum
+
+
 
 ##########################################################################################################
 #korelacje miêdzy atrybutami
 #for(cormethod in c("pearson","kendall","spearman")){
 for(cormethod in c("pearson")){
-	hier2jpg(cormethod,DataSet,paste(mypathout,nData,"_hiercor_",cormethod,"_norm",sep=""))
-	hier2jpg(cormethod,DataSetz,paste(mypathout,nData,"_hiercor_",cormethod,"_zesc",sep=""))
+	hier2jpg(cormethod,DataSet[,parvec],paste(mypathout,nData,"_hiercor_",cormethod,"_norm",sep=""))
+	hier2jpg(cormethod,DataSetz[,parvec],paste(mypathout,nData,"_hiercor_",cormethod,"_zesc",sep=""))
 }
-latt2jpg(DataSet,DataSet$Type,paste(mypathout,nData,"_lattcor_norm",sep=""))
-latt2jpg(DataSetz,DataSet$Type,paste(mypathout,nData,"_lattcor_zesc",sep=""))
+latt2jpg(DataSet[,parvec],DataSetd[,vecfactorzesc],paste(mypathout,nData,"_lattcor_norm",sep=""))
+latt2jpg(DataSetz[,parvec],DataSetzd[,vecfactorzesc],paste(mypathout,nData,"_lattcor_zesc",sep=""))
 #pairs
 
 
@@ -121,13 +163,13 @@ etykiety <- sample(1:nrow(DataSet), round(nrow(DataSet)*0.8))
 classifier<-evalwithattr(rpart,paroutputree,parvectree,DataSet[etykiety,])
 lres<-prederror(classifier,paroutputree,parvectree,DataSet[-etykiety,])
 vmod[[1]]<-classifier;verr<-c(verr,lres$perror)
-classifier<-evalwithattr(rpart,"Type",parvectree,DataSetz[etykiety,])
+classifier<-evalwithattr(rpart,paroutputree,parvectree,DataSetz[etykiety,])
 lres<-prederror(classifier,paroutputree,parvectree,DataSetz[-etykiety,])
 vmod[[2]]<-classifier;verr<-c(verr,lres$perror)
-classifier<-evalwithattr(rpart,"Type",parvectree,DataSetd[etykiety,])
+classifier<-evalwithattr(rpart,paroutputree,parvectree,DataSetd[etykiety,])
 lres<-prederror(classifier,paroutputree,parvectree,DataSetd[-etykiety,])
 vmod[[3]]<-classifier;verr<-c(verr,lres$perror)
-classifier<-evalwithattr(rpart,"Type",parvectree,DataSetzd[etykiety,])
+classifier<-evalwithattr(rpart,paroutputree,parvectree,DataSetzd[etykiety,])
 lres<-prederror(classifier,paroutputree,parvectree,DataSetzd[-etykiety,])
 vmod[[4]]<-classifier;verr<-c(verr,lres$perror)
 zapisz_rpart(vmod[[1]],paste(mypathout,nData,"_rpart_nrm",sep=""))
@@ -143,28 +185,32 @@ etykiety <- sample(1:nrow(DataSet), round(nrow(DataSet)*0.8))
 classifier<-evalwithattr(J48,paroutputree,parvectree,DataSet[etykiety,])
 lres<-prederror(classifier,paroutputree,parvectree,DataSet[-etykiety,])
 vmod[[1]]<-classifier;verr<-c(verr,lres$perror)
-classifier<-evalwithattr(J48,"Type",parvectree,DataSetz[etykiety,])
+classifier<-evalwithattr(J48,paroutputree,parvectree,DataSetz[etykiety,])
 lres<-prederror(classifier,paroutputree,parvectree,DataSetz[-etykiety,])
 vmod[[2]]<-classifier;verr<-c(verr,lres$perror)
-classifier<-evalwithattr(J48,"Type",parvectree,DataSetd[etykiety,])
+classifier<-evalwithattr(J48,paroutputree,parvectree,DataSetd[etykiety,])
 lres<-prederror(classifier,paroutputree,parvectree,DataSetd[-etykiety,])
 vmod[[3]]<-classifier;verr<-c(verr,lres$perror)
-classifier<-evalwithattr(J48,"Type",parvectree,DataSetzd[etykiety,])
+classifier<-evalwithattr(J48,paroutputree,parvectree,DataSetzd[etykiety,])
 lres<-prederror(classifier,paroutputree,parvectree,DataSetzd[-etykiety,])
 vmod[[4]]<-classifier;verr<-c(verr,lres$perror)
+classifier<-evalwithattr(J48,"Type",parvectree,DataSetms[etykiety,])
+lres<-prederror(classifier,paroutputree,parvectree,DataSetms[-etykiety,])
+vmod[[5]]<-classifier;verr<-c(verr,lres$perror)
 zapisz_weka(vmod[[1]],paste(mypathout,nData,"_wkJ48_nrm",sep=""))
 zapisz_weka(vmod[[2]],paste(mypathout,nData,"_wkJ48_zsc",sep=""))
 zapisz_weka(vmod[[3]],paste(mypathout,nData,"_wkJ48_nrd",sep=""))
 zapisz_weka(vmod[[4]],paste(mypathout,nData,"_wkJ48_zsd",sep=""))
+zapisz_weka(vmod[[5]],paste(mypathout,nData,"_wkJ48_mes",sep=""))
 verr
 ##########################################################################################################
 #generujemy svm dla parvectree
 verr<-c();vmod<-list()
 parvectree=setdiff(names(DataSet),parvecnotree)
 etykiety <- sample(1:nrow(DataSet), round(nrow(DataSet)*0.7))
-svmextra<-'kernel="linear"'
+#svmextra<-'kernel="linear"'
 #svmextra<-'kernel="sigmoid"'
-#svmextra<-'kernel="polynomial"'
+svmextra<-'kernel="polynomial"'
 #svmextra<-'kernel="radial"'
 classifier<-evalwithattr(svm,paroutputree,parvectree,DataSet[etykiety,],svmextra)
 lres<-prederror(classifier,paroutputree,parvectree,DataSet[-etykiety,],svmextra)
