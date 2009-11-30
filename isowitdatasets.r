@@ -28,15 +28,12 @@ data(list=nData)
 DataSet<-get(nData)
 
 ##########################################################################################################
-
-
-##########################################################################################################
 if(nData=="Glass"){
 	#operacje kosmetyczne poprawiaj±ce dane, przystosowuj±ce
 	#usuwanie takich samych wierszy ze zbioru Glass, a dok³adnie jednego z nich
 	#(jak siê pojawi± dwa takie same wiersze to wyrzuca b³±d isoMDS, 
 	# dlatego na samym pocz±tku usuwane s± niektóre wiersze z Glass)
-	if(nData=="Glass") DataSet<-DataSet[-c(40),]
+	DataSet<-DataSet[-c(40),]
 	#te atrybuty, co s± faktorami, zmiennymi jako¶ciowymi z kategoriami, etykietami
 	parvecfactor=c("Type")
 	#w parnokruskal to co zostanie nie wys³ane do isoMDS(daisy) np. parnokruskal=c("Type")
@@ -78,6 +75,8 @@ if(nData=="nihills"){
 
 ##########################################################################################################
 if(nData=="photocar"){
+	#usuwanie do Kruskala
+	DataSet<-DataSet[-c(13,25,36,37,67,64,77,52),]
  	#te atrybuty, co s± faktorami, zmiennymi jako¶ciowymi z kategoriami, etykietami
 	parvecfactor=c("group","event","tumor")
 	#atrybut pojedyñczy do zescorowania po jego dyskretnych warto¶ciach
