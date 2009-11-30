@@ -259,7 +259,8 @@ disc.for.chosen<-function (DataSet, parvec, levelnum)
 {
 	DataSetd<-DataSet
 	#DataSetd[names(DataSet) %in% parvec]<-disc.ef(DataSet[names(DataSet) %in% parvec], which(names(DataSetz) %in% parvec), levelnum)
-	DataSetd<-disc.ef(DataSet, which(names(DataSet) %in% parvec), levelnum)
+	DataSetd[,parvec]<-disc.ef(DataSet[,parvec], which(names(DataSet[,parvec]) %in% parvec), levelnum)
+	#DataSetd<-disc.ef(DataSet, which(names(DataSet) %in% parvec), levelnum)
 	DataSetd<-factorto(DataSetd, which(names(DataSetd) %in% parvec))
 	return(DataSetd)
 }

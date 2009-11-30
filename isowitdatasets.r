@@ -13,77 +13,89 @@ mypathout<-paste(mypath,"rysunki/",sep="")
 dir.create(mypathout, showWarnings = TRUE, recursive = TRUE, mode = "0755")
 #Sys.chmod(paths, mode = "0755")
 
-
 source(paste(mypath,"isowitfunkcje.r",sep=""))
 
 ##########################################################################################################
 #nData<-"Glass"
 #nData<-"nihills"
 nData<-"photocar"
+
+##########################################################################################################
 #wczytywanie zbioru treningowego o nazwie nData
 #assign(nData,read.csv(paste("file://",mypath,"meatDataEN.csv",sep=""),head=TRUE,sep=";",dec=",",na.strings=c("NA", "BD", "bd", "", "?")))
 #library(mlbench)
 data(list=nData)
-
 DataSet<-get(nData)
 
 ##########################################################################################################
-#operacje kosmetyczne poprawiaj±ce dane, przystosowuj±ce
-#usuwanie takich samych wierszy ze zbioru Glass, a dok³adnie jednego z nich
-#(jak siê pojawi± dwa takie same wiersze to wyrzuca b³±d isoMDS, 
-# dlatego na samym pocz±tku usuwane s± niektóre wiersze z Glass)
-if(nData=="Glass") DataSet<-DataSet[-c(40),]
 
 
 ##########################################################################################################
-#te atrybuty, co s± faktorami, zmiennymi jako¶ciowymi z kategoriami, etykietami
-if(nData=="Glass") parvecfactor=c("Type")
-#w parnokruskal to co zostanie nie wys³ane do isoMDS(daisy) np. parnokruskal=c("Type")
-if(nData=="Glass") parnokruskal=c()
-#atrybuty w plotMDS do kolorowania powsta³ych punktów 
-if(nData=="Glass") parvecol<-names(DataSet)
-#zmienne, które nie wchodz± do drzewa m.in. jego li¶cie, target, cel optymalizacji drzewa
-if(nData=="Glass") parvecnotree=c("Type")
-#li¶æ drzewa, etykieta
-if(nData=="Glass") paroutputree=c("Type")
-#zmienne zale¿ne i inne zbêdne w regresji
-if(nData=="Glass") parvecnolm=c("Type","RI")
-#wybieramy zmienn± zale¿n±, target dla regresji, zwykle zmiennoprzecinkowy
-if(nData=="Glass") moutput<-"RI"
-##########################################################################################################
-#te atrybuty, co s± faktorami, zmiennymi jako¶ciowymi z kategoriami, etykietami
-if(nData=="nihills") parvecfactor=c()
-#w parnokruskal to co zostanie nie wys³ane do isoMDS(daisy) np. parnokruskal=c("Type")
-if(nData=="nihills") parnokruskal=c()
-#atrybuty w plotMDS do kolorowania powsta³ych punktów 
-if(nData=="nihills") parvecol<-names(DataSet)
-#zmienne, które nie wchodz± do drzewa m.in. jego li¶cie, target, cel optymalizacji drzewa
-if(nData=="nihills") parvecnotree=c('time')
-#li¶æ drzewa, etykieta
-if(nData=="nihills") paroutputree=c('time')
-#zmienne zale¿ne i inne zbêdne w regresji
-if(nData=="nihills") parvecnolm=c("time")
-#wybieramy zmienn± zale¿n±, target dla regresji, zwykle zmiennoprzecinkowy
-if(nData=="nihills") moutput<-"time"
+if(nData=="Glass"){
+	#operacje kosmetyczne poprawiaj±ce dane, przystosowuj±ce
+	#usuwanie takich samych wierszy ze zbioru Glass, a dok³adnie jednego z nich
+	#(jak siê pojawi± dwa takie same wiersze to wyrzuca b³±d isoMDS, 
+	# dlatego na samym pocz±tku usuwane s± niektóre wiersze z Glass)
+	if(nData=="Glass") DataSet<-DataSet[-c(40),]
+	#te atrybuty, co s± faktorami, zmiennymi jako¶ciowymi z kategoriami, etykietami
+	parvecfactor=c("Type")
+	#w parnokruskal to co zostanie nie wys³ane do isoMDS(daisy) np. parnokruskal=c("Type")
+	parnokruskal=c()
+	#atrybut pojedyñczy do zescorowania po jego dyskretnych warto¶ciach
+	vecfactorzesc=c("Type")
+	#atrybuty w plotMDS do kolorowania powsta³ych punktów 
+	parvecol<-names(DataSet)
+	#zmienne, które nie wchodz± do drzewa m.in. jego li¶cie, target, cel optymalizacji drzewa
+	parvecnotree=c("Type")
+	#li¶æ drzewa, etykieta
+	paroutputree=c("Type")
+	#zmienne zale¿ne i inne zbêdne w regresji
+	parvecnolm=c("Type","RI")
+	#wybieramy zmienn± zale¿n±, target dla regresji, zwykle zmiennoprzecinkowy
+	moutput<-"RI"
+}
 
 ##########################################################################################################
-#te atrybuty, co s± faktorami, zmiennymi jako¶ciowymi z kategoriami, etykietami
-if(nData=="photocar") parvecfactor=c("group","event","tumor")
-#atrybut pojedyñczy do zescorowania po jego dyskretnych warto¶ciach
-if(nData=="photocar") vecfactorzesc=c("group")
-#w parnokruskal to co zostanie nie wys³ane do isoMDS(daisy) np. parnokruskal=c("Type")
-if(nData=="photocar") parnokruskal=c()
-#atrybuty w plotMDS do kolorowania powsta³ych punktów 
-if(nData=="photocar") parvecol<-names(DataSet)
-#zmienne, które nie wchodz± do drzewa m.in. jego li¶cie, target, cel optymalizacji drzewa
-if(nData=="photocar") parvecnotree=c("group")
-#li¶æ drzewa, etykieta
-if(nData=="photocar") paroutputree=c("group")
-#zmienne zale¿ne i inne zbêdne w regresji
-#if(nData=="photocar") parvecnolm=c("time","group","tumor","event")
-if(nData=="photocar") parvecnolm=c("time")
-#wybieramy zmienn± zale¿n±, target dla regresji, zwykle zmiennoprzecinkowy
-if(nData=="photocar") moutput<-"time"
+
+if(nData=="nihills"){
+	#te atrybuty, co s± faktorami, zmiennymi jako¶ciowymi z kategoriami, etykietami
+	parvecfactor=c()
+	#w parnokruskal to co zostanie nie wys³ane do isoMDS(daisy) np. parnokruskal=c("Type")
+	parnokruskal=c()
+	#atrybut pojedyñczy do zescorowania po jego dyskretnych warto¶ciach
+	#vecfactorzesc=rep(1,nrow(DataSet))
+	#atrybuty w plotMDS do kolorowania powsta³ych punktów 
+	parvecol<-names(DataSet)
+	#zmienne, które nie wchodz± do drzewa m.in. jego li¶cie, target, cel optymalizacji drzewa
+	parvecnotree=c('time')
+	#li¶æ drzewa, etykieta
+	paroutputree=c('time')
+	#zmienne zale¿ne i inne zbêdne w regresji
+	parvecnolm=c("time")
+	#wybieramy zmienn± zale¿n±, target dla regresji, zwykle zmiennoprzecinkowy
+	moutput<-"time"
+} 
+
+##########################################################################################################
+if(nData=="photocar"){
+ 	#te atrybuty, co s± faktorami, zmiennymi jako¶ciowymi z kategoriami, etykietami
+	parvecfactor=c("group","event","tumor")
+	#atrybut pojedyñczy do zescorowania po jego dyskretnych warto¶ciach
+	vecfactorzesc=c("group")
+	#w parnokruskal to co zostanie nie wys³ane do isoMDS(daisy) np. parnokruskal=c("Type")
+	parnokruskal=c()
+	#atrybuty w plotMDS do kolorowania powsta³ych punktów 
+	parvecol<-names(DataSet)
+	#zmienne, które nie wchodz± do drzewa m.in. jego li¶cie, target, cel optymalizacji drzewa
+	parvecnotree=c("group")
+	#li¶æ drzewa, etykieta
+	paroutputree=c("group")
+	#zmienne zale¿ne i inne zbêdne w regresji
+	#parvecnolm=c("time","group","tumor","event")
+	parvecnolm=c("time")
+	#wybieramy zmienn± zale¿n±, target dla regresji, zwykle zmiennoprzecinkowy
+	moutput<-"time"
+}
 
 ##########################################################################################################
 #te atrybuty, które s± zmiennymi ilo¶ciowymi
@@ -112,12 +124,6 @@ DataSetzd<-disc.for.chosen(DataSetz,parvec,3)
 
 #dyskretyzujê tak¿e nie zeskorowane warto¶ci zwyk³ego zbioru wczytanego na pocz±tku
 DataSetd<-disc.for.chosen(DataSet,parvec,3)
-for(i in 1:ncol(DataSetd))
-	DataSetd[,i]<-factor(DataSetd[,i])	
-
-#DataSetd<-factorto(DataSetd, 1:ncol(DataSetd))
-#indata<-DataSet;varcon<-which(names(DataSet) %in% parvec);k<-levelnum
-
 
 
 ##########################################################################################################
