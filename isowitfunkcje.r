@@ -37,7 +37,7 @@ for(i in biolist)
 #Funkcja prederror zwraca warto¶ci predykcji klasyfikatora, tablicê rezultatów i rzeczywistych warto¶ci, 
 #oraz b³±d klasyfikatora, na wej¶ciu dane testowe, ale nie treningowe wykorzystane do konstrukcji klasyfikatora
 prederror<-function(classimod,paroutputree,parvectree,DataSet,EvalString="DEFAULT"){
-	if (EvalString == "LDA"){
+	if (EvalString == "CLASS"){
 		predvalues=predict(classimod,DataSet[,parvectree])$class
 	} else if(EvalString=="DEFAULT"){
 		predvalues=predict(classimod,newdata=DataSet[,parvectree],"class");
@@ -58,62 +58,137 @@ prederror<-function(classimod,paroutputree,parvectree,DataSet,EvalString="DEFAUL
 #i oblicza dla nich funkcje get(nFunction) i wybiera najlepsz± dla ka¿dego n, wraca listê najlepszych obiektów z kolejnych iteracji  
 #w lb<n> mamy wybierane po kolei kolejne zestawy na najlepsz± regresjê 
 #w m<n> najlepszy model dla n, w sm<n> summary(m<n>), dla n=1 rysuje plot regresji
-permbesteval<-function (nFunction, fname, mDataSet, moutput, parvec, nleven=-1, alpha=0.01, EvalString="DEFAULT"){
-	l<-list()
+permbesteval<-function (nFunction, fname, permDataSet, moutput, parvec, nleven=-1, alpha=0.01, EvalString="DEFAULT"){
+	l<-list();ilist<-list();etykiety<-seq(1,nrow(permDataSet));m01<-FALSE
+	#cat(" NR:",nrow(permDataSet))
 	n<-length(parvec)
 	varvec<-parvec
 	varplus<-paste(parvec,collapse="+")
 	for(numvar in 1:length(parvec)){
-		#cat(" nF:",nFunction)
+		#cat("\n\n nF: ",nFunction)
 		if(nFunction=="lm")
-			ilist<-lmwithattr(mDataSet,moutput,parvec,numvar,nleven,alpha,EvalString)
-		if(nFunction=="polr")
-			ilist<-polrwithattr(mDataSet,moutput,parvec,numvar,EvalString)
-		i<-ilist[[1]]; 
-		#cat(paste("1:",moutput,"~",varplus)," n:",numvar," length:",n," EvalString:",EvalString,"\n")
-		if(numvar<n){
-			perm<-get("combinations","package:gtools")(length(parvec),numvar,parvec)
-			varvec<-perm[i,]
+			ilist<-lmwithattr(permDataSet,moutput,parvec,numvar,nleven,alpha,EvalString)
+		else if(nFunction=="polr")
+			ilist<-polrwithattr(permDataSet,moutput,parvec,numvar,EvalString)
+		else {
+			#cat(paste("1:",moutput,"~",varplus)," n:",numvar," length:",n," EvalString:",EvalString,"\n")
+			ilist<-classwithattr(nFunction,permDataSet,moutput,parvec,numvar,70,5,EvalString)
+			etykiety<-ilist[[4]]
+			m01<-ilist[[5]]
 		}
-		if(numvar==n) varvec<-parvec
-		if(EvalString=="SPLINE") varplus<-paste("bs(",varvec,")",sep="") else varplus<-varvec
-		varplus<-paste(varplus,collapse="+")			
-		m01<-try(evalwithattr(get(nFunction),moutput,varvec,mDataSet,EvalString),TRUE)
-	    #print(m01)
-		if(!inherits(m01, "try-error")){
-			if(numvar<10)mnv<-paste("m0",numvar,sep="")else mnv<-paste("m",numvar,sep="")
-			if(numvar<10)smnv<-paste("sm0",numvar,sep="")else smnv<-paste("sm",numvar,sep="")
-			if(numvar<10)lbnv<-paste("lb0",numvar,sep="")else lbnv<-paste("lb",numvar,sep="")
-			assign(lbnv,ilist[[2]]);
-			assign(mnv,m01);
-			assign(smnv,summary(get(mnv)))
-			get(smnv)
-			#Vif(get(mnv))
-			l[[lbnv]]<-get(lbnv)
-			l[[mnv]]<-get(mnv)
-			l[[smnv]]<-get(smnv)
-			if(nFunction=="lm"){
-				if(numvar==1){
-					jpeg(file=paste(fname,numvar,"_1.jpg",sep=""),width = 1200, height = 1000, quality = 55, bg = "white")
-					par(lwd=4)
-					vartemp<-eval(parse(text=paste("mDataSet$",varvec,sep="")))
-					rangetemp<-seq(min(vartemp),max(vartemp),length.out=213)
-					plot(eval(parse(text=paste(moutput,"~",varvec))),data=mDataSet,main=paste(moutput,"~",varplus), pch=1.0, cex.lab=1.5)
-					dframetemp<-as.data.frame(rangetemp)
-					names(dframetemp)<-varvec
-					lines(rangetemp,predict(get(mnv),newdata=dframetemp), col="red", lwd=3)
-					#cat(paste("3:",moutput,"~",varvec)," n:",numvar," mnv:",mnv," varvec:",paste("mDataSet$",varvec,sep=""),"\n")
+		i<-ilist[[1]]; 
+		if(i){
+			if(numvar<n){
+				perm<-get("combinations","package:gtools")(length(parvec),numvar,parvec)
+				varvec<-perm[i,]
+			}
+			else if(numvar==n) varvec<-parvec
+			if(EvalString=="SPLINE") varplus<-paste("bs(",varvec,")",sep="") else varplus<-varvec
+			varplus<-paste(varplus,collapse="+")
+			if(nFunction%in%c("lm","polr"))
+			m01<-try(evalwithattr(nFunction,moutput,varvec,permDataSet[etykiety,],EvalString),TRUE)
+			#cat("Najlepszy!!!!!!!\n\n")
+		    #print(m01)
+			if(!inherits(m01, "try-error")){
+				if(numvar<10)mnv<-paste("m0",numvar,sep="")else mnv<-paste("m",numvar,sep="")
+				if(numvar<10)smnv<-paste("sm0",numvar,sep="")else smnv<-paste("sm",numvar,sep="")
+				if(numvar<10)lbnv<-paste("lb0",numvar,sep="")else lbnv<-paste("lb",numvar,sep="")
+				if(numvar<10)etnv<-paste("etiq0",numvar,sep="")else etnv<-paste("etiq",numvar,sep="")
+				if(numvar<10)numv<-paste("numv0",numvar,sep="")else numv<-paste("numv",numvar,sep="")
+				assign(lbnv,ilist[[2]]);
+				assign(mnv,m01);
+				assign(etnv,etykiety);
+				assign(numv,numvar);
+				if(nFunction%in%c("lm","polr"))
+					assign(smnv,summary(get(mnv)))
+				else{ 
+					assign(smnv,prederror(m01,moutput,parvec,permDataSet[-etykiety,],EvalString));
+					l[[etnv]]<-get(etnv)
+				}
+				#get(smnv)
+				#Vif(get(mnv))
+				#l[[etnv]]<-get(etnv)
+				l[[lbnv]]<-get(lbnv)
+				l[[mnv]]<-get(mnv)
+				l[[smnv]]<-get(smnv)
+				l[[numv]]<-get(numv)
+				if(nFunction=="lm"){
+					if(numvar==1){
+						jpeg(file=paste(fname,numvar,"_1.jpg",sep=""),width = 1200, height = 1000, quality = 55, bg = "white")
+						par(lwd=4)
+						vartemp<-eval(parse(text=paste("permDataSet$",varvec,sep="")))
+						rangetemp<-seq(min(vartemp),max(vartemp),length.out=213)
+						plot(eval(parse(text=paste(moutput,"~",varvec))),data=permDataSet,main=paste(moutput,"~",varplus), pch=1.0, cex.lab=1.5)
+						dframetemp<-as.data.frame(rangetemp)
+						names(dframetemp)<-varvec
+						lines(rangetemp,predict(get(mnv),newdata=dframetemp), col="red", lwd=3)
+						#cat(paste("3:",moutput,"~",varvec)," n:",numvar," mnv:",mnv," varvec:",paste("permDataSet$",varvec,sep=""),"\n")
+						dev.off()
+					}
+					jpeg(file=paste(fname,numvar,"_2.jpg",sep=""),width = 1200, height = 1000, quality = 55, bg = "white")
+					par(mfrow=c(2,2))
+					plot(get(mnv),main=paste(moutput,"~",varplus), pch=1.0, cex.lab=1.5)
 					dev.off()
 				}
-				jpeg(file=paste(fname,numvar,"_2.jpg",sep=""),width = 1200, height = 1000, quality = 55, bg = "white")
-				par(mfrow=c(2,2))
-				plot(get(mnv),main=paste(moutput,"~",varplus), pch=1.0, cex.lab=1.5)
-				dev.off()
 			}
 		}
 	}
 	return (l)
 }
+
+#Funkcja classwithattr znajduje najlepszy klasyfikator dla numvar zmiennych - atrybutów
+#moutput - wyj¶cie modelu zmienna zale¿na np. "Type", 
+#parvec - wektor zmiennych wej¶ciowych niezale¿nych dla modelu,
+#numvar - ile zmiennych z parvec ma wzi±æ udzia³ w permutacji zmiennych niezale¿nych
+classwithattr<-function (nFunction, cDataSet, moutput, parvec, numvar, percent=70, trials=5,EvalString="DEFAULT"){
+	if(numvar<length(parvec)){
+		perm<-get("combinations","package:gtools")(length(parvec),numvar,parvec)
+		rowperm<-nrow(perm)
+	}
+	else rowperm<-1
+	lb<-c(); ibest<-0; lres<-list(); gbep<-1; gbetykiety<-c(); gbclas<-FALSE;
+	for(i in 1:rowperm){
+		#cat("\nwewnatrz funkcji: ",i," ",numvar)
+		if(numvar<length(parvec)) 	varplus<-perm[i,]
+		if(numvar==length(parvec))	varplus<-parvec
+		vecp<-c(); bep<-1; betykiety<-c(); bclas<-FALSE;
+		for(j in 1:trials){
+			classifier<-FALSE
+			etykiety <- sample(1:nrow(cDataSet), round(nrow(cDataSet)*(percent/100)))
+			#print(etykiety)
+			#print(cDataSet[1:3,])
+			classifier<-try(evalwithattr(nFunction,moutput,varplus,cDataSet[etykiety,],EvalString),TRUE)
+			#print(classifier)
+			if(!inherits(classifier, "try-error") || classifier==FALSE){
+				#cat(" po funkcji:",prederr)
+				lres<-try(prederror(classifier,moutput,parvec,cDataSet[-etykiety,],EvalString),TRUE)
+				if(!inherits(lres, "try-error")){
+					vecp<-c(vecp,lres$perror)
+					if(lres$perror<bep){
+						bep<-lres$perror;
+						betykiety<-etykiety;
+						bclas<-classifier;
+					}
+				}
+			}
+		}
+		if(bep<1){
+			meanp<-sum(vecp)/length(vecp)
+			if(meanp<gbep){ 
+				gbep<-meanp
+				gbetykiety<-betykiety
+				lb<-c(lb, i)
+				ibest<-i
+				gbclas<-bclas
+			}
+		}
+	}
+	#cat("\nNajlepszy dla n:",numvar,"zmiennych: i:",ibest,"\n")
+	#print(parvec)
+	#print(gbclas)
+	return (list(ibest,lb,numvar,betykiety,gbclas))
+}
+
 
 #Funkcja polrwithattr znajduje najlepsz± logistyczn± regresjê dla parametrów
 #moutput - wyj¶cie modelu zmienna zale¿na np. "RI", 
@@ -129,7 +204,7 @@ polrwithattr<-function (DataSet, moutput, parvec, numvar, EvalString="DEFAULT"){
 	for(i in 1:rowperm){
 		if(numvar<length(parvec)) 	varplus<-perm[i,]
 		if(numvar==length(parvec))	varplus<-parvec
-		m01<-try(evalwithattr(polr,moutput,varplus,DataSet,EvalString),TRUE);
+		m01<-try(evalwithattr("polr",moutput,varplus,DataSet,EvalString),TRUE);
 		if(!inherits(m01, "try-error")){
 			sm01<-summary(m01)
 			if(sm01$deviance < br2){ 
@@ -157,7 +232,7 @@ lmwithattr<-function (DataSet, moutput, parvec, numvar, nleven=-1, alpha=0.01, E
 	for(i in 1:rowperm){
 		if(numvar<length(parvec)) 	varplus<-perm[i,]
 		if(numvar==length(parvec))	varplus<-parvec;
-		m01<-try(evalwithattr(lm,moutput,varplus,DataSet,EvalString),TRUE);
+		m01<-try(evalwithattr("lm",moutput,varplus,DataSet,EvalString),TRUE);
 		if(!inherits(m01, "try-error")){
 			tmp=paste("anova(",deparse(substitute(lm)),"(",moutput,"~1,DataSet),m01)",sep="")
 			#an<-anova(lm(RI~1),m01);
@@ -168,7 +243,7 @@ lmwithattr<-function (DataSet, moutput, parvec, numvar, nleven=-1, alpha=0.01, E
 				lt<-levene.test(m01$residuals,factor(mintervals))
 			}
 			if(nleven<0)
-				bp<-evalwithattr(bptest,moutput,varplus,DataSet)
+				bp<-evalwithattr("bptest",moutput,varplus,DataSet)
 			#levene pominiêty dla nleven=0, dla nleven < 0 bptest
 			if((nleven==0 && qf(0.99,1,m01$df)<an$F[2] && sm01$r.squared > br2) 
 					|| (nleven < 0 && qf(0.99,1,m01$df)<an$F[2] && sm01$r.squared > br2 && bp$p.value > alpha)
@@ -184,17 +259,20 @@ lmwithattr<-function (DataSet, moutput, parvec, numvar, nleven=-1, alpha=0.01, E
 
 #Funkcja evalwithattr wywo³uje podan± funkcjê z wyj¶ciowym atrybutem output i 
 #wej¶ciowymi atrybutami parvec oraz zbiorem danych
-evalwithattr<-function(oFunction,output,parvec,oData,EvalString="DEFAULT")
+evalwithattr<-function(nFunction,output,parvec,oData,EvalString="DEFAULT")
 {
-	tmp=paste(deparse(substitute(oFunction)),"(",output,"~")
+	tmp=paste(nFunction,"(",output,"~",sep="")
 	if(EvalString=="SPLINE")  
 		parvec<-paste("bs(",parvec,")",sep="")
 	parvec<-paste(parvec,collapse="+")
 	if(EvalString=="DEFAULT" || EvalString=="SPLINE") 
-		tmp<-paste(tmp,parvec,",data=",deparse(substitute(oData)),")",sep="")
+#		tmp<-paste(tmp,parvec,",data=",deparse(substitute(oData)),")",sep="")
+		tmp<-paste(tmp,parvec,",data=oData)",sep="")
 	else
-		tmp<-paste(tmp,parvec,",data=",deparse(substitute(oData)),",",EvalString,")",sep="")
+		tmp<-paste(tmp,parvec,",data=oData,",EvalString,")",sep="")
+#		tmp<-paste(tmp,parvec,",data=",deparse(substitute(oData)),",",EvalString,")",sep="")
 	return(eval(parse(text=tmp)))
+#	return(tmp)
 }
 
 #Metoda funkcja Vif okre¶la stopieñ korelacji zmiennych niezale¿nych, 
@@ -258,7 +336,7 @@ zscore.for.integer<-function (DataSet, parvec, integercolumnforzscore)
 disc.for.chosen<-function (DataSet, parvec, levelnum)         
 {
 	DataSetd<-DataSet
-	DataSetd[,parvec]<-disc.ef(DataSet[,parvec], which(names(DataSet[,parvec]) %in% parvec), levelnum)
+	DataSetd[,parvec]<-disc.ef(DataSet[,parvec], levelnum)
 	DataSetd<-factorto(DataSetd, which(names(DataSetd) %in% parvec))
 	return(DataSetd)
 }
@@ -308,8 +386,9 @@ disc2<-function (x, k)
 
 #Funkcja disc.ef z pakietu dprep zmieniona (pomija nulle), 
 #gdy¿ w tym pakiecie prawie wszystkie funkcje wymagaj± zmian 
-disc.ef<-function (indata, varcon, k)        # Nastêpuje dyskretyzacja danych
+disc.ef<-function (indata, k)        # Nastêpuje dyskretyzacja danych
 {
+	varcon<-seq(1,ncol(indata))
     indata = as.matrix(indata)
     p <- dim(indata)[2]
     f <- p
@@ -348,7 +427,9 @@ zscore<-function (indata, varcon)        # Nastêpuje dyskretyzacja danych
 				x<-as.numeric(x[-which(is.na(x))])
 			} 
 			if (sum(x!=0) != 0) {
-            x<-(x-mean(x))/sd(x)
+				if(sd(x)!=0)
+            		x<-(x-mean(x))/sd(x)
+				else x[x!=0]=0
 			}
 			z[fs]=x
 			indata[, i]=z
@@ -506,3 +587,21 @@ latt2jpg<-function(indata, gvec, fname){
 	dev.off()
 }
 
+
+#Funkcja meanverr oblicza ¶redni± z list list wyników 
+meanverr<-function(lverr,jmax,imax){
+	verr<-c()
+	for(i in 1:imax){
+		tmp<-"("; mdiv<-jmax;  
+		for(j in 1:jmax){
+			if(!is.na(lverr[[j]][i]))
+				tmp<-paste(tmp,deparse(substitute(lverr)),"[[",j,"]][",i,"]",sep="");
+			if(j!=jmax && !is.na(lverr[[j+1]][i])) tmp<-paste(tmp,"+",sep="");
+			if(is.na(lverr[[j]][i])) {mdiv<-mdiv-1; cat(" i:",i," j:",j)}
+		}
+		tmp<-paste(tmp,")/",mdiv,sep="")
+		cat(tmp,"\n")
+		verr<-c(verr,eval(parse(text=tmp)))
+	}; 
+	verr
+}
