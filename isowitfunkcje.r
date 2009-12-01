@@ -265,7 +265,7 @@ evalwithattr<-function(nFunction,output,parvec,oData,EvalString="DEFAULT")
 	if(EvalString=="SPLINE")  
 		parvec<-paste("bs(",parvec,")",sep="")
 	parvec<-paste(parvec,collapse="+")
-	if(EvalString=="DEFAULT" || EvalString=="SPLINE") 
+	if(EvalString=="DEFAULT" || EvalString=="SPLINE" || EvalString=="CLASS") 
 #		tmp<-paste(tmp,parvec,",data=",deparse(substitute(oData)),")",sep="")
 		tmp<-paste(tmp,parvec,",data=oData)",sep="")
 	else
@@ -597,10 +597,10 @@ meanverr<-function(lverr,jmax,imax){
 			if(!is.na(lverr[[j]][i]))
 				tmp<-paste(tmp,deparse(substitute(lverr)),"[[",j,"]][",i,"]",sep="");
 			if(j!=jmax && !is.na(lverr[[j+1]][i])) tmp<-paste(tmp,"+",sep="");
-			if(is.na(lverr[[j]][i])) {mdiv<-mdiv-1; cat(" i:",i," j:",j)}
+			if(is.na(lverr[[j]][i])) {mdiv<-mdiv-1;}
 		}
 		tmp<-paste(tmp,")/",mdiv,sep="")
-		cat(tmp,"\n")
+		#cat(tmp,"\n")
 		verr<-c(verr,eval(parse(text=tmp)))
 	}; 
 	verr
