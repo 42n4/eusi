@@ -50,7 +50,7 @@ mDataSet<-DataSet
 lmabc_nobp<-permbesteval("lm", paste(mypathout,nData,"_lmabc_nobp",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
 #wybieramy dane zeskorowane
 mDataSet<-DataSetz
-lmabc_zebp<-permbesteval("lm", paste(mypathout,nData,"_lmabc_zebp",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
+#lmabc_zebp<-permbesteval("lm", paste(mypathout,nData,"_lmabc_zebp",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
 #wybieramy dane zeskalowane i zcentrowane
 #mDataSet<-DataSetm
 #skalowanie likwiduje intercept wspó³czynnik przesuniêcia prostej
@@ -63,7 +63,7 @@ nleven<-0;
 mDataSet<-DataSet
 lmabc_nono<-permbesteval("lm", paste(mypathout,nData,"_lmabc_nono",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
 mDataSet<-DataSetz
-lmabc_zeno<-permbesteval("lm", paste(mypathout,nData,"_lmabc_zeno",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
+#lmabc_zeno<-permbesteval("lm", paste(mypathout,nData,"_lmabc_zeno",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
 #mDataSet<-DataSetm
 #lmabc_msno<-permbesteval("lm", paste(mypathout,nData,"_lmabc_msno",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
 
@@ -74,7 +74,7 @@ nleven<-5;
 mDataSet<-DataSet
 lmabc_nolt<-permbesteval("lm", paste(mypathout,nData,"_lmabc_nolt",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
 mDataSet<-DataSetz
-lmabc_zelt<-permbesteval("lm", paste(mypathout,nData,"_lmabc_zelt",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
+#lmabc_zelt<-permbesteval("lm", paste(mypathout,nData,"_lmabc_zelt",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
 #mDataSet<-DataSetm
 #lmabc_mslt<-permbesteval("lm", paste(mypathout,nData,"_lmabc_mslt",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
 
@@ -87,7 +87,7 @@ nleven<--1;
 mDataSet<-DataSet
 lmbsp_nobp<-permbesteval("lm", paste(mypathout,nData,"_lmbsp_nobp",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
 mDataSet<-DataSetz
-lmbsp_zebp<-permbesteval("lm", paste(mypathout,nData,"_lmbsp_zebp",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
+#lmbsp_zebp<-permbesteval("lm", paste(mypathout,nData,"_lmbsp_zebp",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
 #mDataSet<-DataSetm
 #lmbsp_msbp<-permbesteval("lm", paste(mypathout,nData,"_lmbsp_msbp",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
 
@@ -98,7 +98,7 @@ nleven<-0;
 mDataSet<-DataSet
 lmbsp_nono<-permbesteval("lm", paste(mypathout,nData,"_lmbsp_nono",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
 mDataSet<-DataSetz
-lmbsp_zeno<-permbesteval("lm", paste(mypathout,nData,"_lmbsp_zeno",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
+#lmbsp_zeno<-permbesteval("lm", paste(mypathout,nData,"_lmbsp_zeno",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
 #mDataSet<-DataSetm
 #lmbsp_msno<-permbesteval("lm", paste(mypathout,nData,"_lmbsp_msno",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
 
@@ -109,24 +109,14 @@ nleven<-5;
 mDataSet<-DataSet
 lmbsp_nolt<-permbesteval("lm", paste(mypathout,nData,"_lmbsp_nolt",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
 mDataSet<-DataSetz
-lmbsp_zelt<-permbesteval("lm", paste(mypathout,nData,"_lmbsp_zelt",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
+#lmbsp_zelt<-permbesteval("lm", paste(mypathout,nData,"_lmbsp_zelt",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
 #mDataSet<-DataSetm
 #lmbsp_mslt<-permbesteval("lm", paste(mypathout,nData,"_lmbsp_mslt",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
 
-##########################################################################################################
-#REGRESJA LOGISTYCZNA
-nFunction="polr"
-etykiety <- sample(1:nrow(DataSet), round(nrow(DataSet)*0.9))
-parvectree=setdiff(names(DataSet),parvecnotree)
-evalstr<-"Hess=TRUE"
-mDataSet<-DataSetd[etykiety,]
-polra_nodi<-permbesteval("polr", paste(mypathout,nData,"_polra_nodi",sep=""),mDataSet, paroutputree, parvectree, nleven, alpha, evalstr)
-mDataSet<-DataSetzd[etykiety,]
-polra_zedi<-permbesteval("polr", paste(mypathout,nData,"_polra_zedi",sep=""),mDataSet, paroutputree, parvectree, nleven, alpha, evalstr)
 
-#prederror(regression,paroutputree,mparvec,DataSetzd[-etykiety,],evalstr)
-#nFunction<-"polr"; fname<-paste(mypathout,nData,"_polra_nodi",sep=""); moutput<-paroutputree;parvec<-parvectree; EvalString<-evalstr;
-#nFunction="lm";fname<-paste(mypathout,nData,"_lmbsp_zelt",sep="");mDataSet<-DataSetz
-
-
-
+lmabc_nobp
+lmabc_nono
+lmabc_nolt
+lmbsp_nobp
+lmbsp_nono
+lmbsp_nolt
