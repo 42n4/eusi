@@ -28,6 +28,13 @@ DataSet.train <- DataSet[etykiety,]
 DataSet.test <- DataSet[-etykiety,]
 mparvec=setdiff(names(DataSet),parvecnolm)
 
+#Stosujemy kryteria: 
+#BIC Bayes Information Criterion  -2maxlog-likelihood+plogn wybór mniejszych modeli
+#AIC Akaike Information Cryterion -2 maxlog-likelihood + 2p
+#Ridge metoda wybiera jak najmniejsze parametry Beta regresji
+#dla liniowej regresji -2max loglikelihood = nlog(RSS/n)+constant 
+
+
 ##################################################################################################
 #Funkcja optim.lm wybiera "najlepszy" model regresji liniowej na podstawie DataSet.train
 #library leaps i lars
