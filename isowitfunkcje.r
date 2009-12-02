@@ -9,7 +9,7 @@ Sys.setlocale("LC_NUMERIC","C")
 #lista pakietów z CRAN-u
 #naprawiæ pakier gRain
 #pkglist<-c("gRain","splines","betareg","ellipse","nlme","MASS","leaps","car","lmtest","gregmisc","foreign","plyr","mlbench","boot","Hmisc","RWeka","ipred","klaR","ROCR","rpart","dprep","maptree","party","grid","lattice","latticeExtra","playwith","ada","randomForest","kknn","e1071","cluster","class","caret","fda","zoo","lattice","deal","RJDBC","cairoDevice")
-pkglist<-c("bootstrap","DAAG","ff","biglm","bigmemory","splines","betareg","ellipse","nlme","MASS","leaps","car","lmtest","gregmisc","foreign","plyr","mlbench","boot","Hmisc","RWeka","ipred","klaR","ROCR","rpart","dprep","maptree","party","grid","lattice","latticeExtra","playwith","ada","randomForest","kknn","e1071","cluster","class","caret","fda","zoo","lattice","deal","RJDBC","cairoDevice")
+pkglist<-c("faraway","relaimpo","leaps","lars","bootstrap","DAAG","ff","biglm","bigmemory","splines","betareg","ellipse","nlme","MASS","leaps","car","lmtest","gregmisc","foreign","plyr","mlbench","boot","Hmisc","RWeka","ipred","klaR","ROCR","rpart","dprep","maptree","party","grid","lattice","latticeExtra","playwith","ada","randomForest","kknn","e1071","cluster","class","caret","fda","zoo","lattice","deal","RJDBC","cairoDevice")
 pkgcheck <- pkglist %in% row.names(installed.packages())
 for(i in pkglist[!pkgcheck]){
 	install.packages(i,depend=TRUE)
@@ -273,6 +273,24 @@ evalwithattr<-function(nFunction,output,parvec,oData,EvalString="DEFAULT")
 #		tmp<-paste(tmp,parvec,",data=",deparse(substitute(oData)),",",EvalString,")",sep="")
 	return(eval(parse(text=tmp)))
 #	return(tmp)
+}
+
+#Funkcja printwithattr wy¶wietla podan± funkcjê z wyj¶ciowym atrybutem output i 
+#wej¶ciowymi atrybutami parvec oraz zbiorem danych
+printwithattr<-function(nFunction,output,parvec,oData,EvalString="DEFAULT")
+{
+	tmp=paste(nFunction,"(",output,"~",sep="")
+	if(EvalString=="SPLINE")  
+		parvec<-paste("bs(",parvec,")",sep="")
+	parvec<-paste(parvec,collapse="+")
+	if(EvalString=="DEFAULT" || EvalString=="SPLINE" || EvalString=="CLASS") 
+#		tmp<-paste(tmp,parvec,",data=",deparse(substitute(oData)),")",sep="")
+		tmp<-paste(tmp,parvec,",data=oData)",sep="")
+	else
+		tmp<-paste(tmp,parvec,",data=oData,",EvalString,")",sep="")
+#		tmp<-paste(tmp,parvec,",data=",deparse(substitute(oData)),",",EvalString,")",sep="")
+#	return(eval(parse(text=tmp)))
+	return(tmp)
 }
 
 #Metoda funkcja Vif okre¶la stopieñ korelacji zmiennych niezale¿nych, 
