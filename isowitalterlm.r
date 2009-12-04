@@ -42,7 +42,7 @@ mparvec=setdiff(names(DataSet),parvecnolm)
 ##################################################################################################
 #Funkcja optim.lm wybiera "najlepszy" model regresji liniowej na podstawie DataSet.train
 #library leaps i lars
-optim.lm <-function(fname,data,moutput,mparvec,val.size=NULL,cv=10,bic=T,test=T,really.big=F){
+leaps.lm <-function(fname,data,moutput,mparvec,val.size=NULL,cv=10,bic=T,test=T,really.big=F){
 	jpeg(file=paste(fname,".jpg",sep=""),width = 1200, height = 1000, quality = 55, bg = "white")
 	n.plots <- sum(c(bic,test,cv!=0))
 	par(mfrow=c(n.plots,2),pch=1.0,cex.lab=1.5,lwd=3)
@@ -200,6 +200,107 @@ ridge.lm <-function(fname,DataSet,moutput,mparvec,etykiety){
 	list(ridge.best=ridge.best,ridge.train.cv=ridge.train.cv,rss.ridge=rss.ridge)
 }
 
+#### LASSO ############################################################################################
+# metoda LASSO redukuje wymiar i robi ridge optymalizacjê
+# s is the constraint sum |beta| < s, dla s infinity, beta takie samo jak OLS
+#######################################################################################################
+
+#######################################################################################################
+"cv.lasso" <- function(formula,data,K=10,subset=NULL){
+	if (!is.null(subset))
+		data <- data[subset,]
+	y <- data[,names(data)==as.character(formula)[2]]
+	x <- model.matrix(as.formula(formula),data)[,-1]
+	#mycv<-cv;rm(cv)
+	larsfit <- cv.lars(x,y,K=K,plot.it=FALSE)
+	larsfit
+}
+
+#######################################################################################################
+"lasso" <-	function(formula,data,subset=NULL){
+	if (!is.null(subset))
+		data <- data[subset,]
+	
+	y <- data[,names(data)==as.character(formula)[2]]
+	x <- model.matrix(as.formula(formula),data)[,-1]
+	larsfit <- lars(x,y,type="lasso")
+	larsfit
+}
+
+
+###########################################################
+#Funkcja lars.lm wybiera kompaktowy i w miarê dobry model regresji liniowej na podstawie lars i cv.lars
+#library lars
+lars.lm <-function(fname,DataSet,moutput,mparvec,etykiety){
+	DataSet.train <- DataSet[etykiety,]
+	jpeg(file=paste(fname,".jpg",sep=""),width = 1200, height = 1000, quality = 55, bg = "white")
+	par(mfrow=c(1,2),pch=1.0,cex.lab=1.5,lwd=3)
+	lasso.fit <- evalwithattr("lasso",moutput,mparvec,DataSet.train)
+	larsfit <- predict.lars(lasso.fit, DataSet[,mparvec], type="fit")
+	plot(lasso.fit,breaks=F,lty="solid") 
+	DF <- lasso.fit$df #df on the regularization path
+	p <- length(mparvec)
+	n <- nrow(DataSet.train)
+	#note: DF[1] == 1, intercept only
+	#Best AIC/BIC Model
+	LL<- (-n/2)*log(lasso.fit$RSS/n)
+	AICLasso <- -2*LL + 2*DF
+	BICLasso<- -2*LL + log(n)*DF
+	names(AICLasso)<-names(BICLasso)<-paste("df=",DF,sep="")
+	indAICModel<-which.min(AICLasso)
+	indBICModel<-which.min(BICLasso)
+	bLARSAIC<-coef(lasso.fit)[indAICModel,]
+	bLARSBIC<-coef(lasso.fit)[indBICModel,]
+	#names(indAICModel)
+	#sum(bLARSAIC!=0.0) 
+	#names(indBICModel)
+	#sum(bLARSBIC!=0.0)
+	bLARSAICfits=larsfit$fit[,indAICModel]
+	bLARSBICfits=larsfit$fit[,indBICModel]
+	
+	#set.seed(2317723)
+	## best fmin
+	evalstr<-"K=10"
+	lasso.cv <- evalwithattr("cv.lasso",moutput,mparvec,DataSet.train,evalstr)
+	#lasso.cv contains components: 'cv', 'cv.error', 'fraction'
+	CVout <- matrix(c(lasso.cv$cv,lasso.cv$cv.error), ncol=2)
+	indBest<-oneSdRule(CVout)
+	fBest<-(lasso.cv$fraction)[indBest]
+	#fmin <- lasso.cv$fraction[order(lasso.cv$cv)[1]]
+	fmin<-(lasso.cv$fraction)[which.min(lasso.cv$cv)]
+	#
+	plotCVLars(lasso.cv)
+	TotalAbsBeta<-apply(coef(lasso.fit), MARGIN=1, function(x) sum(abs(x)))[-1]
+	BLength<-TotalAbsBeta/TotalAbsBeta[length(TotalAbsBeta)]
+	tablef<-matrix( c(DF[-1], BLength) , ncol=2)
+	#label the df on the plot
+	axis(side=3, at=tablef[,2], labels=tablef[,1])
+	mtext("DF", side=3, line=2)
+	abline(v=fmin, col="red", lwd=3)
+	abline(v=fBest, col="blue", lwd=3)
+	title(sub="One-sd-rule CV (blue) and minimum CV (red) shown")
+	pHatF <- round(approx(x=tablef[,2],y=tablef[,1], xout=fBest)$y,1)
+	#Note: phatF is the estimated df including the intercept
+	# So pHatF-1 is the number of inputs
+	text(0.2, 1.3, labels=bquote(hat(p)==.(pHatF-1)))
+	#Best model using 10-fold CV with one-sd rule
+	pHat <- round(pHatF)
+	indpHat <- match(pHat, lasso.fit$df)
+	bHat<-coef(lasso.fit)[indpHat,]
+	bHatfits=larsfit$fit[,indpHat]
+	dev.off()
+	list(bLARSAIC=bLARSAIC,bLARSAICfits=bLARSAICfits,bLARSBIC=bLARSBIC,bLARSBICfits=bLARSBICfits,bHat=bHat,bHatfits=bHatfits)
+}
+
+#set.seed(23123)
+lars.lm.train <- lars.lm(paste(mypathout,nData,"_lmlrs_norm",sep=""),DataSet,moutput,mparvec,etykiety);
+
+mean.lasso.AIC<-mean((DataSet[-etykiety,moutput] - lars.lm.train$bLARSAICfits[-etykiety])^2)
+mean.lasso.BIC<-mean((DataSet[-etykiety,moutput] - lars.lm.train$bLARSBICfits[-etykiety])^2)
+mean.lasso.bHat<-mean((DataSet[-etykiety,moutput] - lars.lm.train$bHatfits[-etykiety])^2)
+mean.lasso.bHat
+mean.lasso.AIC
+bHat[bHat!=0]
 
 
 ridge.lm.train <- ridge.lm(paste(mypathout,nData,"_lmrdg_norm",sep=""),DataSet,moutput,mparvec,etykiety);
@@ -218,12 +319,12 @@ mean.ridge.best1<-mean((DataSet[-etykiety,moutput] - ridge.pred.best1[-etykiety]
 
 p <- ncol(DataSet.train)-1
 really.big=F
-optim.lm.train <- optim.lm(paste(mypathout,nData,"_lmbic_norm",sep=""),DataSet.train, moutput, mparvec);
-names(optim.lm.train);
+leaps.lm.train <- leaps.lm(paste(mypathout,nData,"_lmbic_norm",sep=""),DataSet.train, moutput, mparvec);
+names(leaps.lm.train);
 # modele wybrane przez metodê BIC, validation, CV (cross validation)
-summary(optim.lm.train$bic.lm)
-summary(optim.lm.train$validation.lm)
-summary(optim.lm.train$cv.lm)
+summary(leaps.lm.train$bic.lm)
+summary(leaps.lm.train$validation.lm)
+summary(leaps.lm.train$cv.lm)
 
 #Stepwise Regression
 #MASS pakiet
@@ -238,44 +339,40 @@ rmse.lm.aic<-rmse(DataSet[-etykiety,moutput],predict(lmstep,DataSet)[-etykiety])
 mean.lm.1<-mean((DataSet[-etykiety,moutput] - mean(DataSet[etykiety,moutput]))^2)
 rmse.lm.1<-rmse(DataSet[-etykiety,moutput],rep(mean(DataSet[etykiety,moutput]),nrow(DataSet[-etykiety,])))
 #bic.lm 
-mean.lm.bic<-mean((DataSet[-etykiety,moutput] - predict(optim.lm.train$bic.lm,DataSet)[-etykiety])^2)
-rmse.lm.bic<-rmse(DataSet[-etykiety,moutput],predict(optim.lm.train$bic.lm,DataSet)[-etykiety])
+mean.lm.bic<-mean((DataSet[-etykiety,moutput] - predict(leaps.lm.train$bic.lm,DataSet)[-etykiety])^2)
+rmse.lm.bic<-rmse(DataSet[-etykiety,moutput],predict(leaps.lm.train$bic.lm,DataSet)[-etykiety])
 #validation.lm 
-mean.lm.validation<-mean((DataSet[-etykiety,moutput] - predict(optim.lm.train$validation.lm,DataSet)[-etykiety])^2)
-rmse.lm.validation<-rmse(DataSet[-etykiety,moutput],predict(optim.lm.train$validation.lm,DataSet)[-etykiety])
+mean.lm.validation<-mean((DataSet[-etykiety,moutput] - predict(leaps.lm.train$validation.lm,DataSet)[-etykiety])^2)
+rmse.lm.validation<-rmse(DataSet[-etykiety,moutput],predict(leaps.lm.train$validation.lm,DataSet)[-etykiety])
 #cv.lm 
-mean.lm.cv<-mean((DataSet[-etykiety,moutput] - predict(optim.lm.train$cv.lm,DataSet)[-etykiety])^2)
-rmse.lm.cv<-rmse(DataSet[-etykiety,moutput],predict(optim.lm.train$cv.lm,DataSet)[-etykiety])
+mean.lm.cv<-mean((DataSet[-etykiety,moutput] - predict(leaps.lm.train$cv.lm,DataSet)[-etykiety])^2)
+rmse.lm.cv<-rmse(DataSet[-etykiety,moutput],predict(leaps.lm.train$cv.lm,DataSet)[-etykiety])
 #ols.lm
 lmfit <- evalwithattr("lm",moutput,mparvec,DataSet.train)
 mean.lm.ols<-mean((DataSet[-etykiety,moutput]-predict(lmfit,DataSet)[-etykiety])^2)
 rmse.lm.ols<-rmse(DataSet[-etykiety,moutput],predict(lmfit,DataSet)[-etykiety])
 
 rmeanstr<-c("mean.lm.1",
-"rmse.lm.1",
 "mean.lm.ols",
-"rmse.lm.ols",
 "mean.ridge.cv",
-"rmse.ridge.cv",
 "mean.ridge.best",
-"rmse.ridge.best",
+"mean.lasso.AIC",
+"mean.lasso.bHat",
 "mean.lm.aic",
-"rmse.lm.aic",
 "mean.lm.bic",
-"rmse.lm.bic",
 "mean.lm.validation",
-"rmse.lm.validation",
-"mean.lm.cv",
-"rmse.lm.cv")
+"mean.lm.cv")
 
-for(i in rmeanstr[seq(1,16,2)]) cat(i,":",get(i),"\t,", sep="")
+j=0;
+for(i in rmeanstr[seq(1,10)]) 
+	{j=j+1; if(j%%4==0) cat(i,":",get(i),"\n", sep="") else cat(i,":",get(i),"\t,", sep="")} 
 
-meanvec<-as.vector(sapply(rmeanstr[seq(1,16,2)],function(x) get(x)))
-olsdiv=round(meanvec[1]/max(meanvec[-1]))
+meanvec<-as.vector(sapply(rmeanstr[seq(1,10)],function(x) get(x)))
+olsdiv=round(meanvec[1]/max(meanvec[-c(1)]))
 meanvec[1]<-meanvec[1]/olsdiv
 #meanscl<-as.data.frame(t(as.vector(scale(meanvec))))
 meanscl<-as.data.frame(t(meanvec))
-names(meanscl)<-rmeanstr[seq(1,16,2)]
+names(meanscl)<-rmeanstr[seq(1,10)]
 
 #################################################################################################
 #generuje rysunek z liniami b³êdami kolejnych metod znajdowania modelu lm, 
@@ -286,12 +383,14 @@ jpeg(file=paste(fname,".jpg",sep=""),width = 1200, height = 1000, quality = 55, 
 x<-seq(1:100)
 y<-seq(min(meanvec),max(meanvec),length.out=100)
 plot(x,y,ylab="Test Mean RSS",xlab="Tuning Parameter", type="n",lwd=3)
-abline(mean.lm.1/olsdiv,0,lwd=1,lty=2, col = "green")
-abline(mean.lm.ols,0,lwd=1,lty=3, col = "blue")
-abline(mean.lm.bic,0,lwd=1,lty=4, col = "grey")
-abline(mean.lm.aic,0,lwd=1,lty=5, col = "red")
-abline(mean.ridge.best,0,lwd=1,lty=6, col = "orange")
-legend(70,mean(y)+sd(y),c(paste("Raw/",olsdiv,sep=""),"OLS","BIC","AIC","Ridge"),col = c("green", "blue", "grey", "red", "orange"), lty=c(2,3,4,5,1),lwd=1)
+abline(mean.lm.1/olsdiv,0,lwd=6,lty=2, col = "green")
+abline(mean.lm.ols,0,lwd=6,lty=3, col = "blue")
+abline(mean.lm.bic,0,lwd=4,lty=4, col = "grey")
+abline(mean.lm.aic,0,lwd=5,lty=5, col = "red")
+abline(mean.ridge.best,0,lwd=6,lty=6, col = "orange")
+abline(mean.lasso.AIC,0,lwd=2,lty=1, col = "black")
+abline(mean.lasso.bHat,0,lwd=3,lty=7, col = "pink")
+legend(70,mean(y)+sd(y),c(paste("Raw/",olsdiv,sep=""),"OLS","LeapsBIC","StepAIC","Ridge","LassoAIC","LassobHat"),col = c("green", "blue", "grey", "red", "orange","black","pink"), lty=c(2,3,4,5,6,1,7),lwd=c(6,6,4,5,6,2,3))
 dev.off()
 
 
@@ -315,106 +414,6 @@ dev.off()
 #rmse(ytpredg,meatspec$fat[173:215])
 #rmse(ytpredg[-13],meatspec$fat[173:215][-13])
 
-#### LASSO ############################################################################################
-# s is the constraint sum |beta| < s, s infinity, beta same as OLS
-#######################################################################################################
-
-"cv.lasso" <- function(formula,data,subset=NULL,K=10){
-	if (!is.null(subset))
-		data <- data[subset,]
-	y <- data[,names(data)==as.character(formula)[2]]
-	x <- model.matrix(as.formula(formula),data)[,-1]
-	#mycv<-cv;rm(cv)
-	larsfit <- cv.lars(x,y,K=K,plot.it=FALSE)
-	larsfit
-}
-
-"lasso" <-	function(formula,data,subset=NULL){
-	if (!is.null(subset))
-		data <- data[subset,]
-	
-	y <- data[,names(data)==as.character(formula)[2]]
-	x <- model.matrix(as.formula(formula),data)[,-1]
-	larsfit <- lars(x,y,type="lasso")
-	larsfit
-}
-
-
-##################################################################################################
-#Funkcja pred.lasso1 predykcja po lars(x,y)
-pred.lasso<-function(coef,moutput,mparvec,DataSet){
-	yc<-DataSet[,moutput]-mean(DataSet[,moutput])
-	scale(DataSet[,mparvec]) %*% coef+mean(DataSet[,moutput])
-}
-
-#library(lars);
-#varvec<-paste(moutput,"~",paste(mparvec,collapse="+"),sep="")
-lasso.fit <- evalwithattr("lasso",moutput,mparvec,DataSet.train)
-plot(lasso.fit,breaks=F,lty="solid") 
-DF <- lasso.fit$df #df on the regularization path
-p <- length(mparvec)
-n <- nrow(DataSet.train)
-#note: DF[1] == 1, intercept only
-#Best AIC/BIC Model
-LL<- (-n/2)*log(lasso.fit$RSS/n)
-AICLasso <- -2*LL + 2*DF
-BICLasso<- -2*LL + log(n)*DF
-names(AICLasso)<-names(BICLasso)<-paste("df=",DF,sep="")
-indAICModel<-which.min(AICLasso)
-indBICModel<-which.min(BICLasso)
-bLARSAIC<-coef(lasso.fit)[indAICModel,]
-bLARSBIC<-coef(lasso.fit)[indBICModel,]
-names(indAICModel)
-sum(bLARSAIC!=0.0) #check: number of coefficients
-names(indBICModel)
-sum(bLARSBIC!=0.0)
-
-lasso.pred.AIC <- pred.lasso(bLARSAIC,moutput,mparvec,DataSet)
-lasso.pred.BIC <- pred.lasso(bLARSBIC,moutput,mparvec,DataSet)
-mean.lasso.AIC<-mean((DataSet[-etykiety,moutput] - lasso.pred.AIC[-etykiety])^2)
-mean.lasso.BIC<-mean((DataSet[-etykiety,moutput] - lasso.pred.BIC[-etykiety])^2)
-
-graphics.off() #clear graphics
-#to make this example reproducible, I have fixed the seed
-#set.seed(2317723)
-## best fmin
-lasso.cv <- evalwithattr("cv.lasso",moutput,mparvec,DataSet.train)
-
-#ans contains components: 'cv', 'cv.error', 'fraction'
-CVout <- matrix(c(lasso.cv$cv,lasso.cv$cv.error), ncol=2)
-indBest<-oneSdRule(CVout)
-fBest<-(lasso.cv$fraction)[indBest]
-#fmin <- lasso.cv$fraction[order(lasso.cv$cv)[1]]
-fmin<-(lasso.cv$fraction)[which.min(lasso.cv$cv)]
-#
-plotCVLars(lasso.cv)
-TotalAbsBeta<-apply(coef(lasso.fit), MARGIN=1, function(x)
-			sum(abs(x)))[-1]
-BLength<-TotalAbsBeta/TotalAbsBeta[length(TotalAbsBeta)]
-tablef<-matrix( c(DF[-1], BLength) , ncol=2)
-#label the df on the plot
-axis(side=3, at=tablef[,2], labels=tablef[,1])
-mtext("DF", side=3, line=2)
-abline(v=fmin, col="red", lwd=3)
-abline(v=fBest, col="blue", lwd=3)
-title(sub="One-sd-rule CV (blue) and minimum CV (red) shown")
-pHatF <- round(approx(x=tablef[,2],y=tablef[,1], xout=fBest)$y,1)
-#Note: phatF is the estimated df including the intercept
-# So pHatF-1 is the number of inputs
-text(0.2, 1.3, labels=bquote(hat(p)==.(pHatF-1)))
-#
-#Best model using 10-fold CV with one-sd rule
-pHat <- round(pHatF)
-indpHat <- match(pHat, lasso.fit$df)
-bHat<-coef(lasso.fit)[indpHat,]
-
-bHat[bHat!=0]
-
-
-lasso.pred.bHat <- pred.lasso(bHat,moutput,mparvec,DataSet)
-mean.lasso.bHat<-mean((DataSet[-etykiety,moutput] - lasso.pred.bHat[-etykiety])^2)
-mean.lasso.bHat
-
 
 
 #predict.lars(lasso.fit,type="fit", s)
@@ -424,7 +423,7 @@ mean.lasso.bHat
 #rss.lasso <- rep(0, 100);
 #for(i in 1:100){
 #	lasso.pred <- predict.lars(lasso.fit, RI~Na+Mg+Al+Si+K+Ca+Ba+Fe, DataSet, s = s.set[i]);
-#	rss.lasso[i] <- mean((DataSet[-etykiety,moutput] - lasso.pred[-td])^2);
+#	rss.lasso[i] <- mean((DataSet[-etykiety,moutput] - lasso.pred[-etykiety])^2);
 #}
 #min(rss.lasso)
 #plot(rss.lasso,type="l")
