@@ -8,6 +8,7 @@
 #nData<-"Glass"
 #nData<-"nihills"
 #nData<-"photocar"
+#nData<-"meatspec"
 
 ##########################################################################################################
 #wczytywanie zbioru treningowego o nazwie nData
@@ -83,6 +84,22 @@ if(nData=="photocar"){
 	parvecnolm=c("time")
 	#wybieramy zmienn± zale¿n±, target dla regresji, zwykle zmiennoprzecinkowy
 	moutput<-"time"
+}
+##########################################################################################################
+if(nData=="meatspec"){
+	#usuwanie do Kruskala
+	#DataSet<-DataSet[-c(13,25,32,33,34,36,37,67,64,77,52),]
+	parvecfactor=c("")
+	vecfactorzesc=c("")
+	#kruskal
+	parnokruskal=c()
+	parvecol<-names(DataSet)
+	#zmienne drzewa
+	parvecnotree=c("fat")
+	paroutputree=c("fat")
+	#zmienne zale¿ne i inne zbêdne w regresji
+	parvecnolm=c("fat")
+	moutput<-"fat"
 }
 
 ##########################################################################################################

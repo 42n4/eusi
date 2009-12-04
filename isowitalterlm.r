@@ -20,9 +20,10 @@ dir.create(mypathout, showWarnings = TRUE, recursive = TRUE, mode = "0755")
 source(paste(mypath,"isowitfunkcje.r",sep=""))
 
 ##########################################################################################################
-nData<-"Glass"
+#nData<-"Glass"
 #nData<-"nihills"
 #nData<-"photocar"
+nData<-"meatspec"
 source(paste(mypath,"isowitdatasets.r",sep=""))
 
 ##################################################################################################
@@ -300,7 +301,7 @@ mean.lasso.BIC<-mean((DataSet[-etykiety,moutput] - lars.lm.train$bLARSBICfits[-e
 mean.lasso.bHat<-mean((DataSet[-etykiety,moutput] - lars.lm.train$bHatfits[-etykiety])^2)
 mean.lasso.bHat
 mean.lasso.AIC
-bHat[bHat!=0]
+
 
 
 ridge.lm.train <- ridge.lm(paste(mypathout,nData,"_lmrdg_norm",sep=""),DataSet,moutput,mparvec,etykiety);
@@ -318,8 +319,8 @@ mean.ridge.cv1<-mean((DataSet[-etykiety,moutput] - ridge.pred.cv1[-etykiety])^2)
 mean.ridge.best1<-mean((DataSet[-etykiety,moutput] - ridge.pred.best1[-etykiety])^2)
 
 p <- ncol(DataSet.train)-1
-really.big=F
-leaps.lm.train <- leaps.lm(paste(mypathout,nData,"_lmbic_norm",sep=""),DataSet.train, moutput, mparvec);
+
+leaps.lm.train <- leaps.lm(paste(mypathout,nData,"_lmbic_norm",sep=""),DataSet.train, moutput, mparvec,really.big=T);
 names(leaps.lm.train);
 # modele wybrane przez metodê BIC, validation, CV (cross validation)
 summary(leaps.lm.train$bic.lm)
