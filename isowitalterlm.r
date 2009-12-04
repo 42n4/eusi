@@ -8,6 +8,10 @@
 #to ¶cie¿ka do plików wykonywalnych z R pow³oki za pomoc± source("...")
 #mypath<-"/media/disk/guest/"
 mypath<-"/home/pwas/workspace/iso/"
+
+#(mypath <- getwd())
+#if (!is.null(mypath)) setwd(mypath)
+
 #to ¶cie¿ka do plików graficznych uzyskiwanych za pomoc± funkcji plot i innych
 mypathout<-paste(mypath,"rysunki/",sep="")
 dir.create(mypathout, showWarnings = TRUE, recursive = TRUE, mode = "0755")
@@ -134,8 +138,8 @@ pred.ridge.etykiety<-function(moutput,mparvec,DataSet,etykiety){
 }
 
 ##################################################################################################
-#Funkcja pred.ridge predykcja po lm.ridge
-pred.ridge<-function(ridge.train,moutput,mparvec,DataSet){
+#Funkcja pred.ridge predykcja po lm.ridge - jak z ksi±¿ki
+pred.ridge1<-function(ridge.train,moutput,mparvec,DataSet){
 	mm<-apply(DataSet[,mparvec],2,mean)
 	trainx <- as.matrix(sweep(DataSet[,mparvec],2,mm))
 	yc<-DataSet[,moutput]-mean(DataSet[,moutput])
@@ -144,6 +148,14 @@ pred.ridge<-function(ridge.train,moutput,mparvec,DataSet){
 	#mlambda<-as.numeric(names(which.min(ridge.train$GCV)))
 	#ridge.train <- lm.ridge(yc~trainx,lambda=mlambda)
 	scale(trainx,center=FALSE,scale=ridge.train$scales) %*% ridge.train$coef+mean(DataSet[,moutput])
+}
+
+
+##################################################################################################
+#Funkcja pred.ridge predykcja po lm.ridge - moja wersja
+pred.ridge<-function(ridge.train,moutput,mparvec,DataSet){
+	yc<-DataSet[,moutput]-mean(DataSet[,moutput])
+	scale(DataSet[,mparvec],scale=ridge.train$scales) %*% ridge.train$coef+mean(DataSet[,moutput])
 }
 
 ###########################################################
@@ -190,8 +202,6 @@ ridge.lm <-function(fname,DataSet,moutput,mparvec,etykiety){
 
 
 
-
-
 ridge.lm.train <- ridge.lm(paste(mypathout,nData,"_lmrdg_norm",sep=""),DataSet,moutput,mparvec,etykiety);
 
 ridge.pred.cv <- pred.ridge(ridge.lm.train$ridge.train.cv,moutput,mparvec,DataSet)
@@ -201,6 +211,10 @@ mean.ridge.cv<-mean((DataSet[-etykiety,moutput] - ridge.pred.cv[-etykiety])^2)
 rmse.ridge.best<-rmse(DataSet[-etykiety,moutput],ridge.pred.best[-etykiety])
 mean.ridge.best<-mean((DataSet[-etykiety,moutput] - ridge.pred.best[-etykiety])^2)
 
+ridge.pred.cv1 <- pred.ridge1(ridge.lm.train$ridge.train.cv,moutput,mparvec,DataSet)
+ridge.pred.best1 <- pred.ridge1(ridge.lm.train$ridge.best,moutput,mparvec,DataSet)
+mean.ridge.cv1<-mean((DataSet[-etykiety,moutput] - ridge.pred.cv1[-etykiety])^2)
+mean.ridge.best1<-mean((DataSet[-etykiety,moutput] - ridge.pred.best1[-etykiety])^2)
 
 p <- ncol(DataSet.train)-1
 really.big=F
@@ -325,32 +339,98 @@ dev.off()
 	larsfit
 }
 
+
+##################################################################################################
+#Funkcja pred.lasso1 predykcja po lars(x,y)
+pred.lasso<-function(coef,moutput,mparvec,DataSet){
+	yc<-DataSet[,moutput]-mean(DataSet[,moutput])
+	scale(DataSet[,mparvec]) %*% coef+mean(DataSet[,moutput])
+}
+
 #library(lars);
-#lasso.fit <- evalwithattr("lasso",moutput,mparvec,DataSet.train)
-#plot(lasso.fit,breaks=F,lty="solid") 
-#lasso.fit
-## best s
-#lasso.cv <- evalwithattr("cv.lasso",moutput,mparvec,DataSet.train)
-#plotCVLars(lasso.cv)
-#s <- lasso.cv$fraction[order(lasso.cv$cv)[1]]
-#s
 #varvec<-paste(moutput,"~",paste(mparvec,collapse="+"),sep="")
-#lasso.pred <- pred.lasso(lasso.fit, RI~Na+Mg+Al+Si+K+Ca+Ba+Fe, DataSet, s)
-#mean((DataSet[-etykiety,moutput] - lasso.pred[-etykiety])^2);
-#pred.lasso(lasso.fit, RI~Na+Mg+Al+Si+K+Ca+Ba+Fe, DataSet, s, "coefficients")
+lasso.fit <- evalwithattr("lasso",moutput,mparvec,DataSet.train)
+plot(lasso.fit,breaks=F,lty="solid") 
+DF <- lasso.fit$df #df on the regularization path
+p <- length(mparvec)
+n <- nrow(DataSet.train)
+#note: DF[1] == 1, intercept only
+#Best AIC/BIC Model
+LL<- (-n/2)*log(lasso.fit$RSS/n)
+AICLasso <- -2*LL + 2*DF
+BICLasso<- -2*LL + log(n)*DF
+names(AICLasso)<-names(BICLasso)<-paste("df=",DF,sep="")
+indAICModel<-which.min(AICLasso)
+indBICModel<-which.min(BICLasso)
+bLARSAIC<-coef(lasso.fit)[indAICModel,]
+bLARSBIC<-coef(lasso.fit)[indBICModel,]
+names(indAICModel)
+sum(bLARSAIC!=0.0) #check: number of coefficients
+names(indBICModel)
+sum(bLARSBIC!=0.0)
+
+lasso.pred.AIC <- pred.lasso(bLARSAIC,moutput,mparvec,DataSet)
+lasso.pred.BIC <- pred.lasso(bLARSBIC,moutput,mparvec,DataSet)
+mean.lasso.AIC<-mean((DataSet[-etykiety,moutput] - lasso.pred.AIC[-etykiety])^2)
+mean.lasso.BIC<-mean((DataSet[-etykiety,moutput] - lasso.pred.BIC[-etykiety])^2)
+
+graphics.off() #clear graphics
+#to make this example reproducible, I have fixed the seed
+#set.seed(2317723)
+## best fmin
+lasso.cv <- evalwithattr("cv.lasso",moutput,mparvec,DataSet.train)
+
+#ans contains components: 'cv', 'cv.error', 'fraction'
+CVout <- matrix(c(lasso.cv$cv,lasso.cv$cv.error), ncol=2)
+indBest<-oneSdRule(CVout)
+fBest<-(lasso.cv$fraction)[indBest]
+#fmin <- lasso.cv$fraction[order(lasso.cv$cv)[1]]
+fmin<-(lasso.cv$fraction)[which.min(lasso.cv$cv)]
+#
+plotCVLars(lasso.cv)
+TotalAbsBeta<-apply(coef(lasso.fit), MARGIN=1, function(x)
+			sum(abs(x)))[-1]
+BLength<-TotalAbsBeta/TotalAbsBeta[length(TotalAbsBeta)]
+tablef<-matrix( c(DF[-1], BLength) , ncol=2)
+#label the df on the plot
+axis(side=3, at=tablef[,2], labels=tablef[,1])
+mtext("DF", side=3, line=2)
+abline(v=fmin, col="red", lwd=3)
+abline(v=fBest, col="blue", lwd=3)
+title(sub="One-sd-rule CV (blue) and minimum CV (red) shown")
+pHatF <- round(approx(x=tablef[,2],y=tablef[,1], xout=fBest)$y,1)
+#Note: phatF is the estimated df including the intercept
+# So pHatF-1 is the number of inputs
+text(0.2, 1.3, labels=bquote(hat(p)==.(pHatF-1)))
+#
+#Best model using 10-fold CV with one-sd rule
+pHat <- round(pHatF)
+indpHat <- match(pHat, lasso.fit$df)
+bHat<-coef(lasso.fit)[indpHat,]
+
+bHat[bHat!=0]
+
+
+lasso.pred.bHat <- pred.lasso(bHat,moutput,mparvec,DataSet)
+mean.lasso.bHat<-mean((DataSet[-etykiety,moutput] - lasso.pred.bHat[-etykiety])^2)
+mean.lasso.bHat
+
+
+
+#predict.lars(lasso.fit,type="fit", s)
 
 #### iterations #########
 #s.set <- seq(0, 1, length = 100);
 #rss.lasso <- rep(0, 100);
 #for(i in 1:100){
-#	lasso.pred <- pred.lasso(lasso.fit, RI~Na+Mg+Al+Si+K+Ca+Ba+Fe, DataSet, s = s.set[i]);
+#	lasso.pred <- predict.lars(lasso.fit, RI~Na+Mg+Al+Si+K+Ca+Ba+Fe, DataSet, s = s.set[i]);
 #	rss.lasso[i] <- mean((DataSet[-etykiety,moutput] - lasso.pred[-td])^2);
 #}
 #min(rss.lasso)
 #plot(rss.lasso,type="l")
 #s <- s.set[order(rss.lasso)[1]];
 #s
-#pred.lasso(lasso.fit, RI~Na+Mg+Al+Si+K+Ca+Ba+Fe, DataSet, s, "coefficients")
+#predict.lars(lasso.fit, RI~Na+Mg+Al+Si+K+Ca+Ba+Fe, DataSet, s, "coefficients")
 
 
 
