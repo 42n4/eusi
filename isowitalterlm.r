@@ -396,12 +396,9 @@ dev.off()
 
 #KONIEC PLIKU PONI¯EJ NOTATKI
 
-# K-fold cross-validation
-#DAAG pakiet
-#cv.lm(df=DataSet, fit, m=10) # 10 fold cross-validation
-
 #Przyk³ad z ksi±¿ki "Linear models with R" James Faraway
 #pozosta³e ze strony http://statisticsr.blogspot.com/
+#oraz ze strony http://www.statmethods.net/stats/regression.html
 #mm<-apply(meatspec[1:172,-101],2,mean)
 #trainx <- as.matrix(sweep(meatspec[1:172,-101],2,mm))
 #testx <- as.matrix(sweep(meatspec[173:215,-101],2,mm))
@@ -414,22 +411,6 @@ dev.off()
 #rmse(ytpredg,meatspec$fat[173:215])
 #rmse(ytpredg[-13],meatspec$fat[173:215][-13])
 
-
-
-#predict.lars(lasso.fit,type="fit", s)
-
-#### iterations #########
-#s.set <- seq(0, 1, length = 100);
-#rss.lasso <- rep(0, 100);
-#for(i in 1:100){
-#	lasso.pred <- predict.lars(lasso.fit, RI~Na+Mg+Al+Si+K+Ca+Ba+Fe, DataSet, s = s.set[i]);
-#	rss.lasso[i] <- mean((DataSet[-etykiety,moutput] - lasso.pred[-etykiety])^2);
-#}
-#min(rss.lasso)
-#plot(rss.lasso,type="l")
-#s <- s.set[order(rss.lasso)[1]];
-#s
-#predict.lars(lasso.fit, RI~Na+Mg+Al+Si+K+Ca+Ba+Fe, DataSet, s, "coefficients")
 
 
 
