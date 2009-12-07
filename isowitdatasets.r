@@ -9,12 +9,13 @@
 #nData<-"nihills"
 #nData<-"photocar"
 #nData<-"meatspec"
+nData<-"skoliozaNIL1.csv"
 
 ##########################################################################################################
 #wczytywanie zbioru treningowego o nazwie nData
-#assign(nData,read.csv(paste("file://",mypath,"meatDataEN.csv",sep=""),head=TRUE,sep=";",dec=",",na.strings=c("NA", "BD", "bd", "", "?")))
-#library(mlbench)
-data(list=nData)
+assign(nData,read.csv(paste("file:///home/pwas/prace/",nData,sep=""),head=TRUE,sep=";",dec=",",na.strings=c("NA", "BD", "bd", "", "?")))
+
+#data(list=nData)
 DataSet<-get(nData)
 
 ##########################################################################################################
@@ -100,6 +101,23 @@ if(nData=="meatspec"){
 	#zmienne zale¿ne i inne zbêdne w regresji
 	parvecnolm=c("fat")
 	moutput<-"fat"
+}
+
+##########################################################################################################
+if(nData=="skoliozaNIL1.csv"){
+	#usuwanie do Kruskala
+	#DataSet<-DataSet[-c(13,25,32,33,34,36,37,67,64,77,52),]
+	parvecfactor=c()
+	vecfactorzesc=c()
+	#kruskal
+	parnokruskal=c()
+	parvecol<-names(DataSet)
+	#zmienne drzewa
+	parvecnotree=c("NI")
+	paroutputree=c("NI")
+	#zmienne zale¿ne i inne zbêdne w regresji
+	parvecnolm=c("NI")
+	moutput<-"NI"
 }
 
 ##########################################################################################################

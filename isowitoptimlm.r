@@ -16,7 +16,7 @@ dir.create(mypathout, showWarnings = TRUE, recursive = TRUE, mode = "0755")
 source(paste(mypath,"isowitfunkcje.r",sep=""))
 
 ##########################################################################################################
-nData<-"Glass"
+#nData<-"Glass"
 #nData<-"nihills"
 #nData<-"photocar"
 source(paste(mypath,"isowitdatasets.r",sep=""))
