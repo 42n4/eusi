@@ -237,9 +237,8 @@ lmwithattr<-function (DataSet, moutput, parvec, numvar, nleven=-1, alpha=0.01, E
 		if(!inherits(m01, "try-error")){
 			#p.value <- 1-pf(f.stat["value"],f.stat["numdf"],f.stat["dendf"])			
 			sm01<-summary(m01)
-			if(is.finite(sm01$fstatistic)){
-				#for(i in 1:length(varplus)
-				#    if(is.finite(sm01$coefficients[i,2])){
+			if(is.finite(sm01$fstatistic)
+					&&(isTRUE(all.equal(as.vector(is.finite(sm01$coefficients[,4])),rep(TRUE,length(varplus)+1))))){
 				tmp=paste("anova(",deparse(substitute(lm)),"(",moutput,"~1,DataSet),m01)",sep="")
 				#an<-anova(lm(RI~1),m01);
 				an<-eval(parse(text=tmp))
