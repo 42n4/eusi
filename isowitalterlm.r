@@ -23,7 +23,7 @@ source(paste(mypath,"isowitfunkcje.r",sep=""))
 #nData<-"Glass"
 #nData<-"nihills"
 #nData<-"photocar"
-nData<-"meatspec"
+#nData<-"meatspec"
 source(paste(mypath,"isowitdatasets.r",sep=""))
 
 ##################################################################################################

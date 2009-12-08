@@ -16,7 +16,7 @@ dir.create(mypathout, showWarnings = TRUE, recursive = TRUE, mode = "0755")
 source(paste(mypath,"isowitfunkcje.r",sep=""))
 
 ##########################################################################################################
-nData<-"Glass"
+#nData<-"Glass"
 #nData<-"nihills"
 #nData<-"photocar"
 source(paste(mypath,"isowitdatasets.r",sep=""))
@@ -120,3 +120,12 @@ lmabc_nolt
 lmbsp_nobp
 lmbsp_nono
 lmbsp_nolt
+#j=0;for( i in lmabc_nobp) {j=j+1;if(j%%4==3) print(i)}
+#mDataSet<-cbind(mDataSet,log(mDataSet$NI))
+#names(mDataSet)[18]<-"logNI"
+#moutput<-"logNI"
+#parvecnolm<-c("NI","logNI")
+#mparvec=setdiff(names(DataSet),parvecnolm)
+#lmlog_nobp<-combesteval("lm", paste(mypathout,nData,"_lmabc_nobp",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
+#moutput<-"NI"
+#DataSet[!is.na(DataSet$potassium),]

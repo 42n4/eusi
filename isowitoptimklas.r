@@ -18,7 +18,7 @@ source(paste(mypath,"isowitfunkcje.r",sep=""))
 ##########################################################################################################
 #nData<-"Glass"
 #nData<-"nihills"
-nData<-"photocar"
+#nData<-"photocar"
 source(paste(mypath,"isowitdatasets.r",sep=""))
 
 ##########################################################################################################
