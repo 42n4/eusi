@@ -4,7 +4,7 @@
 # Author: Piotr W±siewicz
 ########################################################################################################
 
-Sys.setlocale("LC_NUMERIC","C")
+Sys.setlocale("LC_NUMERIC","C") 
 
 #lista pakietów z CRAN-u
 #naprawiæ pakier gRain
@@ -54,39 +54,39 @@ prederror<-function(classimod,paroutputree,parvectree,DataSet,EvalString="DEFAUL
 }
 
 
-#Funkcja permbesteval liczy permutacje zmiennych niezale¿nych dla n=1 do n równego ilo¶æ wszystkich zmiennych 
+#Funkcja combesteval liczy combiutacje zmiennych niezale¿nych dla n=1 do n równego ilo¶æ wszystkich zmiennych 
 #i oblicza dla nich funkcje get(nFunction) i wybiera najlepsz± dla ka¿dego n, wraca listê najlepszych obiektów z kolejnych iteracji  
 #w lb<n> mamy wybierane po kolei kolejne zestawy na najlepsz± regresjê 
 #w m<n> najlepszy model dla n, w sm<n> summary(m<n>), dla n=1 rysuje plot regresji
-permbesteval<-function (nFunction, fname, permDataSet, moutput, parvec, nleven=-1, alpha=0.01, EvalString="DEFAULT"){
-	l<-list();ilist<-list();etykiety<-seq(1,nrow(permDataSet));m01<-FALSE
-	#cat(" NR:",nrow(permDataSet))
+combesteval<-function (nFunction, fname, combiDataSet, moutput, parvec, nleven=-1, alpha=0.01, EvalString="DEFAULT"){
+	l<-list();ilist<-list();etykiety<-seq(1,nrow(combiDataSet));m01<-FALSE
+	#cat(" NR:",nrow(combiDataSet))
 	n<-length(parvec)
 	varvec<-parvec
 	varplus<-paste(parvec,collapse="+")
 	for(numvar in 1:length(parvec)){
 		#cat("\n\n nF: ",nFunction)
 		if(nFunction=="lm")
-			ilist<-lmwithattr(permDataSet,moutput,parvec,numvar,nleven,alpha,EvalString)
+			ilist<-lmwithattr(combiDataSet,moutput,parvec,numvar,nleven,alpha,EvalString)
 		else if(nFunction=="polr")
-			ilist<-polrwithattr(permDataSet,moutput,parvec,numvar,EvalString)
+			ilist<-polrwithattr(combiDataSet,moutput,parvec,numvar,EvalString)
 		else {
 			#cat(paste("1:",moutput,"~",varplus)," n:",numvar," length:",n," EvalString:",EvalString,"\n")
-			ilist<-classwithattr(nFunction,permDataSet,moutput,parvec,numvar,70,5,EvalString)
+			ilist<-classwithattr(nFunction,combiDataSet,moutput,parvec,numvar,70,5,EvalString)
 			etykiety<-ilist[[4]]
 			m01<-ilist[[5]]
 		}
 		i<-ilist[[1]]; 
 		if(i){
 			if(numvar<n){
-				perm<-get("combinations","package:gtools")(length(parvec),numvar,parvec)
-				varvec<-perm[i,]
+				combi<-get("combinations","package:gtools")(length(parvec),numvar,parvec)
+				varvec<-combi[i,]
 			}
 			else if(numvar==n) varvec<-parvec
 			if(EvalString=="SPLINE") varplus<-paste("bs(",varvec,")",sep="") else varplus<-varvec
 			varplus<-paste(varplus,collapse="+")
 			if(nFunction%in%c("lm","polr"))
-			m01<-try(evalwithattr(nFunction,moutput,varvec,permDataSet[etykiety,],EvalString),TRUE)
+			m01<-try(evalwithattr(nFunction,moutput,varvec,combiDataSet[etykiety,],EvalString),TRUE)
 			#cat("Najlepszy!!!!!!!\n\n")
 		    #print(m01)
 			if(!inherits(m01, "try-error")){
@@ -102,7 +102,7 @@ permbesteval<-function (nFunction, fname, permDataSet, moutput, parvec, nleven=-
 				if(nFunction%in%c("lm","polr"))
 					assign(smnv,summary(get(mnv)))
 				else{ 
-					assign(smnv,prederror(m01,moutput,parvec,permDataSet[-etykiety,],EvalString));
+					assign(smnv,prederror(m01,moutput,parvec,combiDataSet[-etykiety,],EvalString));
 					l[[etnv]]<-get(etnv)
 				}
 				#get(smnv)
@@ -116,13 +116,13 @@ permbesteval<-function (nFunction, fname, permDataSet, moutput, parvec, nleven=-
 					if(numvar==1){
 						jpeg(file=paste(fname,numvar,"_1.jpg",sep=""),width = 1200, height = 1000, quality = 55, bg = "white")
 						par(lwd=4)
-						vartemp<-eval(parse(text=paste("permDataSet$",varvec,sep="")))
+						vartemp<-eval(parse(text=paste("combiDataSet$",varvec,sep="")))
 						rangetemp<-seq(min(vartemp),max(vartemp),length.out=213)
-						plot(eval(parse(text=paste(moutput,"~",varvec))),data=permDataSet,main=paste(moutput,"~",varplus), pch=1.0, cex.lab=1.5)
+						plot(eval(parse(text=paste(moutput,"~",varvec))),data=combiDataSet,main=paste(moutput,"~",varplus), pch=1.0, cex.lab=1.5)
 						dframetemp<-as.data.frame(rangetemp)
 						names(dframetemp)<-varvec
 						lines(rangetemp,predict(get(mnv),newdata=dframetemp), col="red", lwd=3)
-						#cat(paste("3:",moutput,"~",varvec)," n:",numvar," mnv:",mnv," varvec:",paste("permDataSet$",varvec,sep=""),"\n")
+						#cat(paste("3:",moutput,"~",varvec)," n:",numvar," mnv:",mnv," varvec:",paste("combiDataSet$",varvec,sep=""),"\n")
 						dev.off()
 					}
 					jpeg(file=paste(fname,numvar,"_2.jpg",sep=""),width = 1200, height = 1000, quality = 55, bg = "white")
@@ -139,17 +139,17 @@ permbesteval<-function (nFunction, fname, permDataSet, moutput, parvec, nleven=-
 #Funkcja classwithattr znajduje najlepszy klasyfikator dla numvar zmiennych - atrybutów
 #moutput - wyj¶cie modelu zmienna zale¿na np. "Type", 
 #parvec - wektor zmiennych wej¶ciowych niezale¿nych dla modelu,
-#numvar - ile zmiennych z parvec ma wzi±æ udzia³ w permutacji zmiennych niezale¿nych
+#numvar - ile zmiennych z parvec ma wzi±æ udzia³ w combiutacji zmiennych niezale¿nych
 classwithattr<-function (nFunction, cDataSet, moutput, parvec, numvar, percent=70, trials=5,EvalString="DEFAULT"){
 	if(numvar<length(parvec)){
-		perm<-get("combinations","package:gtools")(length(parvec),numvar,parvec)
-		rowperm<-nrow(perm)
+		combi<-get("combinations","package:gtools")(length(parvec),numvar,parvec)
+		rowcombi<-nrow(combi)
 	}
-	else rowperm<-1
+	else rowcombi<-1
 	lb<-c(); ibest<-0; lres<-list(); gbep<-1; gbetykiety<-c(); gbclas<-FALSE;
-	for(i in 1:rowperm){
+	for(i in 1:rowcombi){
 		#cat("\nwewnatrz funkcji: ",i," ",numvar)
-		if(numvar<length(parvec)) 	varplus<-perm[i,]
+		if(numvar<length(parvec)) 	varplus<-combi[i,]
 		if(numvar==length(parvec))	varplus<-parvec
 		vecp<-c(); bep<-1; betykiety<-c(); bclas<-FALSE;
 		for(j in 1:trials){
@@ -193,16 +193,16 @@ classwithattr<-function (nFunction, cDataSet, moutput, parvec, numvar, percent=7
 #Funkcja polrwithattr znajduje najlepsz± logistyczn± regresjê dla parametrów
 #moutput - wyj¶cie modelu zmienna zale¿na np. "RI", 
 #parvec - wektor zmiennych wej¶ciowych niezale¿nych dla modelu,
-#numvar - ile zmiennych z parvec ma wzi±æ udzia³ w permutacji zmiennych niezale¿nych
+#numvar - ile zmiennych z parvec ma wzi±æ udzia³ w combiutacji zmiennych niezale¿nych
 polrwithattr<-function (DataSet, moutput, parvec, numvar, EvalString="DEFAULT"){
 	if(numvar<length(parvec)){
-		perm<-get("combinations","package:gtools")(length(parvec),numvar,parvec)
-		rowperm<-nrow(perm)
+		combi<-get("combinations","package:gtools")(length(parvec),numvar,parvec)
+		rowcombi<-nrow(combi)
 	}
-	else rowperm<-1
+	else rowcombi<-1
 	lb<-c(); ibest<-0; br2<-1000000000;
-	for(i in 1:rowperm){
-		if(numvar<length(parvec)) 	varplus<-perm[i,]
+	for(i in 1:rowcombi){
+		if(numvar<length(parvec)) 	varplus<-combi[i,]
 		if(numvar==length(parvec))	varplus<-parvec
 		m01<-try(evalwithattr("polr",moutput,varplus,DataSet,EvalString),TRUE);
 		if(!inherits(m01, "try-error")){
@@ -221,16 +221,16 @@ polrwithattr<-function (DataSet, moutput, parvec, numvar, EvalString="DEFAULT"){
 #Funkcja lmwithattr znajduje najlepsz± liniow± regresjê dla parametrów
 #moutput - wyj¶cie modelu zmienna zale¿na np. "RI", 
 #parvec - wektor zmiennych wej¶ciowych niezale¿nych dla modelu,
-#numvar - ile zmiennych z parvec ma wzi±æ udzia³ w permutacji zmiennych niezale¿nych
+#numvar - ile zmiennych z parvec ma wzi±æ udzia³ w combiutacji zmiennych niezale¿nych
 lmwithattr<-function (DataSet, moutput, parvec, numvar, nleven=-1, alpha=0.01, EvalString="DEFAULT"){
 	if(numvar<length(parvec)){
-		perm<-get("combinations","package:gtools")(length(parvec),numvar,parvec)
-		rowperm<-nrow(perm)
+		combi<-get("combinations","package:gtools")(length(parvec),numvar,parvec)
+		rowcombi<-nrow(combi)
 	}
-	else rowperm<-1
+	else rowcombi<-1
 	lb<-c(); ibest<-0; br2<-0;
-	for(i in 1:rowperm){
-		if(numvar<length(parvec)) 	varplus<-perm[i,]
+	for(i in 1:rowcombi){
+		if(numvar<length(parvec)) 	varplus<-combi[i,]
 		if(numvar==length(parvec))	varplus<-parvec;
 		m01<-try(evalwithattr("lm",moutput,varplus,DataSet,EvalString),TRUE);
 		if(!inherits(m01, "try-error")){

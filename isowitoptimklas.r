@@ -3,7 +3,7 @@
 # Licence LGPL  
 # Author: Piotr W±siewicz
 ########################################################################################################
-
+ 
 #te ¶cie¿ki mypath i mypathout musz± istnieæ w systemie
 #to ¶cie¿ka do plików wykonywalnych z R pow³oki za pomoc± source("...")
 #mypath<-"/media/disk/guest/"
@@ -74,7 +74,7 @@ if(n==2){mbDataSet<-DataSetz;datype<-"zesc";}
 if(n==3){mbDataSet<-DataSetd;datype<-"nrdi";}
 if(n==4){mbDataSet<-DataSetzd;datype<-"zedi";}
 #generujemy nFunction automatycznie dla parvectree i ró¿nej liczby atrybutów dla najlepiej pasuj±cych danych
-pred_norm<-permbesteval(nFunction, paste(mypathout,nData,"_pred_",nFunction,"_",datype,sep=""),mbDataSet, paroutputree,parvectree,80,5,evalstr)
+pred_norm<-combesteval(nFunction, paste(mypathout,nData,"_pred_",nFunction,"_",datype,sep=""),mbDataSet, paroutputree,parvectree,80,5,evalstr)
 y<-seq(1,length(pred_norm));y<-sapply(y,function(x){if(x %% 5) x<-0 else x<-x});y<-y[!y==0];
 z<-c();for(i in y) z<-c(z,pred_norm[[i-1]]$perror); n<-min(which(z==min(z)))
 bestclass<-pred_norm[[(n-1)*5+3]]
@@ -82,7 +82,7 @@ betykiety<-pred_norm[[(n-1)*5+1]]
 bestli<-pred_norm[[(n-1)*5+2]]
 bestn<-pred_norm[[(n-1)*5+5]]
 besti<-bestli[length(bestli)]
-perm<-get("combinations","package:gtools")(length(parvectree),bestn,parvectree)
+combi<-get("combinations","package:gtools")(length(parvectree),bestn,parvectree)
 lres<-prederror(bestclass, paroutputree, parvectree, mbDataSet[-betykiety,],evalstr)
 cat("Best ",nFunction," for variable number=",bestn)
 bestclass
@@ -124,7 +124,7 @@ if(n==2){mbDataSet<-DataSetz;datype<-"zesc";}
 if(n==3){mbDataSet<-DataSetd;datype<-"nrdi";}
 if(n==4){mbDataSet<-DataSetzd;datype<-"zedi";}
 #generujemy nFunction automatycznie dla parvectree i ró¿nej liczby atrybutów dla najlepiej pasuj±cych danych
-pred_norm<-permbesteval(nFunction, paste(mypathout,nData,"_pred_",nFunction,"_",datype,sep=""),mbDataSet, paroutputree,parvectree,80,5,evalstr)
+pred_norm<-combesteval(nFunction, paste(mypathout,nData,"_pred_",nFunction,"_",datype,sep=""),mbDataSet, paroutputree,parvectree,80,5,evalstr)
 y<-seq(1,length(pred_norm));y<-sapply(y,function(x){if(x %% 5) x<-0 else x<-x});y<-y[!y==0];
 z<-c();for(i in y) z<-c(z,pred_norm[[i-1]]$perror); n<-min(which(z==min(z)))
 bestclass<-pred_norm[[(n-1)*5+3]]
@@ -132,7 +132,7 @@ betykiety<-pred_norm[[(n-1)*5+1]]
 bestli<-pred_norm[[(n-1)*5+2]]
 bestn<-pred_norm[[(n-1)*5+5]]
 besti<-bestli[length(bestli)]
-perm<-get("combinations","package:gtools")(length(parvectree),bestn,parvectree)
+combi<-get("combinations","package:gtools")(length(parvectree),bestn,parvectree)
 lres<-prederror(bestclass, paroutputree, parvectree, mbDataSet[-betykiety,],evalstr)
 cat("Best ",nFunction," for variable number=",bestn)
 bestclass
@@ -175,7 +175,7 @@ if(n==2){mbDataSet<-DataSetz;datype<-"zesc";}
 if(n==3){mbDataSet<-DataSetd;datype<-"nrdi";}
 if(n==4){mbDataSet<-DataSetzd;datype<-"zedi";}
 #generujemy nFunction automatycznie dla parvectree i ró¿nej liczby atrybutów dla najlepiej pasuj±cych danych
-pred_norm<-permbesteval(nFunction, paste(mypathout,nData,"_pred_",nFunction,"_",datype,sep=""),mbDataSet, paroutputree,parvectree,80,5,evalstr)
+pred_norm<-combesteval(nFunction, paste(mypathout,nData,"_pred_",nFunction,"_",datype,sep=""),mbDataSet, paroutputree,parvectree,80,5,evalstr)
 y<-seq(1,length(pred_norm));y<-sapply(y,function(x){if(x %% 5) x<-0 else x<-x});y<-y[!y==0];
 z<-c();for(i in y) z<-c(z,pred_norm[[i-1]]$perror); n<-min(which(z==min(z)))
 bestclass<-pred_norm[[(n-1)*5+3]]
@@ -183,7 +183,7 @@ betykiety<-pred_norm[[(n-1)*5+1]]
 bestli<-pred_norm[[(n-1)*5+2]]
 bestn<-pred_norm[[(n-1)*5+5]]
 besti<-bestli[length(bestli)]
-perm<-get("combinations","package:gtools")(length(parvectree),bestn,parvectree)
+combi<-get("combinations","package:gtools")(length(parvectree),bestn,parvectree)
 lres<-prederror(bestclass, paroutputree, parvectree, mbDataSet[-betykiety,],evalstr)
 cat("Best ",nFunction," for variable number=",bestn)
 bestclass
@@ -224,7 +224,7 @@ if(n==2){mbDataSet<-DataSetz;datype<-"zesc";}
 if(n==3){mbDataSet<-DataSetd;datype<-"nrdi";}
 if(n==4){mbDataSet<-DataSetzd;datype<-"zedi";}
 #generujemy nFunction automatycznie dla parvectree i ró¿nej liczby atrybutów dla najlepiej pasuj±cych danych
-pred_norm<-permbesteval(nFunction, paste(mypathout,nData,"_pred_",nFunction,"_",datype,sep=""),mbDataSet, paroutputree,parvectree,80,5,evalstr)
+pred_norm<-combesteval(nFunction, paste(mypathout,nData,"_pred_",nFunction,"_",datype,sep=""),mbDataSet, paroutputree,parvectree,80,5,evalstr)
 y<-seq(1,length(pred_norm));y<-sapply(y,function(x){if(x %% 5) x<-0 else x<-x});y<-y[!y==0];
 z<-c();for(i in y) z<-c(z,pred_norm[[i-1]]$perror); n<-min(which(z==min(z)))
 bestclass<-pred_norm[[(n-1)*5+3]]
@@ -232,7 +232,7 @@ betykiety<-pred_norm[[(n-1)*5+1]]
 bestli<-pred_norm[[(n-1)*5+2]]
 bestn<-pred_norm[[(n-1)*5+5]]
 besti<-bestli[length(bestli)]
-perm<-get("combinations","package:gtools")(length(parvectree),bestn,parvectree)
+combi<-get("combinations","package:gtools")(length(parvectree),bestn,parvectree)
 lres<-prederror(bestclass, paroutputree, parvectree, mbDataSet[-betykiety,],evalstr)
 cat("Best ",nFunction," for variable number=",bestn)
 bestclass
@@ -273,7 +273,7 @@ if(n==2){mbDataSet<-DataSetz;datype<-"zesc";}
 if(n==3){mbDataSet<-DataSetd;datype<-"nrdi";}
 if(n==4){mbDataSet<-DataSetzd;datype<-"zedi";}
 #generujemy nFunction automatycznie dla parvectree i ró¿nej liczby atrybutów dla najlepiej pasuj±cych danych
-pred_norm<-permbesteval(nFunction, paste(mypathout,nData,"_pred_",nFunction,"_",datype,sep=""),mbDataSet, paroutputree,parvectree,80,5,evalstr)
+pred_norm<-combesteval(nFunction, paste(mypathout,nData,"_pred_",nFunction,"_",datype,sep=""),mbDataSet, paroutputree,parvectree,80,5,evalstr)
 y<-seq(1,length(pred_norm));y<-sapply(y,function(x){if(x %% 5) x<-0 else x<-x});y<-y[!y==0];
 z<-c();for(i in y) z<-c(z,pred_norm[[i-1]]$perror); n<-min(which(z==min(z)))
 bestclass<-pred_norm[[(n-1)*5+3]]
@@ -281,7 +281,7 @@ betykiety<-pred_norm[[(n-1)*5+1]]
 bestli<-pred_norm[[(n-1)*5+2]]
 bestn<-pred_norm[[(n-1)*5+5]]
 besti<-bestli[length(bestli)]
-perm<-get("combinations","package:gtools")(length(parvectree),bestn,parvectree)
+combi<-get("combinations","package:gtools")(length(parvectree),bestn,parvectree)
 lres<-prederror(bestclass, paroutputree, parvectree, mbDataSet[-betykiety,],evalstr)
 cat("Best ",nFunction," for variable number=",bestn)
 bestclass
@@ -324,7 +324,7 @@ if(n==2){mbDataSet<-DataSetz;datype<-"zesc";}
 if(n==3){mbDataSet<-DataSetd;datype<-"nrdi";}
 if(n==4){mbDataSet<-DataSetzd;datype<-"zedi";}
 #generujemy nFunction automatycznie dla parvectree i ró¿nej liczby atrybutów dla najlepiej pasuj±cych danych
-pred_norm<-permbesteval(nFunction, paste(mypathout,nData,"_pred_",nFunction,"_",datype,sep=""),mbDataSet, paroutputree,parvectree,80,5,evalstr)
+pred_norm<-combesteval(nFunction, paste(mypathout,nData,"_pred_",nFunction,"_",datype,sep=""),mbDataSet, paroutputree,parvectree,80,5,evalstr)
 y<-seq(1,length(pred_norm));y<-sapply(y,function(x){if(x %% 5) x<-0 else x<-x});y<-y[!y==0];
 z<-c();for(i in y) z<-c(z,pred_norm[[i-1]]$perror); n<-min(which(z==min(z)))
 bestclass<-pred_norm[[(n-1)*5+3]]
@@ -332,7 +332,7 @@ betykiety<-pred_norm[[(n-1)*5+1]]
 bestli<-pred_norm[[(n-1)*5+2]]
 bestn<-pred_norm[[(n-1)*5+5]]
 besti<-bestli[length(bestli)]
-perm<-get("combinations","package:gtools")(length(parvectree),bestn,parvectree)
+combi<-get("combinations","package:gtools")(length(parvectree),bestn,parvectree)
 lres<-prederror(bestclass, paroutputree, parvectree, mbDataSet[-betykiety,],evalstr)
 cat("Best ",nFunction," for variable number=",bestn)
 bestclass
