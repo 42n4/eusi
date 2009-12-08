@@ -39,9 +39,9 @@ etykiety <- sample(1:nrow(DataSet), round(nrow(DataSet)*0.9))
 parvectree=setdiff(names(DataSet),parvecnotree)
 evalstr<-"Hess=TRUE"
 mDataSet<-DataSetd[etykiety,]
-polra_nodi<-permbesteval("polr", paste(mypathout,nData,"_polra_nodi",sep=""),mDataSet, paroutputree, parvectree, nleven, alpha, evalstr)
+polra_nodi<-combesteval("polr", paste(mypathout,nData,"_polra_nodi",sep=""),mDataSet, paroutputree, parvectree, nleven, alpha, evalstr)
 mDataSet<-DataSetzd[etykiety,]
-polra_zedi<-permbesteval("polr", paste(mypathout,nData,"_polra_zedi",sep=""),mDataSet, paroutputree, parvectree, nleven, alpha, evalstr)
+polra_zedi<-combesteval("polr", paste(mypathout,nData,"_polra_zedi",sep=""),mDataSet, paroutputree, parvectree, nleven, alpha, evalstr)
 
 #prederror(regression,paroutputree,mparvec,DataSetzd[-etykiety,],evalstr)
 #nFunction<-"polr"; fname<-paste(mypathout,nData,"_polra_nodi",sep=""); moutput<-paroutputree;parvec<-parvectree; EvalString<-evalstr;

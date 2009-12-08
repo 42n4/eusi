@@ -9,11 +9,12 @@
 #nData<-"nihills"
 #nData<-"photocar"
 #nData<-"meatspec"
-nData<-"skoliozaNIL1.csv"
+#nData<-"skoliozaNIL1.csv"
+nData<-"narchecked.csv"
 
 ##########################################################################################################
 #wczytywanie zbioru treningowego o nazwie nData
-assign(nData,read.csv(paste("file:///home/pwas/prace/",nData,sep=""),head=TRUE,sep=";",dec=",",na.strings=c("NA", "BD", "bd", "", "?")))
+assign(nData,read.csv(paste("file:///home/pwas/workspace/iso/",nData,sep=""),head=TRUE,sep=";",dec=",",na.strings=c("NA", "BD", "bd", "", "?")))
 
 #data(list=nData)
 DataSet<-get(nData)
