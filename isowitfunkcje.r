@@ -92,7 +92,7 @@ prederror<-function(classimod,paroutputree,parvectree,DataSet,EvalString="DEFAUL
 }
 
 
-#Funkcja combesteval liczy combiutacje zmiennych niezale¿nych dla n=1 do n równego ilo¶æ wszystkich zmiennych 
+#Funkcja combesteval liczy kombinacje zmiennych obja¶niaj±cych niezale¿nych dla n=1 do n równego ilo¶æ wszystkich zmiennych 
 #i oblicza dla nich funkcje get(nFunction) i wybiera najlepsz± dla ka¿dego n, wraca listê najlepszych obiektów z kolejnych iteracji  
 #w lb<n> mamy wybierane po kolei kolejne zestawy na najlepsz± regresjê 
 #w m<n> najlepszy model dla n, w sm<n> summary(m<n>), dla n=1 rysuje plot regresji
@@ -103,8 +103,8 @@ combesteval<-function (nFunction, fname, combiDataSet, moutput, parvec, nleven=-
 	varvec<-parvec
 	varplus<-paste(parvec,collapse="+")
 	for(numvar in 1:length(parvec)){
-		cat(paste("1:",moutput,"~",varplus)," n:",numvar," length:",n," EvalString:",EvalString,"\n")
-		#cat("\n\n nF: ",nFunction)
+		#cat(paste("1:",moutput,"~",varplus)," n:",numvar," length:",n," EvalString:",EvalString,"\n")
+		#cat(" i: ",numvar)
 		if(nFunction=="lm")
 			ilist<-lmwithattr(combiDataSet,moutput,parvec,numvar,nleven,alpha,EvalString)
 		else if(nFunction=="polr")
@@ -267,7 +267,7 @@ lmwithattr<-function (DataSet, moutput, parvec, numvar, nleven=-1, alpha=0.01, E
 		rowcombi<-nrow(combi)
 	}
 	else rowcombi<-1
-	lb<-c(); ibest<-0; br2<-0;
+	lb<-c(); ibest<-0; br2<-0; nbs<-1;
 	for(i in 1:rowcombi){
 		if(numvar<length(parvec)) 	varplus<-combi[i,]
 		if(numvar==length(parvec))	varplus<-parvec;
@@ -275,8 +275,11 @@ lmwithattr<-function (DataSet, moutput, parvec, numvar, nleven=-1, alpha=0.01, E
 		if(!inherits(m01, "try-error")){
 			#p.value <- 1-pf(f.stat["value"],f.stat["numdf"],f.stat["dendf"])			
 			sm01<-summary(m01)
+			#cat(" every:",as.character(sm01$call)," -: ",length(varplus)," ::");
+			#print(sm01$coefficients[,4]);cat(rep(TRUE,length(varplus)+1))
+			if(EvalString=="SPLINE") nbs<-3 else nbs<-1
 			if(is.finite(sm01$fstatistic)
-					&&(isTRUE(all.equal(as.vector(is.finite(sm01$coefficients[,4])),rep(TRUE,length(varplus)+1))))){
+					&&(isTRUE(all.equal(as.vector(is.finite(sm01$coefficients[,4])),rep(TRUE,nbs*length(varplus)+1))))){
 				tmp=paste("anova(",deparse(substitute(lm)),"(",moutput,"~1,DataSet),m01)",sep="")
 				#an<-anova(lm(RI~1),m01);
 				an<-eval(parse(text=tmp))
@@ -293,6 +296,7 @@ lmwithattr<-function (DataSet, moutput, parvec, numvar, nleven=-1, alpha=0.01, E
 					br2<-sm01$r.squared
 					lb<-c(lb, i)
 					ibest<-i
+					#cat("\n best:",as.character(sm01$call)," -: ",sm01$fstatistic["value"])
 				}
 			}
 		}

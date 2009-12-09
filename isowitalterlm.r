@@ -27,6 +27,7 @@ source(paste(mypath,"isowitfunkcje.r",sep=""))
 #nData<-"photocar"
 #nData<-"meatspec"
 source(paste(mypath,"isowitdatasets.r",sep=""))
+source(paste(mypath,"isowitdataprep.r",sep=""))
 
 ##################################################################################################
 #podzia³ danych na trenuj±ce i testowe

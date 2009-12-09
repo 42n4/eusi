@@ -20,6 +20,7 @@ source(paste(mypath,"isowitfunkcje.r",sep=""))
 #nData<-"nihills"
 #nData<-"photocar"
 source(paste(mypath,"isowitdatasets.r",sep=""))
+source(paste(mypath,"isowitdataprep.r",sep=""))
 
 ##########################################################################################################
 #korelacje miêdzy atrybutami

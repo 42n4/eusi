@@ -20,6 +20,7 @@ source(paste(mypath,"isowitfunkcje.r",sep=""))
 #nData<-"nihills"
 #nData<-"photocar"
 source(paste(mypath,"isowitdatasets.r",sep=""))
+source(paste(mypath,"isowitdataprep.r",sep=""))
 
 ##########################################################################################################
 #korelacje miêdzy atrybutami
@@ -86,7 +87,7 @@ SPLINE<-"SPLINE";
 nleven<--1; 
 mDataSet<-DataSet
 lmbsp_nobp<-combesteval("lm", paste(mypathout,nData,"_lmbsp_nobp",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
-mDataSet<-DataSetz
+#mDataSet<-DataSetz
 #lmbsp_zebp<-combesteval("lm", paste(mypathout,nData,"_lmbsp_zebp",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
 #mDataSet<-DataSetm
 #lmbsp_msbp<-combesteval("lm", paste(mypathout,nData,"_lmbsp_msbp",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
@@ -97,7 +98,7 @@ mDataSet<-DataSetz
 nleven<-0; 
 mDataSet<-DataSet
 lmbsp_nono<-combesteval("lm", paste(mypathout,nData,"_lmbsp_nono",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
-mDataSet<-DataSetz
+#mDataSet<-DataSetz
 #lmbsp_zeno<-combesteval("lm", paste(mypathout,nData,"_lmbsp_zeno",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
 #mDataSet<-DataSetm
 #lmbsp_msno<-combesteval("lm", paste(mypathout,nData,"_lmbsp_msno",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
@@ -108,7 +109,7 @@ mDataSet<-DataSetz
 nleven<-5; 
 mDataSet<-DataSet
 lmbsp_nolt<-combesteval("lm", paste(mypathout,nData,"_lmbsp_nolt",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
-mDataSet<-DataSetz
+#mDataSet<-DataSetz
 #lmbsp_zelt<-combesteval("lm", paste(mypathout,nData,"_lmbsp_zelt",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
 #mDataSet<-DataSetm
 #lmbsp_mslt<-combesteval("lm", paste(mypathout,nData,"_lmbsp_mslt",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
