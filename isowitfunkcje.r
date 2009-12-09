@@ -34,6 +34,44 @@ for(i in biolist)
 #Funkcje podstawowe zalecane do procesu odkrywania wiedzy
 #############################################################################
 
+#Funkcja brutoptim.klas znajduje najlepszy klasyfikator przeszukuj±c wszystkie kombinacje atrybutów
+brutoptim.klas <-function(mypathout,nData,DataSet,nFunction,paroutputree,parvectree,etykiety,evalstr,jmax){
+	verr<-c();vmod<-list();lverr<-list(); lvmod<-list(); jdiv<-jmax;
+	for(j in 1:jmax){
+		verr<-c();vmod<-list();
+		for(i in 1:4){
+			etykiety <- sample(1:nrow(DataSet), round(nrow(DataSet)*0.9))
+			if(i==1) {mDataSet<-DataSet[etykiety,]; mDataSetn<-DataSet[-etykiety,];datype<-"norm"}
+			else if(i==2) {mDataSet<-DataSetz[etykiety,]; mDataSetn<-DataSetz[-etykiety,];datype<-"zesc"}
+			else if(i==3) {mDataSet<-DataSetd[etykiety,]; mDataSetn<-DataSetd[-etykiety,];datype<-"nrdi"}
+			else if(i==4) {mDataSet<-DataSetzd[etykiety,]; mDataSetn<-DataSetzd[-etykiety,];datype<-"zedi"}
+			classifier<-try(evalwithattr(nFunction,paroutputree,parvectree,mDataSet,evalstr),TRUE)
+			if(!inherits(classifier, "try-error")){
+				lres<-prederror(classifier,paroutputree,parvectree,mDataSetn,evalstr)
+				vmod[[i]]<-classifier;verr<-c(verr,lres$perror);
+			}
+			else jdiv<-jdiv-1;
+		}
+		lverr[[j]]<-verr; lvmod[[j]]<-vmod
+	}
+	verr<-meanverr(lverr,jdiv,4); n<-min(which(verr==min(verr)))
+	if(n==1){mbDataSet<-DataSet;datype<-"norm";}
+	if(n==2){mbDataSet<-DataSetz;datype<-"zesc";}
+	if(n==3){mbDataSet<-DataSetd;datype<-"nrdi";}
+	if(n==4){mbDataSet<-DataSetzd;datype<-"zedi";}
+#generujemy nFunction automatycznie dla parvectree i ró¿nej liczby atrybutów dla najlepiej pasuj±cych danych
+	pred_norm<-combesteval(nFunction, paste(mypathout,nData,"_pred_",nFunction,"_",datype,sep=""),mbDataSet, paroutputree,parvectree,80,5,evalstr)
+	y<-seq(1,length(pred_norm));y<-sapply(y,function(x){if(x %% 5) x<-0 else x<-x});y<-y[!y==0];
+	z<-c();for(i in y) z<-c(z,pred_norm[[i-1]]$perror); n<-min(which(z==min(z)))
+	bestclass<-pred_norm[[(n-1)*5+3]]
+	betykiety<-pred_norm[[(n-1)*5+1]]
+	bestli<-pred_norm[[(n-1)*5+2]]
+	bestn<-pred_norm[[(n-1)*5+5]]
+	if(nFunction=="rpart") zapisz_rpart(bestclass,paste(mypathout,nData,"_Be",nFunction,"_",datype,sep=""))
+	if(nFunction=="J48") zapisz_weka(bestclass,paste(mypathout,nData,"_Best",nFunction,"_",datype,sep=""))
+	list(bestclass=bestclass,betykiety=betykiety,bestli=bestli,bestn=bestn,datype=datype,z=z)
+}
+
 #Funkcja prederror zwraca warto¶ci predykcji klasyfikatora, tablicê rezultatów i rzeczywistych warto¶ci, 
 #oraz b³±d klasyfikatora, na wej¶ciu dane testowe, ale nie treningowe wykorzystane do konstrukcji klasyfikatora
 prederror<-function(classimod,paroutputree,parvectree,DataSet,EvalString="DEFAULT"){

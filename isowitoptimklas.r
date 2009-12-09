@@ -49,48 +49,17 @@ plotMDS.for.chosen(fname, nDataSets, DataSetzd, parvecol, wzorzec1)
 nFunction<-"rpart"
 evalstr<-"DEFAULT"
 jmax<-30
-verr<-c();vmod<-list();lverr<-list(); lvmod<-list(); jdiv<-jmax;
 parvectree=setdiff(names(DataSet),parvecnotree)
-for(j in 1:jmax){
-	verr<-c();vmod<-list();
-	for(i in 1:4){
-		etykiety <- sample(1:nrow(DataSet), round(nrow(DataSet)*0.9))
-		if(i==1) {mDataSet<-DataSet[etykiety,]; mDataSetn<-DataSet[-etykiety,];datype<-"norm"}
-		else if(i==2) {mDataSet<-DataSetz[etykiety,]; mDataSetn<-DataSetz[-etykiety,];datype<-"zesc"}
-		else if(i==3) {mDataSet<-DataSetd[etykiety,]; mDataSetn<-DataSetd[-etykiety,];datype<-"nrdi"}
-		else if(i==4) {mDataSet<-DataSetzd[etykiety,]; mDataSetn<-DataSetzd[-etykiety,];datype<-"zedi"}
-		classifier<-try(evalwithattr(nFunction,paroutputree,parvectree,mDataSet,evalstr),TRUE)
-		if(!inherits(classifier, "try-error")){
-			lres<-prederror(classifier,paroutputree,parvectree,mDataSetn,evalstr)
-			vmod[[i]]<-classifier;verr<-c(verr,lres$perror);
-		}
-		else jdiv<-jdiv-1;
-	}
-	lverr[[j]]<-verr; lvmod[[j]]<-vmod
-}
-verr<-meanverr(lverr,jdiv,4); n<-min(which(verr==min(verr)))
-if(n==1){mbDataSet<-DataSet;datype<-"norm";}
-if(n==2){mbDataSet<-DataSetz;datype<-"zesc";}
-if(n==3){mbDataSet<-DataSetd;datype<-"nrdi";}
-if(n==4){mbDataSet<-DataSetzd;datype<-"zedi";}
-#generujemy nFunction automatycznie dla parvectree i ró¿nej liczby atrybutów dla najlepiej pasuj±cych danych
-pred_norm<-combesteval(nFunction, paste(mypathout,nData,"_pred_",nFunction,"_",datype,sep=""),mbDataSet, paroutputree,parvectree,80,5,evalstr)
-y<-seq(1,length(pred_norm));y<-sapply(y,function(x){if(x %% 5) x<-0 else x<-x});y<-y[!y==0];
-z<-c();for(i in y) z<-c(z,pred_norm[[i-1]]$perror); n<-min(which(z==min(z)))
-bestclass<-pred_norm[[(n-1)*5+3]]
-betykiety<-pred_norm[[(n-1)*5+1]]
-bestli<-pred_norm[[(n-1)*5+2]]
-bestn<-pred_norm[[(n-1)*5+5]]
-besti<-bestli[length(bestli)]
-combi<-get("combinations","package:gtools")(length(parvectree),bestn,parvectree)
-lres<-prederror(bestclass, paroutputree, parvectree, mbDataSet[-betykiety,],evalstr)
-cat("Best ",nFunction," for variable number=",bestn)
-bestclass
-if(nFunction=="rpart") zapisz_rpart(bestclass,paste(mypathout,nData,"_Be",nFunction,"_",datype,sep=""))
-if(nFunction=="J48") zapisz_weka(bestclass,paste(mypathout,nData,"_Best",nFunction,"_",datype,sep=""))
+bk<-brutoptim.klas(mypathout,nData,DataSet,nFunction,paroutputree,parvectree,etykiety,evalstr,jmax)
+besti<-bk$bestli[length(bk$bestli)]
+combi<-get("combinations","package:gtools")(length(parvectree),bk$bestn,parvectree)
+if(bk$datype=="norm") mbDataSet<-DataSet else if(bk$datype=="zesc") mbDataSet<-DataSetz else if(bk$datype=="nrdi") mbDataSet<-DataSetd else if(bk$datype=="zedi") mbDataSet<-DataSetzd;
+lres<-prederror(bk$bestclass, paroutputree, parvectree, mbDataSet[-bk$betykiety,],evalstr)
+cat("Best ",nFunction," for variable number=",bk$bestn)
+bk$bestclass
 lres$table
 lres$perror
-min(z)
+min(bk$z)
 
 
 
@@ -99,48 +68,17 @@ min(z)
 nFunction<-"J48"
 evalstr<-"DEFAULT"
 jmax<-10
-verr<-c();vmod<-list();lverr<-list(); lvmod<-list(); jdiv<-jmax;
 parvectree=setdiff(names(DataSet),parvecnotree)
-for(j in 1:jmax){
-	verr<-c();vmod<-list();
-	for(i in 1:4){
-		etykiety <- sample(1:nrow(DataSet), round(nrow(DataSet)*0.9))
-		if(i==1) {mDataSet<-DataSet[etykiety,]; mDataSetn<-DataSet[-etykiety,];datype<-"norm"}
-		else if(i==2) {mDataSet<-DataSetz[etykiety,]; mDataSetn<-DataSetz[-etykiety,];datype<-"zesc"}
-		else if(i==3) {mDataSet<-DataSetd[etykiety,]; mDataSetn<-DataSetd[-etykiety,];datype<-"nrdi"}
-		else if(i==4) {mDataSet<-DataSetzd[etykiety,]; mDataSetn<-DataSetzd[-etykiety,];datype<-"zedi"}
-		classifier<-try(evalwithattr(nFunction,paroutputree,parvectree,mDataSet,evalstr),TRUE)
-		if(!inherits(classifier, "try-error")){
-			lres<-prederror(classifier,paroutputree,parvectree,mDataSetn,evalstr)
-			vmod[[i]]<-classifier;verr<-c(verr,lres$perror);
-		}
-		else jdiv<-jdiv-1;
-	}
-	lverr[[j]]<-verr; lvmod[[j]]<-vmod
-}
-verr<-meanverr(lverr,jdiv,4); n<-min(which(verr==min(verr)))
-if(n==1){mbDataSet<-DataSet;datype<-"norm";}
-if(n==2){mbDataSet<-DataSetz;datype<-"zesc";}
-if(n==3){mbDataSet<-DataSetd;datype<-"nrdi";}
-if(n==4){mbDataSet<-DataSetzd;datype<-"zedi";}
-#generujemy nFunction automatycznie dla parvectree i ró¿nej liczby atrybutów dla najlepiej pasuj±cych danych
-pred_norm<-combesteval(nFunction, paste(mypathout,nData,"_pred_",nFunction,"_",datype,sep=""),mbDataSet, paroutputree,parvectree,80,5,evalstr)
-y<-seq(1,length(pred_norm));y<-sapply(y,function(x){if(x %% 5) x<-0 else x<-x});y<-y[!y==0];
-z<-c();for(i in y) z<-c(z,pred_norm[[i-1]]$perror); n<-min(which(z==min(z)))
-bestclass<-pred_norm[[(n-1)*5+3]]
-betykiety<-pred_norm[[(n-1)*5+1]]
-bestli<-pred_norm[[(n-1)*5+2]]
-bestn<-pred_norm[[(n-1)*5+5]]
-besti<-bestli[length(bestli)]
-combi<-get("combinations","package:gtools")(length(parvectree),bestn,parvectree)
-lres<-prederror(bestclass, paroutputree, parvectree, mbDataSet[-betykiety,],evalstr)
-cat("Best ",nFunction," for variable number=",bestn)
-bestclass
-if(nFunction=="rpart") zapisz_rpart(bestclass,paste(mypathout,nData,"_Be",nFunction,"_",datype,sep=""))
-if(nFunction=="J48") zapisz_weka(bestclass,paste(mypathout,nData,"_Best",nFunction,"_",datype,sep=""))
+bk<-brutoptim.klas(mypathout,nData,DataSet,nFunction,paroutputree,parvectree,etykiety,evalstr,jmax)
+besti<-bk$bestli[length(bk$bestli)]
+combi<-get("combinations","package:gtools")(length(parvectree),bk$bestn,parvectree)
+if(bk$datype=="norm") mbDataSet<-DataSet else if(bk$datype=="zesc") mbDataSet<-DataSetz else if(bk$datype=="nrdi") mbDataSet<-DataSetd else if(bk$datype=="zedi") mbDataSet<-DataSetzd;
+lres<-prederror(bk$bestclass, paroutputree, parvectree, mbDataSet[-bk$betykiety,],evalstr)
+cat("Best ",nFunction," for variable number=",bk$bestn)
+bk$bestclass
 lres$table
 lres$perror
-min(z)
+min(bk$z)
 
 ##########################################################################################################
 #generujemy maszyny svm dla parvectree
@@ -150,48 +88,17 @@ nFunction<-"svm"
 #evalstr<-'kernel="polynomial"'
 evalstr<-'kernel="radial"'
 jmax<-10
-verr<-c();vmod<-list();lverr<-list(); lvmod<-list(); jdiv<-jmax;
 parvectree=setdiff(names(DataSet),parvecnotree)
-for(j in 1:jmax){
-	verr<-c();vmod<-list();
-	for(i in 1:4){
-		etykiety <- sample(1:nrow(DataSet), round(nrow(DataSet)*0.9))
-		if(i==1) {mDataSet<-DataSet[etykiety,]; mDataSetn<-DataSet[-etykiety,];datype<-"norm"}
-		else if(i==2) {mDataSet<-DataSetz[etykiety,]; mDataSetn<-DataSetz[-etykiety,];datype<-"zesc"}
-		else if(i==3) {mDataSet<-DataSetd[etykiety,]; mDataSetn<-DataSetd[-etykiety,];datype<-"nrdi"}
-		else if(i==4) {mDataSet<-DataSetzd[etykiety,]; mDataSetn<-DataSetzd[-etykiety,];datype<-"zedi"}
-		classifier<-try(evalwithattr(nFunction,paroutputree,parvectree,mDataSet,evalstr),TRUE)
-		if(!inherits(classifier, "try-error")){
-			lres<-prederror(classifier,paroutputree,parvectree,mDataSetn,evalstr)
-			vmod[[i]]<-classifier;verr<-c(verr,lres$perror);
-		}
-		else jdiv<-jdiv-1;
-	}
-	lverr[[j]]<-verr; lvmod[[j]]<-vmod
-}
-verr<-meanverr(lverr,jdiv,4); n<-min(which(verr==min(verr)))
-if(n==1){mbDataSet<-DataSet;datype<-"norm";}
-if(n==2){mbDataSet<-DataSetz;datype<-"zesc";}
-if(n==3){mbDataSet<-DataSetd;datype<-"nrdi";}
-if(n==4){mbDataSet<-DataSetzd;datype<-"zedi";}
-#generujemy nFunction automatycznie dla parvectree i ró¿nej liczby atrybutów dla najlepiej pasuj±cych danych
-pred_norm<-combesteval(nFunction, paste(mypathout,nData,"_pred_",nFunction,"_",datype,sep=""),mbDataSet, paroutputree,parvectree,80,5,evalstr)
-y<-seq(1,length(pred_norm));y<-sapply(y,function(x){if(x %% 5) x<-0 else x<-x});y<-y[!y==0];
-z<-c();for(i in y) z<-c(z,pred_norm[[i-1]]$perror); n<-min(which(z==min(z)))
-bestclass<-pred_norm[[(n-1)*5+3]]
-betykiety<-pred_norm[[(n-1)*5+1]]
-bestli<-pred_norm[[(n-1)*5+2]]
-bestn<-pred_norm[[(n-1)*5+5]]
-besti<-bestli[length(bestli)]
-combi<-get("combinations","package:gtools")(length(parvectree),bestn,parvectree)
-lres<-prederror(bestclass, paroutputree, parvectree, mbDataSet[-betykiety,],evalstr)
-cat("Best ",nFunction," for variable number=",bestn)
-bestclass
-if(nFunction=="rpart") zapisz_rpart(bestclass,paste(mypathout,nData,"_Be",nFunction,"_",datype,sep=""))
-if(nFunction=="J48") zapisz_weka(bestclass,paste(mypathout,nData,"_Best",nFunction,"_",datype,sep=""))
+bk<-brutoptim.klas(mypathout,nData,DataSet,nFunction,paroutputree,parvectree,etykiety,evalstr,jmax)
+besti<-bk$bestli[length(bk$bestli)]
+combi<-get("combinations","package:gtools")(length(parvectree),bk$bestn,parvectree)
+if(bk$datype=="norm") mbDataSet<-DataSet else if(bk$datype=="zesc") mbDataSet<-DataSetz else if(bk$datype=="nrdi") mbDataSet<-DataSetd else if(bk$datype=="zedi") mbDataSet<-DataSetzd;
+lres<-prederror(bk$bestclass, paroutputree, parvectree, mbDataSet[-bk$betykiety,],evalstr)
+cat("Best ",nFunction," for variable number=",bk$bestn)
+bk$bestclass
 lres$table
 lres$perror
-min(z)
+min(bk$z)
 
 
 ##########################################################################################################
@@ -199,97 +106,34 @@ min(z)
 nFunction<-"ipredknn"
 evalstr<-"DEFAULT"
 jmax<-10
-verr<-c();vmod<-list();lverr<-list(); lvmod<-list(); jdiv<-jmax;
 parvectree=setdiff(names(DataSet),parvecnotree)
-for(j in 1:jmax){
-	verr<-c();vmod<-list();
-	for(i in 1:4){
-		etykiety <- sample(1:nrow(DataSet), round(nrow(DataSet)*0.9))
-		if(i==1) {mDataSet<-DataSet[etykiety,]; mDataSetn<-DataSet[-etykiety,];datype<-"norm"}
-		else if(i==2) {mDataSet<-DataSetz[etykiety,]; mDataSetn<-DataSetz[-etykiety,];datype<-"zesc"}
-		else if(i==3) {mDataSet<-DataSetd[etykiety,]; mDataSetn<-DataSetd[-etykiety,];datype<-"nrdi"}
-		else if(i==4) {mDataSet<-DataSetzd[etykiety,]; mDataSetn<-DataSetzd[-etykiety,];datype<-"zedi"}
-		classifier<-try(evalwithattr(nFunction,paroutputree,parvectree,mDataSet,evalstr),TRUE)
-		if(!inherits(classifier, "try-error")){
-			lres<-prederror(classifier,paroutputree,parvectree,mDataSetn,evalstr)
-			vmod[[i]]<-classifier;verr<-c(verr,lres$perror);
-		}
-		else jdiv<-jdiv-1;
-	}
-	lverr[[j]]<-verr; lvmod[[j]]<-vmod
-}
-verr<-meanverr(lverr,jdiv,4); n<-min(which(verr==min(verr)))
-if(n==1){mbDataSet<-DataSet;datype<-"norm";}
-if(n==2){mbDataSet<-DataSetz;datype<-"zesc";}
-if(n==3){mbDataSet<-DataSetd;datype<-"nrdi";}
-if(n==4){mbDataSet<-DataSetzd;datype<-"zedi";}
-#generujemy nFunction automatycznie dla parvectree i ró¿nej liczby atrybutów dla najlepiej pasuj±cych danych
-pred_norm<-combesteval(nFunction, paste(mypathout,nData,"_pred_",nFunction,"_",datype,sep=""),mbDataSet, paroutputree,parvectree,80,5,evalstr)
-y<-seq(1,length(pred_norm));y<-sapply(y,function(x){if(x %% 5) x<-0 else x<-x});y<-y[!y==0];
-z<-c();for(i in y) z<-c(z,pred_norm[[i-1]]$perror); n<-min(which(z==min(z)))
-bestclass<-pred_norm[[(n-1)*5+3]]
-betykiety<-pred_norm[[(n-1)*5+1]]
-bestli<-pred_norm[[(n-1)*5+2]]
-bestn<-pred_norm[[(n-1)*5+5]]
-besti<-bestli[length(bestli)]
-combi<-get("combinations","package:gtools")(length(parvectree),bestn,parvectree)
-lres<-prederror(bestclass, paroutputree, parvectree, mbDataSet[-betykiety,],evalstr)
-cat("Best ",nFunction," for variable number=",bestn)
-bestclass
-if(nFunction=="rpart") zapisz_rpart(bestclass,paste(mypathout,nData,"_Be",nFunction,"_",datype,sep=""))
-if(nFunction=="J48") zapisz_weka(bestclass,paste(mypathout,nData,"_Best",nFunction,"_",datype,sep=""))
+bk<-brutoptim.klas(mypathout,nData,DataSet,nFunction,paroutputree,parvectree,etykiety,evalstr,jmax)
+besti<-bk$bestli[length(bk$bestli)]
+combi<-get("combinations","package:gtools")(length(parvectree),bk$bestn,parvectree)
+if(bk$datype=="norm") mbDataSet<-DataSet else if(bk$datype=="zesc") mbDataSet<-DataSetz else if(bk$datype=="nrdi") mbDataSet<-DataSetd else if(bk$datype=="zedi") mbDataSet<-DataSetzd;
+lres<-prederror(bk$bestclass, paroutputree, parvectree, mbDataSet[-bk$betykiety,],evalstr)
+cat("Best ",nFunction," for variable number=",bk$bestn)
+bk$bestclass
 lres$table
 lres$perror
-min(z)
-
+min(bk$z)
 
 ##########################################################################################################
 #generujemy klasyfikatory lda dla parvectree
 nFunction<-"lda"
 evalstr<-"CLASS"
 jmax<-10
-verr<-c();vmod<-list();lverr<-list(); lvmod<-list(); jdiv<-jmax;
 parvectree=setdiff(names(DataSet),parvecnotree)
-for(j in 1:jmax){
-	verr<-c();vmod<-list();
-	for(i in 1:4){
-		etykiety <- sample(1:nrow(DataSet), round(nrow(DataSet)*0.9))
-		if(i==1) {mDataSet<-DataSet[etykiety,]; mDataSetn<-DataSet[-etykiety,];datype<-"norm"}
-		else if(i==2) {mDataSet<-DataSetz[etykiety,]; mDataSetn<-DataSetz[-etykiety,];datype<-"zesc"}
-		else if(i==3) {mDataSet<-DataSetd[etykiety,]; mDataSetn<-DataSetd[-etykiety,];datype<-"nrdi"}
-		else if(i==4) {mDataSet<-DataSetzd[etykiety,]; mDataSetn<-DataSetzd[-etykiety,];datype<-"zedi"}
-		classifier<-try(evalwithattr(nFunction,paroutputree,parvectree,mDataSet,evalstr),TRUE)
-		if(!inherits(classifier, "try-error")){
-			lres<-prederror(classifier,paroutputree,parvectree,mDataSetn,evalstr)
-			vmod[[i]]<-classifier;verr<-c(verr,lres$perror);
-		}
-		else jdiv<-jdiv-1;
-	}
-	lverr[[j]]<-verr; lvmod[[j]]<-vmod
-}
-verr<-meanverr(lverr,jdiv,4); n<-min(which(verr==min(verr)))
-if(n==1){mbDataSet<-DataSet;datype<-"norm";}
-if(n==2){mbDataSet<-DataSetz;datype<-"zesc";}
-if(n==3){mbDataSet<-DataSetd;datype<-"nrdi";}
-if(n==4){mbDataSet<-DataSetzd;datype<-"zedi";}
-#generujemy nFunction automatycznie dla parvectree i ró¿nej liczby atrybutów dla najlepiej pasuj±cych danych
-pred_norm<-combesteval(nFunction, paste(mypathout,nData,"_pred_",nFunction,"_",datype,sep=""),mbDataSet, paroutputree,parvectree,80,5,evalstr)
-y<-seq(1,length(pred_norm));y<-sapply(y,function(x){if(x %% 5) x<-0 else x<-x});y<-y[!y==0];
-z<-c();for(i in y) z<-c(z,pred_norm[[i-1]]$perror); n<-min(which(z==min(z)))
-bestclass<-pred_norm[[(n-1)*5+3]]
-betykiety<-pred_norm[[(n-1)*5+1]]
-bestli<-pred_norm[[(n-1)*5+2]]
-bestn<-pred_norm[[(n-1)*5+5]]
-besti<-bestli[length(bestli)]
-combi<-get("combinations","package:gtools")(length(parvectree),bestn,parvectree)
-lres<-prederror(bestclass, paroutputree, parvectree, mbDataSet[-betykiety,],evalstr)
-cat("Best ",nFunction," for variable number=",bestn)
-bestclass
-if(nFunction=="rpart") zapisz_rpart(bestclass,paste(mypathout,nData,"_Be",nFunction,"_",datype,sep=""))
-if(nFunction=="J48") zapisz_weka(bestclass,paste(mypathout,nData,"_Best",nFunction,"_",datype,sep=""))
+bk<-brutoptim.klas(mypathout,nData,DataSet,nFunction,paroutputree,parvectree,etykiety,evalstr,jmax)
+besti<-bk$bestli[length(bk$bestli)]
+combi<-get("combinations","package:gtools")(length(parvectree),bk$bestn,parvectree)
+if(bk$datype=="norm") mbDataSet<-DataSet else if(bk$datype=="zesc") mbDataSet<-DataSetz else if(bk$datype=="nrdi") mbDataSet<-DataSetd else if(bk$datype=="zedi") mbDataSet<-DataSetzd;
+lres<-prederror(bk$bestclass, paroutputree, parvectree, mbDataSet[-bk$betykiety,],evalstr)
+cat("Best ",nFunction," for variable number=",bk$bestn)
+bk$bestclass
 lres$table
 lres$perror
-min(z)
+min(bk$z)
 
 ##########################################################################################################
 #NaiveBayes,qda
