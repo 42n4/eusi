@@ -96,7 +96,7 @@ combi<-get("combinations","package:gtools")(length(parvectree),bk$bestn,parvectr
 if(bk$datype=="norm") mbDataSet<-DataSet else if(bk$datype=="zesc") mbDataSet<-DataSetz else if(bk$datype=="nrdi") mbDataSet<-DataSetd else if(bk$datype=="zedi") mbDataSet<-DataSetzd;
 lres<-prederror(bk$bestclass, paroutputree, parvectree, mbDataSet[-bk$betykiety,],evalstr)
 cat("Best ",nFunction," for variable number=",bk$bestn)
-bk$bestclass
+#bk$bestclass
 lres$table
 lres$perror
 min(bk$z)
@@ -114,7 +114,7 @@ combi<-get("combinations","package:gtools")(length(parvectree),bk$bestn,parvectr
 if(bk$datype=="norm") mbDataSet<-DataSet else if(bk$datype=="zesc") mbDataSet<-DataSetz else if(bk$datype=="nrdi") mbDataSet<-DataSetd else if(bk$datype=="zedi") mbDataSet<-DataSetzd;
 lres<-prederror(bk$bestclass, paroutputree, parvectree, mbDataSet[-bk$betykiety,],evalstr)
 cat("Best ",nFunction," for variable number=",bk$bestn)
-bk$bestclass
+#bk$bestclass
 lres$table
 lres$perror
 min(bk$z)
@@ -131,7 +131,7 @@ combi<-get("combinations","package:gtools")(length(parvectree),bk$bestn,parvectr
 if(bk$datype=="norm") mbDataSet<-DataSet else if(bk$datype=="zesc") mbDataSet<-DataSetz else if(bk$datype=="nrdi") mbDataSet<-DataSetd else if(bk$datype=="zedi") mbDataSet<-DataSetzd;
 lres<-prederror(bk$bestclass, paroutputree, parvectree, mbDataSet[-bk$betykiety,],evalstr)
 cat("Best ",nFunction," for variable number=",bk$bestn)
-bk$bestclass
+#bk$bestclass
 lres$table
 lres$perror
 min(bk$z)
@@ -180,7 +180,7 @@ besti<-bestli[length(bestli)]
 combi<-get("combinations","package:gtools")(length(parvectree),bestn,parvectree)
 lres<-prederror(bestclass, paroutputree, parvectree, mbDataSet[-betykiety,],evalstr)
 cat("Best ",nFunction," for variable number=",bestn)
-bestclass
+#bestclass
 if(nFunction=="rpart") zapisz_rpart(bestclass,paste(mypathout,nData,"_Be",nFunction,"_",datype,sep=""))
 if(nFunction=="J48") zapisz_weka(bestclass,paste(mypathout,nData,"_Best",nFunction,"_",datype,sep=""))
 lres$table

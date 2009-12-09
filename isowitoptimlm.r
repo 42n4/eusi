@@ -50,7 +50,7 @@ nleven<--1;
 mDataSet<-DataSet
 lmabc_nobp<-combesteval("lm", paste(mypathout,nData,"_lmabc_nobp",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
 #wybieramy dane zeskorowane
-mDataSet<-DataSetz
+#mDataSet<-DataSetz
 #lmabc_zebp<-combesteval("lm", paste(mypathout,nData,"_lmabc_zebp",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
 #wybieramy dane zeskalowane i zcentrowane
 #mDataSet<-DataSetm
@@ -63,7 +63,7 @@ mDataSet<-DataSetz
 nleven<-0; 
 mDataSet<-DataSet
 lmabc_nono<-combesteval("lm", paste(mypathout,nData,"_lmabc_nono",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
-mDataSet<-DataSetz
+#mDataSet<-DataSetz
 #lmabc_zeno<-combesteval("lm", paste(mypathout,nData,"_lmabc_zeno",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
 #mDataSet<-DataSetm
 #lmabc_msno<-combesteval("lm", paste(mypathout,nData,"_lmabc_msno",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
@@ -74,7 +74,7 @@ mDataSet<-DataSetz
 nleven<-5; 
 mDataSet<-DataSet
 lmabc_nolt<-combesteval("lm", paste(mypathout,nData,"_lmabc_nolt",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
-mDataSet<-DataSetz
+#mDataSet<-DataSetz
 #lmabc_zelt<-combesteval("lm", paste(mypathout,nData,"_lmabc_zelt",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
 #mDataSet<-DataSetm
 #lmabc_mslt<-combesteval("lm", paste(mypathout,nData,"_lmabc_mslt",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
