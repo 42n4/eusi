@@ -104,7 +104,7 @@ combesteval<-function (nFunction, fname, combiDataSet, moutput, parvec, nleven=-
 	varplus<-paste(parvec,collapse="+")
 	for(numvar in 1:length(parvec)){
 		#cat(paste("1:",moutput,"~",varplus)," n:",numvar," length:",n," EvalString:",EvalString,"\n")
-		#cat(" i: ",numvar)
+		cat(" i: ",numvar)
 		if(nFunction=="lm")
 			ilist<-lmwithattr(combiDataSet,moutput,parvec,numvar,nleven,alpha,EvalString)
 		else if(nFunction=="polr")
@@ -275,14 +275,16 @@ lmwithattr<-function (DataSet, moutput, parvec, numvar, nleven=-1, alpha=0.01, E
 		if(!inherits(m01, "try-error")){
 			#p.value <- 1-pf(f.stat["value"],f.stat["numdf"],f.stat["dendf"])			
 			sm01<-summary(m01)
-			#cat(" every:",as.character(sm01$call)," -: ",length(varplus)," ::");
-			#print(sm01$coefficients[,4]);cat(rep(TRUE,length(varplus)+1))
+			#cat(" every:",as.character(sm01$call)," -: ",length(varplus)," :: ");
+			#print(sm01$coefficients[,4]);
+			#cat(is.finite(sm01$fstatistic["value"])," <> ")
+			#cat(isTRUE(all.equal(as.vector(is.finite(sm01$coefficients[,4])),rep(TRUE,nbs*length(varplus)+1))))
 			if(EvalString=="SPLINE") nbs<-3 else nbs<-1
-			if(is.finite(sm01$fstatistic)
+			if(is.finite(sm01$fstatistic["value"])
 					&&(isTRUE(all.equal(as.vector(is.finite(sm01$coefficients[,4])),rep(TRUE,nbs*length(varplus)+1))))){
-				tmp=paste("anova(",deparse(substitute(lm)),"(",moutput,"~1,DataSet),m01)",sep="")
+				#tmp=paste("anova(",deparse(substitute(lm)),"(",moutput,"~1,DataSet),m01)",sep="")
 				#an<-anova(lm(RI~1),m01);
-				an<-eval(parse(text=tmp))
+				#an<-eval(parse(text=tmp))
 				if(nleven>0){
 					mintervals<-cut(m01$fitted.values,nleven)
 					lt<-levene.test(m01$residuals,factor(mintervals))
@@ -290,9 +292,9 @@ lmwithattr<-function (DataSet, moutput, parvec, numvar, nleven=-1, alpha=0.01, E
 				if(nleven<0)
 					bp<-evalwithattr("bptest",moutput,varplus,DataSet)
 				#levene pominiêty dla nleven=0, dla nleven < 0 bptest
-				if((nleven==0 && qf(0.99,1,m01$df)<an$F[2] && sm01$r.squared > br2) 
-							|| (nleven < 0 && qf(0.99,1,m01$df)<an$F[2] && sm01$r.squared > br2 && bp$p.value > alpha)
-							|| (nleven > 0 && qf(0.99,1,m01$df)<an$F[2] && sm01$r.squared > br2 && lt$"Pr(>F)"[1] > alpha && qf(1-alpha,lt$Df[1],lt$Df[2]) > lt$"F value"[1])){
+				if((nleven==0 && qf(0.99,1,m01$df)<sm01$fstatistic["value"] && sm01$r.squared > br2) 
+							|| (nleven < 0 && qf(0.99,1,m01$df)<sm01$fstatistic["value"] && sm01$r.squared > br2 && bp$p.value > alpha)
+							|| (nleven > 0 && qf(0.99,1,m01$df)<sm01$fstatistic["value"] && sm01$r.squared > br2 && lt$"Pr(>F)"[1] > alpha && qf(1-alpha,lt$Df[1],lt$Df[2]) > lt$"F value"[1])){
 					br2<-sm01$r.squared
 					lb<-c(lb, i)
 					ibest<-i
