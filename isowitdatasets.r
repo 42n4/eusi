@@ -21,11 +21,6 @@ DataSet<-get(nData)
 
 ##########################################################################################################
 if(nData=="Glass"){
-	#operacje kosmetyczne poprawiaj±ce dane, przystosowuj±ce
-	#usuwanie takich samych wierszy ze zbioru Glass, a dok³adnie jednego z nich
-	#(jak siê pojawi± dwa takie same wiersze to wyrzuca b³±d isoMDS, 
-	# dlatego na samym pocz±tku usuwane s± niektóre wiersze z Glass)
-	DataSet<-DataSet[-c(40),]
 	#te atrybuty, co s± faktorami, zmiennymi jako¶ciowymi z kategoriami, etykietami
 	parvecfactor=c("Type")
 	#kruskal
@@ -63,8 +58,6 @@ if(nData=="nihills"){
 
 ##########################################################################################################
 if(nData=="photocar"){
-	#usuwanie do Kruskala
-	DataSet<-DataSet[-c(13,25,32,33,34,36,37,67,64,77,52),]
 	parvecfactor=c("group","event","tumor")
 	vecfactorzesc=c("event")
 	#kruskal
@@ -95,8 +88,6 @@ if(nData=="meatspec"){
 
 ##########################################################################################################
 if(nData=="skoliozaNIL1.csv"){
-	#usuwanie do Kruskala
-	#DataSet<-DataSet[-c(13,25,32,33,34,36,37,67,64,77,52),]
 	parvecfactor=c()
 	vecfactorzesc=c()
 	#kruskal
