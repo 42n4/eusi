@@ -394,9 +394,10 @@ scale_for<-function (DataSet, parvec, CENTER, SCALE)
 zscore.for.integer<-function (DataSet, parvec, integercolumnforzscore)         
 {
 	indata<-DataSet
-	for(i in sort(unique(DataSet[[integercolumnforzscore]]))){
-		indata[(indata[[integercolumnforzscore]]==i),]=zscore(indata[(indata[[integercolumnforzscore]]==i),],which(names(indata) %in% parvec))
-	}
+	if(length(integercolumnforzscore))
+		for(i in sort(unique(DataSet[[integercolumnforzscore]]))){
+			indata[(indata[[integercolumnforzscore]]==i),]=zscore(indata[(indata[[integercolumnforzscore]]==i),],which(names(indata) %in% parvec))
+		}
 	return(indata)
 }
 
