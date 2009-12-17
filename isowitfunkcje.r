@@ -881,7 +881,7 @@ ridge.lm <-function(fname,DataSet,moutput,mparvec,etykiety){
 }
 
 
-###########################################################
+#######################################################################################################
 #Funkcja lars.lm wybiera kompaktowy i w miarê dobry model regresji liniowej na podstawie lars i cv.lars
 #library lars
 lars.lm <-function(fname,DataSet,moutput,mparvec,etykiety){
@@ -945,3 +945,20 @@ lars.lm <-function(fname,DataSet,moutput,mparvec,etykiety){
 	list(bLARSAIC=bLARSAIC,bLARSAICfits=bLARSAICfits,bLARSBIC=bLARSBIC,bLARSBICfits=bLARSBICfits,bHat=bHat,bHatfits=bHatfits)
 }
 
+#######################################################################################################
+#Funkcja evalbn wywo³uje z bnlearn funkcjê nFunction=c("iabm","gc","hc","fast.iabm","inter.iabm") 
+#tworzenia sieci bayesa i zwraca bn (sieæ) i bnfit (prawdopodobieñstwa lub regresje)  
+evalbn<-function(fname,nFunction,oData){
+	mcall<-match.call()
+	jpeg(file=paste(fname,"_",nFunction,".jpg",sep=""),width = 1600, height = 1000, quality = 55, bg = "white")
+	par(mfrow=c(1,2),pch=1.0,cex.lab=1.5,lwd=3)
+	tmp<-paste(nFunction,"(",as.character(mcall$oData),")")
+	bnet1 = eval(parse(text=tmp))
+	tmp<-paste("pdag2dag(bnet1, ordering=c(\"",paste(names(oData),collapse='","'),"\"))",sep="")
+	bnet1b = eval(parse(text=tmp))
+	plot(bnet1b)
+	graphviz.plot(bnet1b)
+	dev.off()
+	fit = bn.fit(bnet1b, oData)
+	list(bn=bnet1b,bnfit=fit)
+}
