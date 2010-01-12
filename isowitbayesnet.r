@@ -38,10 +38,11 @@ try(latt2jpg(DataSetz[,parvec],DataSetzd[,vecfactorzesc],paste(mypathout,nData,"
 #Sieci Bayesa
 #
 fname<-paste(mypathout,nData,"_bnet_norm",sep="")
-lbn_iabm<-evalbn(fname,"iamb",DataSet)
-lbn_gs<-evalbn(fname,"gs",DataSet)
-lbn_fast<-evalbn(fname,"fast.iamb",DataSet)
-lbn_inter<-evalbn(fname,"inter.iamb",DataSet)
+DataSetm<-DataSet
+lbn_iabm<-evalbn(fname,"iamb",DataSetm)
+lbn_gs<-evalbn(fname,"gs",DataSetm)
+lbn_fast<-evalbn(fname,"fast.iamb",DataSetm)
+lbn_inter<-evalbn(fname,"inter.iamb",DataSetm)
 #fname<-paste(mypathout,nData,"_bnet_norm",sep="")
 #lbn_mmhc<-evalbn("mmhc",DataSet,fname)
 
