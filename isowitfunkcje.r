@@ -398,6 +398,34 @@ defactor.numeric<-function (DataSet, parvec)
 }
 
 #######################################################################################################
+#Funkcja normfactor zmienia faktory na numery i ponownie faktory
+normfactor<-function (DataSet, parvecfactor)         
+{
+	for(i in parvecfactor){
+		x<-as.character(DataSet[,i])
+		z = x
+		n = length(x)
+		f = seq(n)
+		if(sum(is.na(x))!=0)
+		{
+			f<-f[-which(is.na(x))]
+			x<-x[-which(is.na(x))]
+		}
+		m = length(x)
+		nfn=1:length(unique(x))
+		ofn=sort(unique(x))
+		y<-x; k=0
+		for(j in ofn){ 
+			k<-k+1
+			y[x==j]<-k
+		}
+		z[f]<-y
+		DataSet[,i]<-factor(as.numeric(z))
+	}
+	DataSet
+}
+
+#######################################################################################################
 #Funkcja scale.numeric skaluje wybrane numeryczne kolumny z liczbami zmiennoprzecinkowymi i ca³kowitymi
 #z paramerami CENTER=TRUE mean=0, a dla SCALE=TRUE sd=1
 scale_for<-function (DataSet, parvec, CENTER, SCALE)         
@@ -461,7 +489,7 @@ plotMDS.for.chosen<-function (fname, nDataSets, DataSet, parvec, wzorzec1)
 disc2<-function (x, k) 
 {
 	z = x
-    	n = length(x)
+    n = length(x)
 	f = seq(n)
 	if(sum(is.na(x))!=0)
 	{
@@ -983,14 +1011,14 @@ lars.lm <-function(fname,DataSet,moutput,mparvec,etykiety){
 #tworzenia sieci bayesa i zwraca bn (sieæ) i bnfit (prawdopodobieñstwa lub regresje)  
 evalbn<-function(fname,nFunction,oData){
 	mcall<-match.call()
-	jpeg(file=paste(fname,"_",nFunction,".jpg",sep=""),width = 1600, height = 1000, quality = 55, bg = "white")
+	jpeg(file=paste(fname,"_",nFunction,".jpg",sep=""),width = 1600, height = 1000, quality = 85, bg = "white")
 	par(mfrow=c(1,2),pch=1.0,cex.lab=1.5,lwd=3)
 	tmp<-paste(nFunction,"(",as.character(mcall$oData),")")
 	bnet1 = eval(parse(text=tmp))
 	tmp<-paste("pdag2dag(bnet1, ordering=c(\"",paste(names(oData),collapse='","'),"\"))",sep="")
 	bnet1b = eval(parse(text=tmp))
 	plot(bnet1b)
-	graphviz.plot(bnet1b)
+	graphviz.plot(bnet1b,shape = "ellipse")
 	dev.off()
 	fit = bn.fit(bnet1b, oData)
 	list(bn=bnet1b,bnfit=fit)
@@ -1101,4 +1129,27 @@ bn2gr<-function(bn,bnfit){
 		lcpname<-c(lcpname,tmp)
 	}
 	list(lname=lname,lcpname=lcpname)
+}
+
+#######################################################################################################
+#Funkcja clust_plot zapisuje cluster z etykietami do pliku
+clust_plot<-function(tname,tvect,DataSetm,etykiety)
+{
+	fname<-paste(mypathout,nData,"_cluster_",tname,sep="")
+	jpeg(file=paste(fname,".jpg",sep=""),width = 500, height = 500, quality = 35, bg = "white")
+	plot(cmdscale(dist(DataSetm)),pch=c(18,19,17)[etykiety],col=c("yellow","black","green","red")[tvect],cex=3,main=tname)
+	dev.off()
+}
+
+#######################################################################################################
+#Funkcja clust_multiplot wypisuje kombinacje klaster, a zdyskretyzowane warto¶ci 
+clust_multiplot<-function(tmeth,DataSetd,DataSetm,etykiety)
+{
+	for(i in 1:length(names(DataSetd)))
+	{
+		tname<-names(DataSetd)[i]
+		tname<-paste(tmeth,"_",tname,sep="")
+		#print(tname)
+		clust_plot(tname,DataSetd[,i],DataSetm,etykiety)
+	}
 }

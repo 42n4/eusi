@@ -7,8 +7,8 @@
 #te ¶cie¿ki mypath i mypathout musz± istnieæ w systemie
 #to ¶cie¿ka do plików wykonywalnych z R pow³oki za pomoc± source("...")
 #mypath<-"/media/disk/guest/"
-mypath<-"/home/pwas/workspace/iso/"
-#mypath<-"/home/pwas/workspace/dataset/"
+#mypath<-"/home/pwas/workspace/iso/"
+mypath<-"/home/pwas/workspace/dataset/"
 #to ¶cie¿ka do plików graficznych uzyskiwanych za pomoc± funkcji plot i innych
 mypathout<-paste(mypath,"rysunki/",sep="")
 dir.create(mypathout, showWarnings = TRUE, recursive = TRUE, mode = "0755")
