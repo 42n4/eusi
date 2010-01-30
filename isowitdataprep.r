@@ -4,8 +4,12 @@
 # Author: Piotr W±siewicz
 ########################################################################################################
 
-#te atrybuty, które s± zmiennymi ilo¶ciowymi
+#te atrybuty, które s± zmiennymi ilo¶ciowymi i nie identyfikatorami
 parvec=setdiff(names(DataSet),parvecfactor)
+parvec=setdiff(parvec,parnokruskal)
+
+#Zamieniam dowolne faktory na numeryczne faktory typu 1,2,3
+DataSet<-normfactor(DataSet, parvecfactor)
 
 #potem faktoryzujê na wszelki wypadek kolumny, które s± etykietami, maj± ju¿ zdyskretyzowane warto¶ci; ich wybór jest w wektorze parvecfactor
 DataSet<-factorto(DataSet, which(names(DataSet) %in% parvecfactor))
