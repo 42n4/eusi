@@ -7,7 +7,7 @@
 #te ¶cie¿ki mypath i mypathout musz± istnieæ w systemie
 #to ¶cie¿ka do plików wykonywalnych z R pow³oki za pomoc± source("...")
 #mypath<-"/media/disk/guest/"
-mypath<-"/home/pwas/workspace/iso/"
+mypath<-"/home/guest/workspace/iso/"
 
 #(mypath <- getwd())
 #if (!is.null(mypath)) setwd(mypath)

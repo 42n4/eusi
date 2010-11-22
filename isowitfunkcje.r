@@ -9,7 +9,7 @@ Sys.setlocale("LC_NUMERIC","C")
 #lista pakietów z CRAN-u
 #naprawiæ pakier gRain
 #pkglist<-c("gRain")
-pkglist<-c("magic","snowfall","rsprng","bnlearn","snow","ggplot2","reshape","gbm","caret","arules","mboost","bestglm","ElemStatLearn","faraway","relaimpo","leaps","lars","bootstrap","DAAG","ff","biglm","bigmemory","splines","betareg","ellipse","nlme","MASS","leaps","car","lmtest","gregmisc","foreign","plyr","mlbench","boot","Hmisc","RWeka","ipred","klaR","ROCR","rpart","dprep","maptree","party","grid","lattice","latticeExtra","playwith","ada","randomForest","kknn","e1071","cluster","class","caret","fda","zoo","lattice","deal","RJDBC","cairoDevice")
+pkglist<-c("flexclust","rgl","magic","snowfall","rsprng","bnlearn","snow","ggplot2","reshape","gbm","caret","arules","mboost","bestglm","ElemStatLearn","faraway","relaimpo","leaps","lars","bootstrap","DAAG","ff","biglm","bigmemory","splines","betareg","ellipse","nlme","MASS","leaps","car","lmtest","gregmisc","foreign","plyr","mlbench","boot","Hmisc","RWeka","ipred","klaR","ROCR","rpart","maptree","party","grid","lattice","latticeExtra","playwith","ada","randomForest","kknn","e1071","cluster","class","caret","fda","zoo","lattice","deal","RJDBC","cairoDevice","multicore","iterators","doMC","foreach","nws","Rmpi","PTAk","Rcpp","rrules","Boruta")
 
 pkgcheck <- pkglist %in% row.names(installed.packages())
 for(i in pkglist[!pkgcheck]){
@@ -25,10 +25,10 @@ for(i in biolist[!biocheck]){
 	biocLite(i)
 }
 
-pkgrforge<-c("mlr")
+pkgrforge<-c("mlr","tm.plugin.dc","hive","EEG")
 pkgcheck <- pkgrforge %in% row.names(installed.packages())
 for(i in pkglist[!pkgcheck]){
-	install.packages("mlr", repos="http://R-Forge.R-project.org")
+	install.packages(i, repos="http://R-Forge.R-project.org")
 }
 
 for(i in pkglist)
@@ -44,41 +44,20 @@ for(i in biolist)
 
 #######################################################################################################
 #Funkcja brutoptim.klas znajduje najlepszy klasyfikator przeszukuj±c wszystkie kombinacje atrybutów
-brutoptim.klas <-function(mypathout,nData,DataSet,nFunction,paroutputree,parvectree,etykiety,evalstr,jmax){
-	verr<-c();vmod<-list();lverr<-list(); lvmod<-list(); jdiv<-jmax;
-	for(j in 1:jmax){
-		verr<-c();vmod<-list();
-		for(i in 1:4){
-			etykiety <- sample(1:nrow(DataSet), round(nrow(DataSet)*0.9))
-			if(i==1) {mDataSet<-DataSet[etykiety,]; mDataSetn<-DataSet[-etykiety,];datype<-"norm"}
-			else if(i==2) {mDataSet<-DataSetz[etykiety,]; mDataSetn<-DataSetz[-etykiety,];datype<-"zesc"}
-			else if(i==3) {mDataSet<-DataSetd[etykiety,]; mDataSetn<-DataSetd[-etykiety,];datype<-"nrdi"}
-			else if(i==4) {mDataSet<-DataSetzd[etykiety,]; mDataSetn<-DataSetzd[-etykiety,];datype<-"zedi"}
-			classifier<-try(evalwithattr(nFunction,paroutputree,parvectree,mDataSet,evalstr),TRUE)
-			if(!inherits(classifier, "try-error")){
-				lres<-prederror(classifier,paroutputree,parvectree,mDataSetn,evalstr)
-				vmod[[i]]<-classifier;verr<-c(verr,lres$perror);
-			}
-			else jdiv<-jdiv-1;
-		}
-		lverr[[j]]<-verr; lvmod[[j]]<-vmod
-	}
-	verr<-meanverr(lverr,jdiv,4); n<-min(which(verr==min(verr)))
-	if(n==1){mbDataSet<-DataSet;datype<-"norm";}
-	if(n==2){mbDataSet<-DataSetz;datype<-"zesc";}
-	if(n==3){mbDataSet<-DataSetd;datype<-"nrdi";}
-	if(n==4){mbDataSet<-DataSetzd;datype<-"zedi";}
-#generujemy nFunction automatycznie dla parvectree i ró¿nej liczby atrybutów dla najlepiej pasuj±cych danych
-	pred_norm<-combesteval(nFunction, paste(mypathout,nData,"_pred_",nFunction,"_",datype,sep=""),mbDataSet, paroutputree,parvectree,80,5,evalstr)
-	y<-seq(1,length(pred_norm));y<-sapply(y,function(x){if(x %% 5) x<-0 else x<-x});y<-y[!y==0];
-	z<-c();for(i in y) z<-c(z,pred_norm[[i-1]]$perror); n<-min(which(z==min(z)))
-	bestclass<-pred_norm[[(n-1)*5+3]]
-	betykiety<-pred_norm[[(n-1)*5+1]]
-	bestli<-pred_norm[[(n-1)*5+2]]
-	bestn<-pred_norm[[(n-1)*5+5]]
-	if(nFunction=="rpart") zapisz_rpart(bestclass,paste(mypathout,nData,"_Be",nFunction,"_",datype,sep=""))
-	if(nFunction=="J48") zapisz_weka(bestclass,paste(mypathout,nData,"_Best",nFunction,"_",datype,sep=""))
-	list(bestclass=bestclass,betykiety=betykiety,bestli=bestli,bestn=bestn,datype=datype,z=z)
+brutoptim.klas <-function(mypathout,nData,nFunction,paroutputree,parvectree,percent,trials,evalstr){
+	DataSet<-get(nData)
+	DataSet<-DataSet[!is.na(DataSet[[paroutputree]]),]
+	pred_norm<-combestklas(nFunction, paste(mypathout,nData,"_pred_",nFunction,"_",paroutputree,sep=""),DataSet, paroutputree,parvectree,percent,trials,evalstr)
+	if(length(pred_norm))
+	{
+		y<-seq(1, length(pred_norm));y<-sapply(y,function(x){if(x %% 5) x<-0 else x<-x});y<-y[!y==0];
+		z<-c();for(i in y) z<-c(z,pred_norm[[i-1]]$perror); n<-min(which(z==min(z)))
+		bestclass<-pred_norm[[(n-1)*5+3]]
+		betykiety<-pred_norm[[(n-1)*5+1]]
+		bestli<-pred_norm[[(n-1)*5+2]]
+		bestn<-pred_norm[[(n-1)*5+5]]
+		list(bestclass=bestclass,betykiety=betykiety)
+	} else list()
 }
 
 #######################################################################################################
@@ -92,7 +71,9 @@ prederror<-function(classimod,paroutputree,parvectree,DataSet,EvalString="DEFAUL
 	}  else {
 		predvalues=predict(classimod,DataSet[,parvectree]);
 	}
-	tabresults=table(predicted=predvalues, real=DataSet[,paroutputree])
+	if(length(predvalues)==length(DataSet[,paroutputree]))
+		tabresults=table(predicted=predvalues, real=DataSet[,paroutputree])
+	else tabresults<-c()
 	prederr<-1-sum(diag(tabresults))/sum(tabresults)
 	l<-list()
 	l[["pvalues"]]<-predvalues
@@ -101,28 +82,76 @@ prederror<-function(classimod,paroutputree,parvectree,DataSet,EvalString="DEFAUL
 	l
 }
 
+#######################################################################################################
+#Funkcja combestklas liczy kombinacje zmiennych obja¶niaj±cych niezale¿nych dla n=1 do n równego ilo¶æ wszystkich zmiennych 
+#i oblicza dla nich funkcje get(nFunction) i wybiera najlepsz± dla ka¿dego n, wraca listê najlepszych obiektów z kolejnych iteracji  
+#w lb<n> mamy wybierane po kolei kolejne zestawy na najlepsz± regresjê 
+#w m<n> najlepszy model dla n, w sm<n> summary(m<n>), dla n=1 rysuje plot regresji
+combestklas<-function (nFunction, fname, DataSet, moutput, parvec, nleven=-1, alpha=0.01, EvalString="DEFAULT"){
+	l<-list();ilist<-list();etykiety<-seq(1,nrow(DataSet));m01<-FALSE
+	#cat(" NR:",nrow(DataSet))
+	n<-length(parvec)
+	varvec<-parvec
+	varplus<-paste(parvec,collapse="+")
+	for(numvar in 1:length(parvec)){
+		#cat(paste("1:",moutput,"~",varplus)," n:",numvar," length:",n," EvalString:",EvalString,"\n")
+		cat("\n i: ",numvar)
+		ilist<-classwithattr(nFunction,DataSet,moutput,parvec,numvar,nleven,alpha,EvalString)
+		etykiety<-ilist[[4]]
+		m01<-ilist[[5]]
+		i<-ilist[[1]]; 
+		if(i){
+			if(numvar<n){
+				combi<-get("combinations","package:gtools")(length(parvec),numvar,parvec)
+				varvec<-combi[i,]
+			}
+			else if(numvar==n) varvec<-parvec
+			if(EvalString=="SPLINE") varplus<-paste("bs(",varvec,")",sep="") else varplus<-varvec
+			varplus<-paste(varplus,collapse="+")
+			if(!inherits(m01, "try-error")){
+				if(numvar<10)mnv<-paste("m0",numvar,sep="")else mnv<-paste("m",numvar,sep="")
+				if(numvar<10)smnv<-paste("sm0",numvar,sep="")else smnv<-paste("sm",numvar,sep="")
+				if(numvar<10)lbnv<-paste("lb0",numvar,sep="")else lbnv<-paste("lb",numvar,sep="")
+				if(numvar<10)etnv<-paste("etiq0",numvar,sep="")else etnv<-paste("etiq",numvar,sep="")
+				if(numvar<10)numv<-paste("numv0",numvar,sep="")else numv<-paste("numv",numvar,sep="")
+				assign(lbnv,ilist[[2]]);
+				assign(mnv,m01);
+				assign(etnv,etykiety);
+				assign(numv,numvar);
+				assign(smnv,prederror(m01,moutput,parvec,DataSet[! row.names(DataSet) %in% etykiety,],EvalString));
+				l[[etnv]]<-get(etnv)
+				l[[lbnv]]<-get(lbnv)
+				l[[mnv]]<-get(mnv)
+				l[[smnv]]<-get(smnv)
+				l[[numv]]<-get(numv)
+			}
+		}
+	}
+	return (l)
+}
+
 
 #######################################################################################################
 #Funkcja combesteval liczy kombinacje zmiennych obja¶niaj±cych niezale¿nych dla n=1 do n równego ilo¶æ wszystkich zmiennych 
 #i oblicza dla nich funkcje get(nFunction) i wybiera najlepsz± dla ka¿dego n, wraca listê najlepszych obiektów z kolejnych iteracji  
 #w lb<n> mamy wybierane po kolei kolejne zestawy na najlepsz± regresjê 
 #w m<n> najlepszy model dla n, w sm<n> summary(m<n>), dla n=1 rysuje plot regresji
-combesteval<-function (nFunction, fname, combiDataSet, moutput, parvec, nleven=-1, alpha=0.01, EvalString="DEFAULT"){
-	l<-list();ilist<-list();etykiety<-seq(1,nrow(combiDataSet));m01<-FALSE
-	#cat(" NR:",nrow(combiDataSet))
+combesteval<-function (nFunction, fname, DataSet, moutput, parvec, nleven=-1, alpha=0.01, EvalString="DEFAULT"){
+	l<-list();ilist<-list();etykiety<-seq(1,nrow(DataSet));m01<-FALSE
+	#cat(" NR:",nrow(DataSet))
 	n<-length(parvec)
 	varvec<-parvec
 	varplus<-paste(parvec,collapse="+")
 	for(numvar in 1:length(parvec)){
 		#cat(paste("1:",moutput,"~",varplus)," n:",numvar," length:",n," EvalString:",EvalString,"\n")
-		cat(" i: ",numvar)
+		cat("\n i: ",numvar)
 		if(nFunction=="lm")
-			ilist<-lmwithattr(combiDataSet,moutput,parvec,numvar,nleven,alpha,EvalString)
+			ilist<-lmwithattr(DataSet,moutput,parvec,numvar,nleven,alpha,EvalString)
 		else if(nFunction=="polr")
-			ilist<-polrwithattr(combiDataSet,moutput,parvec,numvar,EvalString)
+			ilist<-polrwithattr(DataSet,moutput,parvec,numvar,EvalString)
 		else {
 			#cat(paste("1:",moutput,"~",varplus)," n:",numvar," length:",n," EvalString:",EvalString,"\n")
-			ilist<-classwithattr(nFunction,combiDataSet,moutput,parvec,numvar,70,5,EvalString)
+			ilist<-classwithattr(nFunction,DataSet,moutput,parvec,numvar,nleven,alpha,EvalString)
 			etykiety<-ilist[[4]]
 			m01<-ilist[[5]]
 		}
@@ -136,7 +165,7 @@ combesteval<-function (nFunction, fname, combiDataSet, moutput, parvec, nleven=-
 			if(EvalString=="SPLINE") varplus<-paste("bs(",varvec,")",sep="") else varplus<-varvec
 			varplus<-paste(varplus,collapse="+")
 			if(nFunction%in%c("lm","polr"))
-			m01<-try(evalwithattr(nFunction,moutput,varvec,combiDataSet[etykiety,],EvalString),TRUE)
+			m01<-try(evalwithattr(nFunction,moutput,varvec,DataSet[etykiety,],EvalString),TRUE)
 			#cat("Najlepszy!!!!!!!\n\n")
 		    #print(m01)
 			if(!inherits(m01, "try-error")){
@@ -147,12 +176,13 @@ combesteval<-function (nFunction, fname, combiDataSet, moutput, parvec, nleven=-
 				if(numvar<10)numv<-paste("numv0",numvar,sep="")else numv<-paste("numv",numvar,sep="")
 				assign(lbnv,ilist[[2]]);
 				assign(mnv,m01);
+				#print(ilist)
 				assign(etnv,etykiety);
 				assign(numv,numvar);
 				if(nFunction%in%c("lm","polr"))
 					assign(smnv,summary(get(mnv)))
 				else{ 
-					assign(smnv,prederror(m01,moutput,parvec,combiDataSet[-etykiety,],EvalString));
+					assign(smnv,prederror(m01,moutput,parvec,DataSet[! row.names(DataSet) %in% etykiety,],EvalString));
 					l[[etnv]]<-get(etnv)
 				}
 				#get(smnv)
@@ -166,13 +196,13 @@ combesteval<-function (nFunction, fname, combiDataSet, moutput, parvec, nleven=-
 					if(numvar==1){
 						jpeg(file=paste(fname,numvar,"_1.jpg",sep=""),width = 1200, height = 1000, quality = 55, bg = "white")
 						par(lwd=4)
-						vartemp<-eval(parse(text=paste("combiDataSet$",varvec,sep="")))
+						vartemp<-eval(parse(text=paste("DataSet$",varvec,sep="")))
 						rangetemp<-seq(min(vartemp),max(vartemp),length.out=213)
-						plot(eval(parse(text=paste(moutput,"~",varvec))),data=combiDataSet,main=paste(moutput,"~",varplus), pch=1.0, cex.lab=1.5)
+						plot(eval(parse(text=paste(moutput,"~",varvec))),data=DataSet,main=paste(moutput,"~",varplus), pch=1.0, cex.lab=1.5)
 						dframetemp<-as.data.frame(rangetemp)
 						names(dframetemp)<-varvec
 						lines(rangetemp,predict(get(mnv),newdata=dframetemp), col="red", lwd=3)
-						#cat(paste("3:",moutput,"~",varvec)," n:",numvar," mnv:",mnv," varvec:",paste("combiDataSet$",varvec,sep=""),"\n")
+						#cat(paste("3:",moutput,"~",varvec)," n:",numvar," mnv:",mnv," varvec:",paste("DataSet$",varvec,sep=""),"\n")
 						dev.off()
 					}
 					jpeg(file=paste(fname,numvar,"_2.jpg",sep=""),width = 1200, height = 1000, quality = 55, bg = "white")
@@ -191,29 +221,41 @@ combesteval<-function (nFunction, fname, combiDataSet, moutput, parvec, nleven=-
 #moutput - wyj¶cie modelu zmienna zale¿na np. "Type", 
 #parvec - wektor zmiennych wej¶ciowych niezale¿nych dla modelu,
 #numvar - ile zmiennych z parvec ma wzi±æ udzia³ w combiutacji zmiennych niezale¿nych
-classwithattr<-function (nFunction, cDataSet, moutput, parvec, numvar, percent=70, trials=5,EvalString="DEFAULT"){
-	if(numvar<length(parvec)){
+classwithattr<-function (nFunction, DataSet, moutput, parvec, numvar, percent=70, trials=5,EvalString="DEFAULT"){
+	if(numvar<length(parvec)){ 
 		combi<-get("combinations","package:gtools")(length(parvec),numvar,parvec)
 		rowcombi<-nrow(combi)
 	}
 	else rowcombi<-1
-	lb<-c(); ibest<-0; lres<-list(); gbep<-1; gbetykiety<-c(); gbclas<-FALSE;
+	etykiety <- sample(1:nrow(DataSet), round(nrow(DataSet)*(percent/100)))
+	lb<-c(); ibest<-0; lres<-list(); gbep<-1; gbetykiety<-c(); gbclas<-FALSE;div<-0;
 	for(i in 1:rowcombi){
+		cat(".")
 		#cat("\nwewnatrz funkcji: ",i," ",numvar)
 		if(numvar<length(parvec)) 	varplus<-combi[i,]
 		if(numvar==length(parvec))	varplus<-parvec
-		vecp<-c(); bep<-1; betykiety<-c(); bclas<-FALSE;
+		vecp<-c(); bep<-1.1; betykiety<-c(); bclas<-FALSE;
 		for(j in 1:trials){
 			classifier<-FALSE
-			etykiety <- sample(1:nrow(cDataSet), round(nrow(cDataSet)*(percent/100)))
-			#print(etykiety)
-			#print(cDataSet[1:3,])
-			classifier<-try(evalwithattr(nFunction,moutput,varplus,cDataSet[etykiety,],EvalString),TRUE)
-			#print(classifier)
+			etykiety <- sample(1:nrow(DataSet), round(nrow(DataSet)*(percent/100)))
+			if(length(unique(DataSet[,moutput]))==2){
+				while((table(DataSet[etykiety,moutput])[1]*table(DataSet[etykiety,moutput])[2])==0){
+					cat("-")
+					etykiety <- sample(1:nrow(DataSet), round(nrow(DataSet)*(percent/100)))
+					#if(table(DataSet[etykiety,moutput])[1]<table(DataSet[etykiety,moutput])[2]){
+					#	div<-table(DataSet[etykiety,moutput])[1]/table(DataSet[etykiety,moutput])[2]
+					#}else{div<-table(DataSet[etykiety,moutput])[2]/table(DataSet[etykiety,moutput])[1]}
+				}
+			}
+			#cat("jeden:");print(etykiety)
+			#print(DataSet[1:3,])
+			classifier<-try(evalwithattr(nFunction,moutput,varplus,DataSet[etykiety,],EvalString),TRUE)
 			if(!inherits(classifier, "try-error") || classifier==FALSE){
 				#cat(" po funkcji:",prederr)
-				lres<-try(prederror(classifier,moutput,parvec,cDataSet[-etykiety,],EvalString),TRUE)
-				if(!inherits(lres, "try-error")){
+				lres<-try(prederror(classifier,moutput,parvec,DataSet[! row.names(DataSet) %in% etykiety,],EvalString),TRUE)
+				if((!inherits(lres, "try-error"))&&(((length(unique(DataSet[,moutput]))==2)&&(length(unique(lres$pvalues))>1)&&(det(matrix(lres$table, ncol=length(unique(DataSet[,moutput]))))>0))||(length(unique(DataSet[,moutput]))>2))){
+					#cat("dwa:");print(etykiety)
+					#print(classifier)
 					vecp<-c(vecp,lres$perror)
 					if(lres$perror<bep){
 						bep<-lres$perror;
@@ -223,7 +265,7 @@ classwithattr<-function (nFunction, cDataSet, moutput, parvec, numvar, percent=7
 				}
 			}
 		}
-		if(bep<1){
+		if(bep<=1){
 			meanp<-sum(vecp)/length(vecp)
 			if(meanp<gbep){ 
 				gbep<-meanp
@@ -237,7 +279,8 @@ classwithattr<-function (nFunction, cDataSet, moutput, parvec, numvar, percent=7
 	#cat("\nNajlepszy dla n:",numvar,"zmiennych: i:",ibest,"\n")
 	#print(parvec)
 	#print(gbclas)
-	return (list(ibest,lb,numvar,betykiety,gbclas))
+    #print(list(ibest,lb,numvar,gbetykiety,gbclas))
+	return (list(ibest,lb,numvar,gbetykiety,gbclas))
 }
 
 
@@ -451,10 +494,30 @@ zscore.for.integer<-function (DataSet, parvec, integercolumnforzscore)
 
 #######################################################################################################
 #Funkcja discret.for.chosen dyskretyzujê atrybuty (kolumny) z parvec na levelnum poziomów
-disc.for.chosen<-function (DataSet, parvec, levelnum)         
+disc.for.scale<-function (DataSetd, parvec, scale)         
+{
+	if(length(scale)>0&length(DataSetd[DataSetd[,c(parvec)]<=scale[1],c(parvec)]))
+		DataSetd[DataSetd[,c(parvec)]<=scale[1],c(parvec)]<-1	
+	if(length(scale)>1){
+		for(i in 2:length(scale)){
+			if(length(DataSetd[DataSetd[,c(parvec)]>scale[i-1]&DataSetd[,c(parvec)]<=scale[i],c(parvec)]))
+				DataSetd[DataSetd[,c(parvec)]>scale[i-1]&DataSetd[,c(parvec)]<=scale[i],c(parvec)]<-i
+		}
+		if(length(DataSetd[DataSet[,c(parvec)]>scale[length(scale)],c(parvec)]))
+			DataSetd[DataSet[,c(parvec)]>scale[length(scale)],c(parvec)]<-length(scale)+1
+	}
+	DataSetd<-factorto(DataSetd, which(names(DataSetd) %in% parvec))
+	return(DataSetd)
+}
+
+
+
+#######################################################################################################
+#Funkcja discret.for.chosen dyskretyzujê atrybuty (kolumny) z parvec na levelnum poziomów
+disc.for.chosen<-function (DataSet, parvec, levelnum, zero=-1)         
 {
 	DataSetd<-DataSet
-	DataSetd[,parvec]<-disc.ef(DataSet[,parvec], levelnum)
+	DataSetd[,parvec]<-disc.ef(DataSet[,parvec], levelnum, zero)
 	DataSetd<-factorto(DataSetd, which(names(DataSetd) %in% parvec))
 	return(DataSetd)
 }
@@ -469,9 +532,9 @@ KruskelMDS<-function (DataSet, parvec, dimnum)
 
 #######################################################################################################
 #Funkcja plotMDS.for.chosen zapisuje rzuty wielowymiarowe na p³aszczyznê
-plotMDS.for.chosen<-function (fname, nDataSets, DataSet, parvec, wzorzec1)         
+plotMDS.for.chosen<-function (fname, nDataSets, DataSetd, parvec, wzorzec1)         
 {
-	DataSet1<-DataSet[,which(names(DataSet)%in%parvec)]
+	DataSet1<-DataSetd[,which(names(DataSetd)%in%parvec)]
 	for(i in which(names(DataSet1)%in%parvec)){
 		wzorzec=DataSet1[,i]
 		#wzorzec1=2
@@ -486,7 +549,7 @@ plotMDS.for.chosen<-function (fname, nDataSets, DataSet, parvec, wzorzec1)
 
 #######################################################################################################
 #Funkcja disc2 wykonywana w funkcji disc.ef
-disc2<-function (x, k) 
+disc2<-function (x, k, zero=-1) 
 {
 	z = x
     n = length(x)
@@ -495,6 +558,11 @@ disc2<-function (x, k)
 	{
 		f<-f[-which(is.na(x))]
 		x<-x[-which(is.na(x))]
+	}
+	if(zero>=0)
+	{
+		f<-f[-which(x==zero)]
+		x<-x[-which(x==zero)]
 	}
 	m = length(x)
 	ciclo = ceiling(m/k)
@@ -510,10 +578,11 @@ disc2<-function (x, k)
 #######################################################################################################
 #Funkcja disc.ef z pakietu dprep zmieniona (pomija nulle), 
 #gdy¿ w tym pakiecie prawie wszystkie funkcje wymagaj± zmian 
-disc.ef<-function (indata, k)        # Nastêpuje dyskretyzacja danych
+disc.ef<-function (indata, k, zero=-1)        # Nastêpuje dyskretyzacja danych
 {
-	varcon<-seq(1,ncol(indata))
-    indata = as.matrix(indata)
+	indata = as.matrix(indata)
+	if(ncol(indata)>1)
+		varcon<-seq(1,ncol(indata)) else varcon=1
     p <- dim(indata)[2]
     f <- p
     ft <- rep(0, f)
@@ -522,7 +591,7 @@ disc.ef<-function (indata, k)        # Nastêpuje dyskretyzacja danych
     }
     for (i in 1:f) {
         if (ft[i] > 0) {
-            indata[, i] <- disc2(as.vector(indata[, i]), k)
+            indata[, i] <- disc2(as.vector(indata[, i]), k, zero)
         }
     }
     indata
@@ -615,6 +684,16 @@ zmianana<- function (kolumna_wyjatek, wartoscNA)
  	return (x)
 }
 
+
+#######################################################################################################
+#Funkcja "zmianana"  zamienia warto¶ci B na A
+zamiana<- function (kolumna_wyjatek, wartoscB, wartoscA)         
+{
+	x<-kolumna_wyjatek
+	x[x==wartoscB]<-wartoscA 
+	return (x)
+}
+
 #######################################################################################################
 #Funkcja z4na3 zamienia przedzia³y 1,2,3,4 na 1,2,2,3
 z4na3<-function (indata, varcon)
@@ -665,7 +744,7 @@ zapisz_rpart = function (drzewo, fname)
 {
     jpeg(file=paste(fname,".jpg",sep=""),width = 1200, height = 1000, quality = 55, bg = "white")
 	par(lwd=4)
-	draw.tree(drzewo, cex=3.3, pch=1.0, print.levels=TRUE)
+	draw.tree(drzewo, cex=2, pch=1.0, print.levels=TRUE)
    # plot(drzewo,uniform=T,branch=0.3,compress=T,margin=0.02)
    # text(drzewo,all=T,use.n=T, fancy=T)
     dev.off()
@@ -697,9 +776,9 @@ hier2jpg<-function(inmethod,indata,fname){
 	dn <- as.dendrogram(hc)
 	# Now draw the dendrogram.
 	#op <- par(mar = c(3, 4, 3, 2.86))
-	jpeg(file=paste(fname,".jpg",sep=""),width = 1200, height = 1000, quality = 55, bg = "white")
+	jpeg(file=paste(fname,".jpg",sep=""),width = 1400, height = 1000, quality = 55, bg = "white")
 	par(mar=c(9,9,9,9))
-	plot(dn, horiz = TRUE, nodePar = list(col = 3:2, cex = c(2.0, 0.75), pch = 21:22, bg=  c("light blue", "black"), lab.cex = 3.75, cex.main = 1.8, cex.axis = 1.2,  lab.col = "tomato"), edgePar = list(col = "gray", lwd = 2))
+	plot(dn, horiz = TRUE, nodePar = list(col = 3:2, cex = c(2.0, 0.75), pch = 21:22, bg=  c("light blue", "black"), lab.cex = 1.75, cex.main = 0.6, cex.axis = 1.0,  lab.col = "tomato"), edgePar = list(col = "gray", lwd = 2))
 	title(main=paste("Variable Correlation Clusters ",as.character(substitute(indata)),"using",inmethod),cex.main=2)
 	#par(op)
 	dev.off()
@@ -837,7 +916,7 @@ rmse <- function(x,y) sqrt(mean((x-y)^2))
 pred.ridge.etykiety<-function(moutput,mparvec,DataSet,etykiety){
 	mm<-apply(DataSet[etykiety,mparvec],2,mean)
 	trainx <- as.matrix(sweep(DataSet[etykiety,mparvec],2,mm))
-	testx <- as.matrix(sweep(DataSet[-etykiety,mparvec],2,mm))
+	testx <- as.matrix(sweep(DataSet[! row.names(DataSet) %in% etykiety,mparvec],2,mm))
 	yc<-DataSet[etykiety,moutput]-mean(DataSet[etykiety,moutput])
 	lambda.set <- 10^(seq(-2, 8, length = 100))
 	ridge.train<-lm.ridge(yc~trainx,lambda=lambda.set)
@@ -1152,4 +1231,289 @@ clust_multiplot<-function(tmeth,DataSetd,DataSetm,etykiety)
 		#print(tname)
 		clust_plot(tname,DataSetd[,i],DataSetm,etykiety)
 	}
+}
+
+#######################################################################################################
+#Funkcja binplot.3d
+binplot.3d<-function(x,y,z,alpha=1,topcol="#ff0000",sidecol="#aaaaaa")
+{
+	save <- par3d(skipRedraw=TRUE)
+	on.exit(par3d(save))
+	
+	x1<-c(rep(c(x[1],x[2],x[2],x[1]),3),rep(x[1],4),rep(x[2],4))
+	z1<-c(rep(0,4),rep(c(0,0,z,z),4))
+	y1<-c(y[1],y[1],y[2],y[2],rep(y[1],4),rep(y[2],4),rep(c(y[1],y[2],y[2],y[1]),2))
+	x2<-c(rep(c(x[1],x[1],x[2],x[2]),2),rep(c(x[1],x[2],rep(x[1],3),rep(x[2],3)),2))
+	z2<-c(rep(c(0,z),4),rep(0,8),rep(z,8) )
+	y2<-c(rep(y[1],4),rep(y[2],4),rep(c(rep(y[1],3),rep(y[2],3),y[1],y[2]),2) )
+	rgl.quads(x1,z1,y1,col=rep(sidecol,each=4),alpha=alpha)
+	rgl.quads(c(x[1],x[2],x[2],x[1]),rep(z,4),c(y[1],y[1],y[2],y[2]),col=rep(topcol,each=4),alpha=1) 
+	rgl.lines(x2,z2,y2,col="#000000")
+}
+
+#######################################################################################################
+#Funkcja hist3d
+hist3d<-function(x,y=NULL,nclass="auto",alpha=1,col="#ff0000",scale=10)
+{
+	save <- par3d(skipRedraw=TRUE)
+	on.exit(par3d(save))
+	xy <- xy.coords(x,y)
+	x <- xy$x
+	y <- xy$y
+	n<-length(x)
+	if (nclass == "auto") { nclass<-ceiling(sqrt(nclass.Sturges(x))) }
+	breaks.x <- seq(min(x),max(x),length=(nclass+1))
+	breaks.y <- seq(min(y),max(y),length=(nclass+1))
+	z<-matrix(0,(nclass),(nclass))
+	for (i in 1:nclass) 
+	{
+		for (j in 1:nclass) 
+		{
+			z[i, j] <- (1/n)*sum(x < breaks.x[i+1] & y < breaks.y[j+1] & 
+							x >= breaks.x[i] & y >= breaks.y[j])
+			binplot.3d(c(breaks.x[i],breaks.x[i+1]),c(breaks.y[j],breaks.y[j+1]),
+					scale*z[i,j],alpha=alpha,topcol=col)
+		}
+	}
+}
+
+
+#######################################################################################################
+#Funkcja zapisz_cloud zapisuje wykres ISOMDS z dwóch wzorców w pliku jpeg
+zapisz_cloud <- function (nDataSetds, fname, wzorzec1, wzorzec2, co, pc, scex)
+{
+	jpeg(file=paste(mypathout,fname,".jpg",sep=""),width = 1200, height = 1000, quality = 55, bg = "white")
+	#plot(npointszds$points, type="p", col=co[wzorzec1], pch=pc[wzorzec2], cex=scex)
+	#co = c('black','green','red','yellow')
+	#pc = c("*","+",".","o")
+	#scex = 2.5
+	#wzorzec1 = DataSetd[,18]
+	#wzorzec2 = ifelse(DataSetd$normal_develop==0,1,ifelse(DataSetd$AED_off==1,2,3))
+	cat(paste(mypathout,fname,".jpg",sep="")," \n")
+	p<-cloud(wzorzec2 ~ nDataSetds$points[,1] + nDataSetds$points[,2],
+			type="p", col=co[wzorzec2], pch=pc[wzorzec1], cex = scex, zoom = 1,
+			xlab=NULL, ylab = NULL, zlab = NULL,
+			par.settings = list(axis.line = list(col = "transparent")),
+			scales = list (draw = FALSE),perspective=TRUE, screen=list(z=0,x=0,y=0))
+	xpanel=2;ypanel=2
+	rotx<-c(0,0,0,0)
+	roty<-c(0,70,60,120)
+	rotz<-c(0,0,60,60)
+	plot(update(p[rep(1,2*xpanel)],layout=c(ypanel,xpanel),
+					panel = function(...,screen){
+						crow<-current.row();ccol<-current.column();
+						panel.cloud(...,distance=0.145, screen = list(z=rotz[ypanel*(ypanel-crow)+ccol],x=rotx[ypanel*(ypanel-crow)+ccol],y=roty[ypanel*(ypanel-crow)+ccol]))
+					}))
+	
+#   cloud(nDataSetds$points[,1] ~ nDataSetds$points[,2] + nDataSetds$points[,3],type="p",col=co[wzorzec_kol2],
+#	pch = pc[wzorzec1_pun2],cex = scex, zoom = 1, xlab=NULL, ylab = NULL, zlab = NULL,
+#	par.settings = list(axis.line = list(col = "transparent")),	scales = list (draw = FALSE))
+	dev.off()
+}
+
+
+
+#######################################################################################################
+#Funkcja zapisz_3dcast
+zapisz_3dcast <- function (nDataSets, fname, DataSetd, nwzorzec1, nwzorzec2)
+{
+	rgl.open()
+	open3d()
+	par3d(windowRect=c(1,1,1000,1000))
+	x<-nDataSets$points[,1]
+	y<-nDataSets$points[,2]
+	wzorzec1<-DataSetd[,which(names(DataSetd)%in%nwzorzec1)]
+	wzorzec2<-DataSetd[,which(names(DataSetd)%in%nwzorzec2)]
+	jpeg(file=paste(fname,"_0.jpg",sep=""),width = 1200, height = 1000, quality = 55, bg = "white")
+	plot(table(wzorzec2,wzorzec1))
+	dev.off()
+	wzorzec1s = as.numeric(as.vector(wzorzec1)) * 0.5
+	z<-wzorzec2
+	co = c('black','green','red','yellow','blue')
+	rgl.viewpoint(40,25,60,1)
+	plot3d(x,y,z,col=co[wzorzec2],type="s",size=wzorzec1s)
+	fname1<-paste(fname,"_2.jpg",sep="")
+	rgl.snapshot(fname1)
+	rgl.viewpoint(0,0,60,1)
+	plot3d(x,y,1,col=co[wzorzec2],type="s",size=wzorzec1s)
+	fname1<-paste(fname,"_1.jpg",sep="")
+	rgl.snapshot(fname1)
+	co = c('black','green','red','yellow','blue')
+	pc = c(".","-","+","*","o")
+	fname1<-paste(fname,"_3",sep="")
+	zapisz_cloud(nDataSets,fname1,wzorzec1,wzorzec2,co,pc,2.5)
+}
+
+#######################################################################################################
+#Funkcja lessone
+lessone<-function(x){ifelse(x>1,x<-1/x,ifelse(x<(-1),x<-1/x,x<-x))}
+
+#######################################################################################################
+#Funkcja lesstwo
+lesstwo<-function(DataSetm,x,y){
+	parvec<-names(DataSetm)
+	#z<-0;
+	#for(i in 1:length(x)){
+	#	if(abs(x)>abs(y)){z<-x;x<-y;y<-z}
+	#	if((x[i]<0 & y[i]>0)|(x[i]>0 & y[i]<0)) {x[i]<-abs(x[i]); y[i]<-abs(y[i])+2*abs(x[i]); }
+	#	if(x[i]<0 & y[i]<0) {x[i]<-abs(x[i]); y[i]<-abs(y[i])}
+	#}
+	#sapply(x/y,lessone)
+	#sapply(sd(DataSetm)/abs(y-x),lessone)
+	sd(DataSetm)/abs(y-x)
+}
+
+
+
+#######################################################################################################
+#Funkcja clusterfun 
+clusterfun<-function(DataSetm,etykiety,nFunFrame){
+	parvec<-names(DataSetm)
+	ltmp<-list()
+	for(j in parvec){
+		tmp<-c()
+		datatmp<-c()
+		for(i in sort(unique(etykiety))){
+			datatmp<-DataSetm[etykiety==i,c(j)]
+			tmp<-c(tmp,eval(parse(text=paste(nFunFrame,"(datatmp)",sep=""))))
+		}
+		ltmp[[j]]<-tmp
+	}
+	ltmp<-t(as.data.frame.list(ltmp))
+	#tmp<-sapply(ltmp[,1]/ltmp[,2],lessone)
+	tmp<-lesstwo(DataSetm,ltmp[,1],ltmp[,2])
+	#for(i in 1:length(tmp)) ifelse(tmp[i]>1,tmp[i]<-1/tmp[i],tmp[i]<-tmp[i])
+	if(length(unique(etykiety))>=3){
+		for(i in 3:length(unique(etykiety))){
+			#tmp1<-sapply(ltmp[,2]/ltmp[,3],lessone)
+			tmp1<-lesstwo(DataSetm,ltmp[,i-1],ltmp[,i])
+			#tmp<-sapply((tmp+tmp1)/2,lessone)
+			tmp<-(tmp+tmp1)/2
+		}
+		tmp1<-lesstwo(DataSetm,ltmp[,i],ltmp[,1])
+		#tmp<-sapply((tmp+tmp1)/2,lessone)
+		tmp<-(tmp+tmp1)/2
+	}
+	ltmp<-merge(ltmp,tmp,by=0)
+	ltmp<-ltmp[order(ltmp[,length(unique(etykiety))+2]),]
+}
+
+#######################################################################################################
+#Funkcja sexcount 
+sexcount<-function(DataSetd,etykiety){
+	DataSet<-cbind(DataSetd,etykiety)
+	ltmp<-list()
+	for(j in sort(unique(etykiety))){
+		tmp<-c()
+		datatmp<-DataSet[DataSet[,ncol(DataSet)]==j,c("sex")]
+		for(i in sort(unique(DataSet$sex))){
+			tmp<-c(tmp,length(datatmp[datatmp==i]))
+		}
+		ltmp[[j]]<-tmp
+	}
+	ltmp<-as.data.frame.list(ltmp)
+}
+	
+#######################################################################################################
+#Funkcja meanvar 
+meanvar<-function(x) c(sum=sum(x),mean=mean(x),var=var(x),n=length(x))
+
+#######################################################################################################
+#Funkcja clusterfunext
+clusterfunext<-function(DataSetm,etykiety,nFunFrame){
+	ltmp<-clusterfun(DataSetm,etykiety,nFunFrame);etykiety<-factor(etykiety)
+	DataSetk<-cbind(DataSetm,etykiety)
+	pvans<-c()
+	for(i in 1:length(ltmp[,1])){
+		fit<-lm(DataSetk[[ltmp[i,1]]]~DataSetk$etykiety, DataSetk)
+		pvans<-c(pvans,as.matrix(anova(fit)[5])[1,1])
+	}
+	ltmp<-cbind(ltmp,pvans)
+	sdv<-c()
+	for(i in 1:length(ltmp[,1])){
+		sdv<-c(sdv,sd(DataSetk[[ltmp[i,1]]]))
+	}
+	ltmp<-cbind(ltmp,sdv)
+	ltmp
+}
+
+#######################################################################################################
+#Funkcja multicluster
+multicluster<-function(DataSetm,DataSetd,ploton,clname,ntimes,nFunFrame){
+	klaster <- diana(DataSetm, metric = "manhattan", stand = TRUE)
+	etykiety <- cutree(as.hclust(klaster), k = ntimes)
+	tmeth <- paste(clname,"_diana",ntimes,sep="")
+	if(ploton) clust_multiplot(tmeth,DataSetd,DataSetm,etykiety)
+	print(tmeth);
+	ltmp<-sexcount(DataSetd,etykiety); print(ltmp)
+	ltmp<-clusterfunext(DataSetm,etykiety,nFunFrame);
+	print(format(ltmp[ltmp[length(ltmp)-1]<=0.05,], digits = 3, nsmall = 3))
+	print(format(ltmp[ltmp[length(ltmp)-1]>0.05,], digits = 3, nsmall = 3))
+	
+	#metric = c("euclidean", "manhattan", "SqEuclidean")
+	klaster <- fanny(dist(DataSetm)^2, ntimes)
+	etykiety<-klaster$clustering
+	tmeth <- paste(clname,"_fanny",ntimes,sep="")
+	if(ploton) clust_multiplot(tmeth,DataSetd,DataSetm,etykiety)
+	print(tmeth);
+	ltmp<-sexcount(DataSetd,etykiety); print(ltmp)
+	ltmp<-clusterfunext(DataSetm,etykiety,nFunFrame);
+	print(format(ltmp[ltmp[length(ltmp)-1]<=0.05,], digits = 3, nsmall = 3))
+	print(format(ltmp[ltmp[length(ltmp)-1]>0.05,], digits = 3, nsmall = 3))
+	
+	klaster <- hclust(dist(DataSetm)^2, "cen")
+	etykiety<- cutree(klaster, k = ntimes)
+	tmeth <- paste(clname,"_hclus",ntimes,sep="")
+	if(ploton) clust_multiplot(tmeth,DataSetd,DataSetm,etykiety)
+	print(tmeth);
+	ltmp<-sexcount(DataSetd,etykiety); print(ltmp)
+	ltmp<-clusterfunext(DataSetm,etykiety,nFunFrame);
+	print(format(ltmp[ltmp[length(ltmp)-1]<=0.05,], digits = 3, nsmall = 3))
+	print(format(ltmp[ltmp[length(ltmp)-1]>0.05,], digits = 3, nsmall = 3))
+	
+	klaster<-agnes(dist(DataSetm,method="manhattan"),method="complete");
+	etykiety<-cutree(klaster,k=ntimes)
+	tmeth <- paste(clname,"_agnes",ntimes,sep="")
+	if(ploton) clust_multiplot(tmeth,DataSetd,DataSetm,etykiety)
+	print(tmeth);
+	ltmp<-sexcount(DataSetd,etykiety); print(ltmp)
+	ltmp<-clusterfunext(DataSetm,etykiety,nFunFrame);
+	print(format(ltmp[ltmp[length(ltmp)-1]<=0.05,], digits = 3, nsmall = 3))
+	print(format(ltmp[ltmp[length(ltmp)-1]>0.05,], digits = 3, nsmall = 3))
+	
+	klaster<-kmeans(DataSetm,ntimes,nstart=100)
+	etykiety<-klaster$cluster
+	tmeth <- paste(clname,"_kmean",ntimes,sep="")
+	if(ploton) clust_multiplot(tmeth,DataSetd,DataSetm,klaster$cluster)
+	print(tmeth);
+	ltmp<-sexcount(DataSetd,etykiety); print(ltmp)
+	ltmp<-clusterfunext(DataSetm,etykiety,nFunFrame);
+	print(format(ltmp[ltmp[length(ltmp)-1]<=0.05,], digits = 3, nsmall = 3))
+	print(format(ltmp[ltmp[length(ltmp)-1]>0.05,], digits = 3, nsmall = 3))
+}
+
+
+#######################################################################################################
+#Funkcja joinYN
+joinYN<-function(DataSet,parvecforout){
+	DataVec<-c(); 
+	for(j in 1:nrow(DataSet)) 
+	{
+		y_one<-1
+		for( i in parvecforout){ 
+			if(!is.na(DataSet[j,i])){
+				if(DataSet[j,i]=="Y"){ 
+					DataVec[j]<-"Y"; 
+					y_one<-0
+					#cat("Y(",j," ",i,")")
+				}else
+				if(y_one==1)
+					DataVec[j]<-"N"
+			}else{
+				if(y_one==1)
+					DataVec[j]<-"N"
+			}
+		}
+	}
+	factor(DataVec)
 }
