@@ -63,10 +63,10 @@ brutoptim.klas <-function(mypathout,nData,nFunction,paroutputree,parvectree,perc
 #######################################################################################################
 #Funkcja prederror zwraca warto¶ci predykcji klasyfikatora, tablicê rezultatów i rzeczywistych warto¶ci, 
 #oraz b³±d klasyfikatora, na wej¶ciu dane testowe, ale nie treningowe wykorzystane do konstrukcji klasyfikatora
-prederror<-function(classimod,paroutputree,parvectree,DataSet,EvalString="DEFAULT"){
+prederror<-function(classimod,nFunction,paroutputree,parvectree,DataSet,EvalString="DEFAULT"){
 	if (EvalString == "CLASS"){
 		predvalues=predict(classimod,DataSet[,parvectree])$class
-	} else if(EvalString=="DEFAULT"){
+	} else if(EvalString=="DEFAULT" || nFunction =="rpart"){
 		predvalues=predict(classimod,newdata=DataSet[,parvectree],"class");
 	}  else {
 		predvalues=predict(classimod,DataSet[,parvectree]);
@@ -89,7 +89,6 @@ prederror<-function(classimod,paroutputree,parvectree,DataSet,EvalString="DEFAUL
 #w m<n> najlepszy model dla n, w sm<n> summary(m<n>), dla n=1 rysuje plot regresji
 combestklas<-function (nFunction, fname, DataSet, moutput, parvec, nleven=-1, alpha=0.01, EvalString="DEFAULT"){
 	l<-list();ilist<-list();etykiety<-seq(1,nrow(DataSet));m01<-FALSE
-	#cat(" NR:",nrow(DataSet))
 	n<-length(parvec)
 	varvec<-parvec
 	varplus<-paste(parvec,collapse="+")
@@ -118,7 +117,7 @@ combestklas<-function (nFunction, fname, DataSet, moutput, parvec, nleven=-1, al
 				assign(mnv,m01);
 				assign(etnv,etykiety);
 				assign(numv,numvar);
-				assign(smnv,prederror(m01,moutput,parvec,DataSet[! row.names(DataSet) %in% etykiety,],EvalString));
+				assign(smnv,prederror(m01,nFunction,moutput,parvec,DataSet[! row.names(DataSet) %in% etykiety,],EvalString));
 				l[[etnv]]<-get(etnv)
 				l[[lbnv]]<-get(lbnv)
 				l[[mnv]]<-get(mnv)
@@ -182,7 +181,7 @@ combesteval<-function (nFunction, fname, DataSet, moutput, parvec, nleven=-1, al
 				if(nFunction%in%c("lm","polr"))
 					assign(smnv,summary(get(mnv)))
 				else{ 
-					assign(smnv,prederror(m01,moutput,parvec,DataSet[! row.names(DataSet) %in% etykiety,],EvalString));
+					assign(smnv,prederror(m01,nFunction,moutput,parvec,DataSet[! row.names(DataSet) %in% etykiety,],EvalString));
 					l[[etnv]]<-get(etnv)
 				}
 				#get(smnv)
@@ -225,13 +224,11 @@ classwithattr<-function (nFunction, DataSet, moutput, parvec, numvar, percent=70
 	if(numvar<length(parvec)){ 
 		combi<-get("combinations","package:gtools")(length(parvec),numvar,parvec)
 		rowcombi<-nrow(combi)
-	}
-	else rowcombi<-1
+	}else rowcombi<-1
 	etykiety <- sample(1:nrow(DataSet), round(nrow(DataSet)*(percent/100)))
 	lb<-c(); ibest<-0; lres<-list(); gbep<-1; gbetykiety<-c(); gbclas<-FALSE;div<-0;
 	for(i in 1:rowcombi){
 		cat(".")
-		#cat("\nwewnatrz funkcji: ",i," ",numvar)
 		if(numvar<length(parvec)) 	varplus<-combi[i,]
 		if(numvar==length(parvec))	varplus<-parvec
 		vecp<-c(); bep<-1.1; betykiety<-c(); bclas<-FALSE;
@@ -242,25 +239,20 @@ classwithattr<-function (nFunction, DataSet, moutput, parvec, numvar, percent=70
 				while((table(DataSet[etykiety,moutput])[1]*table(DataSet[etykiety,moutput])[2])==0){
 					cat("-")
 					etykiety <- sample(1:nrow(DataSet), round(nrow(DataSet)*(percent/100)))
-					#if(table(DataSet[etykiety,moutput])[1]<table(DataSet[etykiety,moutput])[2]){
-					#	div<-table(DataSet[etykiety,moutput])[1]/table(DataSet[etykiety,moutput])[2]
-					#}else{div<-table(DataSet[etykiety,moutput])[2]/table(DataSet[etykiety,moutput])[1]}
 				}
 			}
-			#cat("jeden:");print(etykiety)
-			#print(DataSet[1:3,])
 			classifier<-try(evalwithattr(nFunction,moutput,varplus,DataSet[etykiety,],EvalString),TRUE)
-			if(!inherits(classifier, "try-error") || classifier==FALSE){
-				#cat(" po funkcji:",prederr)
-				lres<-try(prederror(classifier,moutput,parvec,DataSet[! row.names(DataSet) %in% etykiety,],EvalString),TRUE)
+			#print(classifier)
+			if(!inherits(classifier, "try-error")){
+				lres<-try(prederror(classifier,nFunction,moutput,parvec,DataSet[-etykiety,],EvalString),TRUE)
 				if((!inherits(lres, "try-error"))&&(((length(unique(DataSet[,moutput]))==2)&&(length(unique(lres$pvalues))>1)&&(det(matrix(lres$table, ncol=length(unique(DataSet[,moutput]))))>0))||(length(unique(DataSet[,moutput]))>2))){
-					#cat("dwa:");print(etykiety)
-					#print(classifier)
 					vecp<-c(vecp,lres$perror)
-					if(lres$perror<bep){
-						bep<-lres$perror;
-						betykiety<-etykiety;
-						bclas<-classifier;
+					#print(lres)
+					if(!is.na(lres$perror<bep))
+						if(lres$perror<bep ){
+							bep<-lres$perror;
+							betykiety<-etykiety;
+							bclas<-classifier;
 					}
 				}
 			}
@@ -276,10 +268,6 @@ classwithattr<-function (nFunction, DataSet, moutput, parvec, numvar, percent=70
 			}
 		}
 	}
-	#cat("\nNajlepszy dla n:",numvar,"zmiennych: i:",ibest,"\n")
-	#print(parvec)
-	#print(gbclas)
-    #print(list(ibest,lb,numvar,gbetykiety,gbclas))
 	return (list(ibest,lb,numvar,gbetykiety,gbclas))
 }
 
