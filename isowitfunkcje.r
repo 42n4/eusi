@@ -9,7 +9,7 @@ Sys.setlocale("LC_NUMERIC","C")
 #lista pakietów z CRAN-u
 #naprawiæ pakier gRain
 #pkglist<-c("gRain")
-pkglist<-c("flexclust","rgl","magic","snowfall","rsprng","bnlearn","snow","ggplot2","reshape","gbm","caret","arules","mboost","bestglm","ElemStatLearn","faraway","relaimpo","leaps","lars","bootstrap","DAAG","ff","biglm","bigmemory","splines","betareg","ellipse","nlme","MASS","leaps","car","lmtest","gregmisc","foreign","plyr","mlbench","boot","Hmisc","RWeka","ipred","klaR","ROCR","rpart","maptree","party","grid","lattice","latticeExtra","playwith","ada","randomForest","kknn","e1071","cluster","class","caret","fda","zoo","lattice","deal","RJDBC","cairoDevice","multicore","iterators","doMC","foreach","nws","Rmpi","PTAk","Rcpp","rrules","Boruta")
+pkglist<-c("TTR","TSPostgreSQL","modeest","flexclust","rgl","magic","snowfall","rsprng","bnlearn","snow","ggplot2","reshape","gbm","caret","arules","mboost","bestglm","ElemStatLearn","faraway","relaimpo","leaps","lars","bootstrap","DAAG","ff","biglm","bigmemory","splines","betareg","ellipse","nlme","MASS","leaps","car","lmtest","gregmisc","foreign","plyr","mlbench","boot","Hmisc","RWeka","ipred","klaR","ROCR","rpart","maptree","party","grid","lattice","latticeExtra","playwith","ada","randomForest","kknn","e1071","cluster","class","caret","fda","zoo","lattice","deal","RJDBC","cairoDevice","multicore","iterators","doMC","foreach","nws","PTAk","Rcpp","rrules","Boruta")
 
 pkgcheck <- pkglist %in% row.names(installed.packages())
 for(i in pkglist[!pkgcheck]){
@@ -17,7 +17,7 @@ for(i in pkglist[!pkgcheck]){
 }
 
 #lista pakietów z bioconductora
-biolist<-c("Rgraphviz")
+biolist<-c("Rgraphviz","PROcess")
 biocheck <- biolist %in% row.names(installed.packages())
 for(i in biolist[!biocheck]){
     source("http://bioconductor.org/biocLite.R")
@@ -27,20 +27,29 @@ for(i in biolist[!biocheck]){
 
 pkgrforge<-c("mlr","tm.plugin.dc","hive","EEG")
 pkgcheck <- pkgrforge %in% row.names(installed.packages())
-for(i in pkglist[!pkgcheck]){
+for(i in pkgrforge[!pkgcheck]){
 	install.packages(i, repos="http://R-Forge.R-project.org")
 }
 
-for(i in pkglist)
+pkgall<-c(pkglist,biolist,pkgrforge)
+
+for(i in c("mda","xtable","lattice","TSPostgreSQL","RWeka","doMC","foreach","nws","ROCR","rpart","e1071","MASS","cluster","party","randomForest","PROcess"))
 { library(i, character.only = TRUE);}
 
-for(i in biolist)
-{ library(i, character.only = TRUE);}
+#pkgbyhand<-c("rparallel")
+#for(i in pkgbyhand)
+#{ library(i, character.only = TRUE);}
 
 #######################################################################################################
 #############################################################################
 #Funkcje podstawowe zalecane do procesu odkrywania wiedzy
 #############################################################################
+
+#######################################################################################################
+#Funkcja most frequent factor
+mff<-function(x){
+	names(table ( x ))[which ( table ( x ) == max ( table ( x ) ) )]
+}
 
 #######################################################################################################
 #Funkcja brutoptim.klas znajduje najlepszy klasyfikator przeszukuj±c wszystkie kombinacje atrybutów
@@ -524,14 +533,12 @@ plotMDS.for.chosen<-function (fname, nDataSets, DataSetd, parvec, wzorzec1)
 {
 	DataSet1<-DataSetd[,which(names(DataSetd)%in%parvec)]
 	for(i in which(names(DataSet1)%in%parvec)){
-		wzorzec=DataSet1[,i]
+		wzorzec=as.integer(DataSet1[,i])
+		print(names(DataSet1)[i])
+		print(wzorzec)
 		#wzorzec1=2
-		if(i < 10){
-			zapisz_pplot(nDataSets,paste(fname,"_0",i,parvec[i],sep=""),wzorzec,wzorzec1,c('yellow','black','green','red','blue','cyan','magenta','pink'),c(17,16,15,18,20,9,10,12),3.5)
+		zapisz_pplot(nDataSets,paste(fname,names(DataSet1)[i],sep=""),wzorzec,wzorzec1,c('yellow','black','green','red','blue','cyan','magenta','pink'),c(17,16,15,18,20,9,10,12),3.5)
 			#zapisz_pplot(nDataSets,paste(fname,"_0",i,parvec[i],sep=""),wzorzec,2,c('yellow','black','green','red','blue','cyan','magenta','pink'),c(17,16,15,18,20,9,10,12),wzorzec1)
-		}else{
-			zapisz_pplot(nDataSets,paste(fname,"_",i,parvec[i],sep=""),wzorzec,wzorzec1,c('yellow','black','green','red','blue','cyan','magenta','pink'),c(17,16,15,18,20,9,10,12),3.5)
-		}
 	}
 }
 

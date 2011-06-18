@@ -5,7 +5,7 @@
 ########################################################################################################
 
 ##########################################################################################################
-nData<-"Glass"
+nData<-"glass"
 #nData<-"nihills"
 #nData<-"photocar"
 #nData<-"meatspec"
@@ -20,7 +20,7 @@ data(list=nData)
 DataSet<-get(nData)
 
 ##########################################################################################################
-if(nData=="Glass"){
+if(nData=="glass"){
 	#te atrybuty, co s± faktorami, zmiennymi jako¶ciowymi z kategoriami, etykietami
 	parvecfactor=c("Type")
 	#kruskal
