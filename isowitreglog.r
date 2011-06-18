@@ -44,6 +44,9 @@ polra_nodi<-combesteval("polr", paste(mypathout,nData,"_polra_nodi",sep=""),mDat
 mDataSet<-DataSetzd[etykiety,]
 polra_zedi<-combesteval("polr", paste(mypathout,nData,"_polra_zedi",sep=""),mDataSet, paroutputree, parvectree, nleven, alpha, evalstr)
 
+polra_nodi
+polra_zedi
+
 #prederror(regression,paroutputree,mparvec,DataSetzd[-etykiety,],evalstr)
 #nFunction<-"polr"; fname<-paste(mypathout,nData,"_polra_nodi",sep=""); moutput<-paroutputree;parvec<-parvectree; EvalString<-evalstr;
 #nFunction="lm";fname<-paste(mypathout,nData,"_lmbsp_zelt",sep="");mDataSet<-DataSetz

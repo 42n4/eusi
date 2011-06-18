@@ -33,7 +33,7 @@ for(i in pkgrforge[!pkgcheck]){
 
 pkgall<-c(pkglist,biolist,pkgrforge)
 
-for(i in c("mda","xtable","lattice","TSPostgreSQL","RWeka","doMC","foreach","nws","ROCR","rpart","e1071","MASS","cluster","party","randomForest","PROcess"))
+for(i in c("gRain","bnlearn","car","lmtest","bestglm","leaps","lars","mda","xtable","lattice","TSPostgreSQL","RWeka","doMC","foreach","nws","ROCR","rpart","e1071","MASS","cluster","party","randomForest","PROcess"))
 { library(i, character.only = TRUE);}
 
 #pkgbyhand<-c("rparallel")
@@ -994,7 +994,7 @@ ridge.lm <-function(fname,DataSet,moutput,mparvec,etykiety){
 #######################################################################################################
 
 #######################################################################################################
-"cv.lasso" <- function(formula,data,K=10,subset=NULL){
+cv.lasso <- function(formula,data,K=10,subset=NULL){
 	if (!is.null(subset))
 		data <- data[subset,]
 	y <- data[,names(data)==as.character(formula)[2]]
@@ -1005,7 +1005,7 @@ ridge.lm <-function(fname,DataSet,moutput,mparvec,etykiety){
 }
 
 #######################################################################################################
-"lasso" <-	function(formula,data,subset=NULL){
+lasso <-	function(formula,data,subset=NULL){
 	if (!is.null(subset))
 		data <- data[subset,]
 	
