@@ -1,7 +1,7 @@
-# zbiór funkcji do zajêæ EU SI lm with NA 
-# TODO: test, testowaæ
+# zbiÃ³r funkcji do zajÄ™Ä‡ EU SI lm with NA 
+# TODO: test, testowaÄ‡
 # Licence LGPL 
-# Author: Piotr W±siewicz
+# Author: Piotr WÄ…siewicz
 ########################################################################################################
 
 x=rnorm(100,0,1)

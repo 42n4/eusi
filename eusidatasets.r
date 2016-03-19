@@ -1,7 +1,7 @@
-# skrypt do zajêæ EU SI: dane testowe
-# TODO: test, testowaæ
+# skrypt do zajÄ™Ä‡ EU SI: dane testowe
+# TODO: test, testowaÄ‡
 # Licence LGPL  
-# Author: Piotr W±siewicz
+# Author: Piotr WÄ…siewicz
 ########################################################################################################
 
 ##########################################################################################################
@@ -21,23 +21,23 @@ DataSet<-get(nData)
 
 ##########################################################################################################
 if(nData=="glass"){
-	#te atrybuty, co s± faktorami, zmiennymi jako¶ciowymi z kategoriami, etykietami
+	#te atrybuty, co sÄ… faktorami, zmiennymi jakoÅ›ciowymi z kategoriami, etykietami
 	parvecfactor=c("Type")
 	#kruskal
-	#w parnokruskal to co zostanie nie wys³ane do isoMDS(daisy) np. parnokruskal=c("Type")
+	#w parnokruskal to co zostanie nie wysÅ‚ane do isoMDS(daisy) np. parnokruskal=c("Type")
 	parnokruskal=c()
-	#atrybut pojedyñczy do zescorowania po jego dyskretnych warto¶ciach
+	#atrybut pojedyÅ„czy do zescorowania po jego dyskretnych wartoÅ›ciach
 	vecfactorzesc=c("Type")
-	#atrybuty w plotMDS do kolorowania powsta³ych punktów 
+	#atrybuty w plotMDS do kolorowania powstaÅ‚ych punktÃ³w 
 	parvecol<-names(DataSet)
 	#zmienne drzewa
-	#zmienne, które nie wchodz± do drzewa m.in. jego li¶cie, target, cel optymalizacji drzewa
+	#zmienne, ktÃ³re nie wchodzÄ… do drzewa m.in. jego liÅ›cie, target, cel optymalizacji drzewa
 	parvecnotree=c("Type")
-	#li¶æ drzewa, etykieta
+	#liÅ›Ä‡ drzewa, etykieta
 	paroutputree=c("Type")
-	#zmienne zale¿ne i inne zbêdne w regresji
+	#zmienne zaleÅ¼ne i inne zbÄ™dne w regresji
 	parvecnolm=c("Type","RI")
-	#wybieramy zmienn± zale¿n±, target dla regresji, zwykle zmiennoprzecinkowy
+	#wybieramy zmiennÄ… zaleÅ¼nÄ…, target dla regresji, zwykle zmiennoprzecinkowy
 	moutput<-"RI"
 }
 
@@ -51,7 +51,7 @@ if(nData=="nihills"){
 	#zmienne drzewa
 	parvecnotree=c('time')
 	paroutputree=c('time')
-	#zmienne zale¿ne i inne zbêdne w regresji
+	#zmienne zaleÅ¼ne i inne zbÄ™dne w regresji
 	parvecnolm=c("time")
 	moutput<-"time"
 } 
@@ -66,7 +66,7 @@ if(nData=="photocar"){
 	#zmienne drzewa
 	parvecnotree=c("group")
 	paroutputree=c("group")
-	#zmienne zale¿ne i inne zbêdne w regresji
+	#zmienne zaleÅ¼ne i inne zbÄ™dne w regresji
 	#parvecnolm=c("time","group","tumor","event")
 	parvecnolm=c("time")
 	moutput<-"time"
@@ -81,7 +81,7 @@ if(nData=="meatspec"){
 	#zmienne drzewa
 	parvecnotree=c("fat")
 	paroutputree=c("fat")
-	#zmienne zale¿ne i inne zbêdne w regresji
+	#zmienne zaleÅ¼ne i inne zbÄ™dne w regresji
 	parvecnolm=c("fat")
 	moutput<-"fat"
 }
@@ -96,7 +96,7 @@ if(nData=="skoliozaNIL1.csv"){
 	#zmienne drzewa
 	parvecnotree=c("NI")
 	paroutputree=c("NI")
-	#zmienne zale¿ne i inne zbêdne w regresji
+	#zmienne zaleÅ¼ne i inne zbÄ™dne w regresji
 	parvecnolm=c("NI")
 	moutput<-"NI"
 }

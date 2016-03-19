@@ -1,14 +1,14 @@
-# skrypt do zajêæ EU SI: Kruskal, lm, rpart
-# TODO: test, testowaæ
+# skrypt do zajÄ™Ä‡ EU SI: Kruskal, lm, rpart
+# TODO: test, testowaÄ‡
 # Licence LGPL  
-# Author: Piotr W±siewicz
+# Author: Piotr WÄ…siewicz
 ########################################################################################################
 
-#te ¶cie¿ki mypath i mypathout musz± istnieæ w systemie
-#to ¶cie¿ka do plików wykonywalnych z R pow³oki za pomoc± source("...")
+#te Å›cieÅ¼ki mypath i mypathout muszÄ… istnieÄ‡ w systemie
+#to Å›cieÅ¼ka do plikÃ³w wykonywalnych z R powÅ‚oki za pomocÄ… source("...")
 #mypath<-"/media/disk/guest/"
 mypath<-"/home/guest/workspace/iso/"
-#to ¶cie¿ka do plików graficznych uzyskiwanych za pomoc± funkcji plot i innych
+#to Å›cieÅ¼ka do plikÃ³w graficznych uzyskiwanych za pomocÄ… funkcji plot i innych
 mypathout<-paste(mypath,"rysunki/",sep="")
 dir.create(mypathout, showWarnings = TRUE, recursive = TRUE, mode = "0755")
 #Sys.chmod(paths, mode = "0755")
@@ -23,7 +23,7 @@ source(paste(mypath,"eusidatasets.r",sep=""))
 source(paste(mypath,"eusidataprep.r",sep=""))
 
 ##########################################################################################################
-#korelacje miêdzy atrybutami
+#korelacje miÄ™dzy atrybutami
 #for(cormethod in c("pearson","kendall","spearman")){
 for(cormethod in c("pearson")){
 	hier2jpg(cormethod,DataSet[,parvec],paste(mypathout,nData,"_hiercor_",cormethod,"_norm",sep=""))
@@ -36,14 +36,14 @@ try(latt2jpg(DataSetz[,parvec],DataSetzd[,vecfactorzesc],paste(mypathout,nData,"
 ##########################################################################################################
 #REGRESJA LINIOWA
 nFunction="lm"
-#w mparvec zmienne niezale¿ne do regresji
+#w mparvec zmienne niezaleÅ¼ne do regresji
 mparvec=setdiff(names(DataSet),parvecnolm)
  
 ##########################################################################################################
-#alpha to krytyczna warto¶æ prawdopodobieñstwa p dla statystyk bp i f 
+#alpha to krytyczna wartoÅ›Ä‡ prawdopodobieÅ„stwa p dla statystyk bp i f 
 alpha<-0.1;
 ##########################################################################################################
-#dla nleven > 0 le vena ilo¶æ przedzia³ów, dla nleven < 0 bptest, dla nleven == 0 brak testów wariancji
+#dla nleven > 0 le vena iloÅ›Ä‡ przedziaÅ‚Ã³w, dla nleven < 0 bptest, dla nleven == 0 brak testÃ³w wariancji
 #bptest
 nleven<--1; 
 #wybieramy dane normalne
@@ -54,12 +54,12 @@ lmabc_nobp<-combesteval("lm", paste(mypathout,nData,"_lmabc_nobp",sep=""),mDataS
 #lmabc_zebp<-combesteval("lm", paste(mypathout,nData,"_lmabc_zebp",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
 #wybieramy dane zeskalowane i zcentrowane
 #mDataSet<-DataSetm
-#skalowanie likwiduje intercept wspó³czynnik przesuniêcia prostej
+#skalowanie likwiduje intercept wspÃ³Å‚czynnik przesuniÄ™cia prostej
 #lmabc_msbp<-combesteval("lm", paste(mypathout,nData,"_lmabc_msbp",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
 
 ##########################################################################################################
-#dla nleven > 0 levena ilo¶æ przedzia³ów, dla nleven < 0 bptest, dla nleven == 0 brak testów wariancji
-#brak testów wariancji
+#dla nleven > 0 levena iloÅ›Ä‡ przedziaÅ‚Ã³w, dla nleven < 0 bptest, dla nleven == 0 brak testÃ³w wariancji
+#brak testÃ³w wariancji
 nleven<-0; 
 mDataSet<-DataSet
 lmabc_nono<-combesteval("lm", paste(mypathout,nData,"_lmabc_nono",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
@@ -69,7 +69,7 @@ lmabc_nono<-combesteval("lm", paste(mypathout,nData,"_lmabc_nono",sep=""),mDataS
 #lmabc_msno<-combesteval("lm", paste(mypathout,nData,"_lmabc_msno",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
 
 ##########################################################################################################
-#dla nleven > 0 levena ilo¶æ przedzia³ów, dla nleven < 0 bptest, dla nleven == 0 brak testów wariancji
+#dla nleven > 0 levena iloÅ›Ä‡ przedziaÅ‚Ã³w, dla nleven < 0 bptest, dla nleven == 0 brak testÃ³w wariancji
 #leven
 nleven<-5; 
 mDataSet<-DataSet
@@ -80,7 +80,7 @@ lmabc_nolt<-combesteval("lm", paste(mypathout,nData,"_lmabc_nolt",sep=""),mDataS
 #lmabc_mslt<-combesteval("lm", paste(mypathout,nData,"_lmabc_mslt",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
 
 ##########################################################################################################
-#Teraz u¿yjemy splinów czyli y~bs(x1)+bs(x2)+...
+#Teraz uÅ¼yjemy splinÃ³w czyli y~bs(x1)+bs(x2)+...
 SPLINE<-"SPLINE";
 ##########################################################################################################
 #bptest
@@ -93,8 +93,8 @@ lmbsp_nobp<-combesteval("lm", paste(mypathout,nData,"_lmbsp_nobp",sep=""),mDataS
 #lmbsp_msbp<-combesteval("lm", paste(mypathout,nData,"_lmbsp_msbp",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
 
 ##########################################################################################################
-#dla nleven > 0 levena ilo¶æ przedzia³ów, dla nleven < 0 bptest, dla nleven == 0 brak testów wariancji
-#brak testów wariancji
+#dla nleven > 0 levena iloÅ›Ä‡ przedziaÅ‚Ã³w, dla nleven < 0 bptest, dla nleven == 0 brak testÃ³w wariancji
+#brak testÃ³w wariancji
 nleven<-0; 
 mDataSet<-DataSet
 lmbsp_nono<-combesteval("lm", paste(mypathout,nData,"_lmbsp_nono",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
@@ -104,7 +104,7 @@ lmbsp_nono<-combesteval("lm", paste(mypathout,nData,"_lmbsp_nono",sep=""),mDataS
 #lmbsp_msno<-combesteval("lm", paste(mypathout,nData,"_lmbsp_msno",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
 
 ##########################################################################################################
-#dla nleven > 0 levena ilo¶æ przedzia³ów, dla nleven < 0 bptest, dla nleven == 0 brak testów wariancji
+#dla nleven > 0 levena iloÅ›Ä‡ przedziaÅ‚Ã³w, dla nleven < 0 bptest, dla nleven == 0 brak testÃ³w wariancji
 #leven
 nleven<-5; 
 mDataSet<-DataSet

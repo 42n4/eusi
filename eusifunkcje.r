@@ -1,13 +1,13 @@
-# zbiór funkcji do zajêæ EU SI 
-# TODO: test, testowaæ
+# zbiÃ³r funkcji do zajÄ™Ä‡ EU SI 
+# TODO: test, testowaÄ‡
 # Licence LGPL  
-# Author: Piotr W±siewicz
+# Author: Piotr WÄ…siewicz
 ########################################################################################################
 
 Sys.setlocale("LC_NUMERIC","C") 
 
-#lista pakietów z CRAN-u
-#naprawiæ pakier gRain
+#lista pakietÃ³w z CRAN-u
+#naprawiÄ‡ pakier gRain
 #pkglist<-c("gRain")
 pkglist<-c("TTR","TSPostgreSQL","modeest","flexclust","rgl","magic","snowfall","rsprng","bnlearn","snow","ggplot2","reshape","gbm","caret","arules","mboost","bestglm","ElemStatLearn","faraway","relaimpo","leaps","lars","bootstrap","DAAG","ff","biglm","bigmemory","splines","betareg","ellipse","nlme","MASS","leaps","car","lmtest","gregmisc","foreign","plyr","mlbench","boot","Hmisc","RWeka","ipred","klaR","ROCR","rpart","maptree","party","grid","lattice","latticeExtra","playwith","ada","randomForest","kknn","e1071","cluster","class","caret","fda","zoo","lattice","deal","RJDBC","cairoDevice","multicore","iterators","doMC","foreach","nws","PTAk","Rcpp","rrules","Boruta")
 
@@ -16,7 +16,7 @@ for(i in pkglist[!pkgcheck]){
 	install.packages(i,depend=TRUE)
 }
 
-#lista pakietów z bioconductora
+#lista pakietÃ³w z bioconductora
 biolist<-c("Rgraphviz","PROcess")
 biocheck <- biolist %in% row.names(installed.packages())
 for(i in biolist[!biocheck]){
@@ -52,7 +52,7 @@ mff<-function(x){
 }
 
 #######################################################################################################
-#Funkcja brutoptim.klas znajduje najlepszy klasyfikator przeszukuj±c wszystkie kombinacje atrybutów
+#Funkcja brutoptim.klas znajduje najlepszy klasyfikator przeszukujÄ…c wszystkie kombinacje atrybutÃ³w
 brutoptim.klas <-function(mypathout,nData,nFunction,paroutputree,parvectree,percent,trials,evalstr){
 	DataSet<-get(nData)
 	DataSet<-DataSet[!is.na(DataSet[[paroutputree]]),]
@@ -70,8 +70,8 @@ brutoptim.klas <-function(mypathout,nData,nFunction,paroutputree,parvectree,perc
 }
 
 #######################################################################################################
-#Funkcja prederror zwraca warto¶ci predykcji klasyfikatora, tablicê rezultatów i rzeczywistych warto¶ci, 
-#oraz b³±d klasyfikatora, na wej¶ciu dane testowe, ale nie treningowe wykorzystane do konstrukcji klasyfikatora
+#Funkcja prederror zwraca wartoÅ›ci predykcji klasyfikatora, tablicÄ™ rezultatÃ³w i rzeczywistych wartoÅ›ci, 
+#oraz bÅ‚Ä…d klasyfikatora, na wejÅ›ciu dane testowe, ale nie treningowe wykorzystane do konstrukcji klasyfikatora
 prederror<-function(classimod,nFunction,paroutputree,parvectree,DataSet,EvalString="DEFAULT"){
 	if (EvalString == "CLASS"){
 		predvalues=predict(classimod,DataSet[,parvectree])$class
@@ -92,9 +92,9 @@ prederror<-function(classimod,nFunction,paroutputree,parvectree,DataSet,EvalStri
 }
 
 #######################################################################################################
-#Funkcja combestklas liczy kombinacje zmiennych obja¶niaj±cych niezale¿nych dla n=1 do n równego ilo¶æ wszystkich zmiennych 
-#i oblicza dla nich funkcje get(nFunction) i wybiera najlepsz± dla ka¿dego n, wraca listê najlepszych obiektów z kolejnych iteracji  
-#w lb<n> mamy wybierane po kolei kolejne zestawy na najlepsz± regresjê 
+#Funkcja combestklas liczy kombinacje zmiennych objaÅ›niajÄ…cych niezaleÅ¼nych dla n=1 do n rÃ³wnego iloÅ›Ä‡ wszystkich zmiennych 
+#i oblicza dla nich funkcje get(nFunction) i wybiera najlepszÄ… dla kaÅ¼dego n, wraca listÄ™ najlepszych obiektÃ³w z kolejnych iteracji  
+#w lb<n> mamy wybierane po kolei kolejne zestawy na najlepszÄ… regresjÄ™ 
 #w m<n> najlepszy model dla n, w sm<n> summary(m<n>), dla n=1 rysuje plot regresji
 combestklas<-function (nFunction, fname, DataSet, moutput, parvec, nleven=-1, alpha=0.01, EvalString="DEFAULT"){
 	l<-list();ilist<-list();etykiety<-seq(1,nrow(DataSet));m01<-FALSE
@@ -140,9 +140,9 @@ combestklas<-function (nFunction, fname, DataSet, moutput, parvec, nleven=-1, al
 
 
 #######################################################################################################
-#Funkcja combesteval liczy kombinacje zmiennych obja¶niaj±cych niezale¿nych dla n=1 do n równego ilo¶æ wszystkich zmiennych 
-#i oblicza dla nich funkcje get(nFunction) i wybiera najlepsz± dla ka¿dego n, wraca listê najlepszych obiektów z kolejnych iteracji  
-#w lb<n> mamy wybierane po kolei kolejne zestawy na najlepsz± regresjê 
+#Funkcja combesteval liczy kombinacje zmiennych objaÅ›niajÄ…cych niezaleÅ¼nych dla n=1 do n rÃ³wnego iloÅ›Ä‡ wszystkich zmiennych 
+#i oblicza dla nich funkcje get(nFunction) i wybiera najlepszÄ… dla kaÅ¼dego n, wraca listÄ™ najlepszych obiektÃ³w z kolejnych iteracji  
+#w lb<n> mamy wybierane po kolei kolejne zestawy na najlepszÄ… regresjÄ™ 
 #w m<n> najlepszy model dla n, w sm<n> summary(m<n>), dla n=1 rysuje plot regresji
 combesteval<-function (nFunction, fname, DataSet, moutput, parvec, nleven=-1, alpha=0.01, EvalString="DEFAULT"){
 	l<-list();ilist<-list();etykiety<-seq(1,nrow(DataSet));m01<-FALSE
@@ -225,10 +225,10 @@ combesteval<-function (nFunction, fname, DataSet, moutput, parvec, nleven=-1, al
 }
 
 #######################################################################################################
-#Funkcja classwithattr znajduje najlepszy klasyfikator dla numvar zmiennych - atrybutów
-#moutput - wyj¶cie modelu zmienna zale¿na np. "Type", 
-#parvec - wektor zmiennych wej¶ciowych niezale¿nych dla modelu,
-#numvar - ile zmiennych z parvec ma wzi±æ udzia³ w combiutacji zmiennych niezale¿nych
+#Funkcja classwithattr znajduje najlepszy klasyfikator dla numvar zmiennych - atrybutÃ³w
+#moutput - wyjÅ›cie modelu zmienna zaleÅ¼na np. "Type", 
+#parvec - wektor zmiennych wejÅ›ciowych niezaleÅ¼nych dla modelu,
+#numvar - ile zmiennych z parvec ma wziÄ…Ä‡ udziaÅ‚ w combiutacji zmiennych niezaleÅ¼nych
 classwithattr<-function (nFunction, DataSet, moutput, parvec, numvar, percent=70, trials=5,EvalString="DEFAULT"){
 	if(numvar<length(parvec)){ 
 		combi<-get("combinations","package:gtools")(length(parvec),numvar,parvec)
@@ -282,10 +282,10 @@ classwithattr<-function (nFunction, DataSet, moutput, parvec, numvar, percent=70
 
 
 #######################################################################################################
-#Funkcja polrwithattr znajduje najlepsz± logistyczn± regresjê dla parametrów
-#moutput - wyj¶cie modelu zmienna zale¿na np. "RI", 
-#parvec - wektor zmiennych wej¶ciowych niezale¿nych dla modelu,
-#numvar - ile zmiennych z parvec ma wzi±æ udzia³ w combiutacji zmiennych niezale¿nych
+#Funkcja polrwithattr znajduje najlepszÄ… logistycznÄ… regresjÄ™ dla parametrÃ³w
+#moutput - wyjÅ›cie modelu zmienna zaleÅ¼na np. "RI", 
+#parvec - wektor zmiennych wejÅ›ciowych niezaleÅ¼nych dla modelu,
+#numvar - ile zmiennych z parvec ma wziÄ…Ä‡ udziaÅ‚ w combiutacji zmiennych niezaleÅ¼nych
 polrwithattr<-function (DataSet, moutput, parvec, numvar, EvalString="DEFAULT"){
 	if(numvar<length(parvec)){
 		combi<-get("combinations","package:gtools")(length(parvec),numvar,parvec)
@@ -311,10 +311,10 @@ polrwithattr<-function (DataSet, moutput, parvec, numvar, EvalString="DEFAULT"){
 
 
 #######################################################################################################
-#Funkcja lmwithattr znajduje najlepsz± liniow± regresjê dla parametrów
-#moutput - wyj¶cie modelu zmienna zale¿na np. "RI", 
-#parvec - wektor zmiennych wej¶ciowych niezale¿nych dla modelu,
-#numvar - ile zmiennych z parvec ma wzi±æ udzia³ w combiutacji zmiennych niezale¿nych
+#Funkcja lmwithattr znajduje najlepszÄ… liniowÄ… regresjÄ™ dla parametrÃ³w
+#moutput - wyjÅ›cie modelu zmienna zaleÅ¼na np. "RI", 
+#parvec - wektor zmiennych wejÅ›ciowych niezaleÅ¼nych dla modelu,
+#numvar - ile zmiennych z parvec ma wziÄ…Ä‡ udziaÅ‚ w combiutacji zmiennych niezaleÅ¼nych
 lmwithattr<-function (DataSet, moutput, parvec, numvar, nleven=-1, alpha=0.01, EvalString="DEFAULT"){
 	if(numvar<length(parvec)){
 		combi<-get("combinations","package:gtools")(length(parvec),numvar,parvec)
@@ -345,7 +345,7 @@ lmwithattr<-function (DataSet, moutput, parvec, numvar, nleven=-1, alpha=0.01, E
 				}
 				if(nleven<0)
 					bp<-evalwithattr("bptest",moutput,varplus,DataSet)
-				#levene pominiêty dla nleven=0, dla nleven < 0 bptest
+				#levene pominiÄ™ty dla nleven=0, dla nleven < 0 bptest
 				if((nleven==0 && qf(0.99,1,m01$df)<sm01$fstatistic["value"] && sm01$r.squared > br2) 
 							|| (nleven < 0 && qf(0.99,1,m01$df)<sm01$fstatistic["value"] && sm01$r.squared > br2 && bp$p.value > alpha)
 							|| (nleven > 0 && qf(0.99,1,m01$df)<sm01$fstatistic["value"] && sm01$r.squared > br2 && lt$"Pr(>F)"[1] > alpha && qf(1-alpha,lt$Df[1],lt$Df[2]) > lt$"F value"[1])){
@@ -361,8 +361,8 @@ lmwithattr<-function (DataSet, moutput, parvec, numvar, nleven=-1, alpha=0.01, E
 }
 
 #######################################################################################################
-#Funkcja evalwithattr wywo³uje podan± funkcjê z wyj¶ciowym atrybutem output i 
-#wej¶ciowymi atrybutami parvec oraz zbiorem danych
+#Funkcja evalwithattr wywoÅ‚uje podanÄ… funkcjÄ™ z wyjÅ›ciowym atrybutem output i 
+#wejÅ›ciowymi atrybutami parvec oraz zbiorem danych
 evalwithattr<-function(nFunction,output,parvec,oData,EvalString="DEFAULT")
 {
 	tmp=paste(nFunction,"(",output,"~",sep="")
@@ -380,8 +380,8 @@ evalwithattr<-function(nFunction,output,parvec,oData,EvalString="DEFAULT")
 }
 
 #######################################################################################################
-#Funkcja printwithattr wy¶wietla podan± funkcjê z wyj¶ciowym atrybutem output i 
-#wej¶ciowymi atrybutami parvec oraz zbiorem danych
+#Funkcja printwithattr wyÅ›wietla podanÄ… funkcjÄ™ z wyjÅ›ciowym atrybutem output i 
+#wejÅ›ciowymi atrybutami parvec oraz zbiorem danych
 printwithattr<-function(nFunction,output,parvec,oData,EvalString="DEFAULT")
 {
 	mcall<-match.call()
@@ -400,8 +400,8 @@ printwithattr<-function(nFunction,output,parvec,oData,EvalString="DEFAULT")
 }
 
 #######################################################################################################
-#Metoda funkcja Vif okre¶la stopieñ korelacji zmiennych niezale¿nych, 
-#podaje warto¶ci takie same jak vif z pakietu car, a jest prostsza i dzia³a dla jednej zmiennej (podaje 1) 
+#Metoda funkcja Vif okreÅ›la stopieÅ„ korelacji zmiennych niezaleÅ¼nych, 
+#podaje wartoÅ›ci takie same jak vif z pakietu car, a jest prostsza i dziaÅ‚a dla jednej zmiennej (podaje 1) 
 Vif <- function(object, ...)
 	UseMethod("Vif")
 
@@ -426,7 +426,7 @@ Vif.lm <- function(object, ...) {
 }
 
 #######################################################################################################
-#Funkcja defactor.numeric najpierw defaktoryzuje, a potem oznacza jako numeryczne kolumny z liczbami zmiennoprzecinkowymi i ca³kowitymi, tak na wszelki wypadek, gdyby csv ¼le siê wczyta³ (w przypadku zbiorów data() to tylko æwiczenie)
+#Funkcja defactor.numeric najpierw defaktoryzuje, a potem oznacza jako numeryczne kolumny z liczbami zmiennoprzecinkowymi i caÅ‚kowitymi, tak na wszelki wypadek, gdyby csv Åºle siÄ™ wczytaÅ‚ (w przypadku zbiorÃ³w data() to tylko Ä‡wiczenie)
 defactor.numeric<-function (DataSet, parvec)         
 {
 	DataSet<-unfactorto(DataSet, which(names(DataSet) %in% parvec))
@@ -466,7 +466,7 @@ normfactor<-function (DataSet, parvecfactor)
 }
 
 #######################################################################################################
-#Funkcja scale.numeric skaluje wybrane numeryczne kolumny z liczbami zmiennoprzecinkowymi i ca³kowitymi
+#Funkcja scale.numeric skaluje wybrane numeryczne kolumny z liczbami zmiennoprzecinkowymi i caÅ‚kowitymi
 #z paramerami CENTER=TRUE mean=0, a dla SCALE=TRUE sd=1
 scale_for<-function (DataSet, parvec, CENTER, SCALE)         
 {
@@ -478,7 +478,7 @@ scale_for<-function (DataSet, parvec, CENTER, SCALE)
 
 
 #######################################################################################################
-#Funkcja zscore.for.integer zetskoruje wybrane kolumny z liczbami zmiennoprzecinkowymi i ca³kowitymi po kolumnie zdyskretyzowanej (etykiecie) integercolumnforzscore dla poszczególnych jej warto¶ci
+#Funkcja zscore.for.integer zetskoruje wybrane kolumny z liczbami zmiennoprzecinkowymi i caÅ‚kowitymi po kolumnie zdyskretyzowanej (etykiecie) integercolumnforzscore dla poszczegÃ³lnych jej wartoÅ›ci
 zscore.for.integer<-function (DataSet, parvec, integercolumnforzscore)         
 {
 	indata<-DataSet
@@ -490,7 +490,7 @@ zscore.for.integer<-function (DataSet, parvec, integercolumnforzscore)
 }
 
 #######################################################################################################
-#Funkcja discret.for.chosen dyskretyzujê atrybuty (kolumny) z parvec na levelnum poziomów
+#Funkcja discret.for.chosen dyskretyzujÄ™ atrybuty (kolumny) z parvec na levelnum poziomÃ³w
 disc.for.scale<-function (DataSetd, parvec, scale)         
 {
 	if(length(scale)>0&length(DataSetd[DataSetd[,c(parvec)]<=scale[1],c(parvec)]))
@@ -510,7 +510,7 @@ disc.for.scale<-function (DataSetd, parvec, scale)
 
 
 #######################################################################################################
-#Funkcja discret.for.chosen dyskretyzujê atrybuty (kolumny) z parvec na levelnum poziomów
+#Funkcja discret.for.chosen dyskretyzujÄ™ atrybuty (kolumny) z parvec na levelnum poziomÃ³w
 disc.for.chosen<-function (DataSet, parvec, levelnum, zero=-1)         
 {
 	DataSetd<-DataSet
@@ -520,7 +520,7 @@ disc.for.chosen<-function (DataSet, parvec, levelnum, zero=-1)
 }
 
 #######################################################################################################
-#Funkcja KruskelMDS generuje z daisy ró¿nice miêdzy wierszami podanego zbioru i wprowadza do isoMDS rzutuj±cego na wymiary k=dimnum (jak siê pojawi± dwa takie same wiersze to wyrzuca b³±d, dlatego na samym pocz±tku usuwa³em wiersze z Glass
+#Funkcja KruskelMDS generuje z daisy rÃ³Å¼nice miÄ™dzy wierszami podanego zbioru i wprowadza do isoMDS rzutujÄ…cego na wymiary k=dimnum (jak siÄ™ pojawiÄ… dwa takie same wiersze to wyrzuca bÅ‚Ä…d, dlatego na samym poczÄ…tku usuwaÅ‚em wiersze z Glass
 KruskelMDS<-function (DataSet, parvec, dimnum)         
 {
 	DataSet<-subset(DataSet,!duplicated(DataSet))
@@ -528,7 +528,7 @@ KruskelMDS<-function (DataSet, parvec, dimnum)
 }
 
 #######################################################################################################
-#Funkcja plotMDS.for.chosen zapisuje rzuty wielowymiarowe na p³aszczyznê
+#Funkcja plotMDS.for.chosen zapisuje rzuty wielowymiarowe na pÅ‚aszczyznÄ™
 plotMDS.for.chosen<-function (fname, nDataSets, DataSetd, parvec, wzorzec1)         
 {
 	DataSet1<-DataSetd[,which(names(DataSetd)%in%parvec)]
@@ -572,8 +572,8 @@ disc2<-function (x, k, zero=-1)
 
 #######################################################################################################
 #Funkcja disc.ef z pakietu dprep zmieniona (pomija nulle), 
-#gdy¿ w tym pakiecie prawie wszystkie funkcje wymagaj± zmian 
-disc.ef<-function (indata, k, zero=-1)        # Nastêpuje dyskretyzacja danych
+#gdyÅ¼ w tym pakiecie prawie wszystkie funkcje wymagajÄ… zmian 
+disc.ef<-function (indata, k, zero=-1)        # NastÄ™puje dyskretyzacja danych
 {
 	indata = as.matrix(indata)
 	if(ncol(indata)>1)
@@ -593,9 +593,9 @@ disc.ef<-function (indata, k, zero=-1)        # Nastêpuje dyskretyzacja danych
 }
 
 #######################################################################################################
-#Funkcja zscore zeskoruje dane ca³kowite lub zmiennoprzecinkowe 
-#czyli odejmuje ¶redni± i dzieli przez standardowe odchylenie
-zscore<-function (indata, varcon)        # Nastêpuje dyskretyzacja danych
+#Funkcja zscore zeskoruje dane caÅ‚kowite lub zmiennoprzecinkowe 
+#czyli odejmuje Å›redniÄ… i dzieli przez standardowe odchylenie
+zscore<-function (indata, varcon)        # NastÄ™puje dyskretyzacja danych
 {
 #    indata = as.matrix(indata)
     p <- dim(indata)[2]
@@ -628,7 +628,7 @@ zscore<-function (indata, varcon)        # Nastêpuje dyskretyzacja danych
 }
 
 #######################################################################################################
-#Funkcja factorto faktoryzuje dane wej¶ciowe z domy¶lnymi poziomami
+#Funkcja factorto faktoryzuje dane wejÅ›ciowe z domyÅ›lnymi poziomami
 factorto<-function (indata, varcon)  
 {
 	varcon <- as.vector(varcon)
@@ -647,7 +647,7 @@ factorto<-function (indata, varcon)
 }
 
 #######################################################################################################
-#Funkcja unfactorto defaktoryzuje dane wej¶ciowe z ustalonymi poziomami
+#Funkcja unfactorto defaktoryzuje dane wejÅ›ciowe z ustalonymi poziomami
 unfactorto<-function (indata, varcon)  
 {
 	varcon <- as.vector(varcon)
@@ -671,7 +671,7 @@ unfactorto<-function (indata, varcon)
 }
 
 #######################################################################################################
-#Funkcja "zmianana"  zamienia warto¶ci 9; 99; 99.9 na NA
+#Funkcja "zmianana"  zamienia wartoÅ›ci 9; 99; 99.9 na NA
 zmianana<- function (kolumna_wyjatek, wartoscNA)         
 {
  	x<-kolumna_wyjatek
@@ -681,7 +681,7 @@ zmianana<- function (kolumna_wyjatek, wartoscNA)
 
 
 #######################################################################################################
-#Funkcja "zmianana"  zamienia warto¶ci B na A
+#Funkcja "zmianana"  zamienia wartoÅ›ci B na A
 zamiana<- function (kolumna_wyjatek, wartoscB, wartoscA)         
 {
 	x<-kolumna_wyjatek
@@ -690,7 +690,7 @@ zamiana<- function (kolumna_wyjatek, wartoscB, wartoscA)
 }
 
 #######################################################################################################
-#Funkcja z4na3 zamienia przedzia³y 1,2,3,4 na 1,2,2,3
+#Funkcja z4na3 zamienia przedziaÅ‚y 1,2,3,4 na 1,2,2,3
 z4na3<-function (indata, varcon)
 {
     indata = as.matrix(indata)
@@ -746,7 +746,7 @@ zapisz_rpart = function (drzewo, fname)
 }
 
 #######################################################################################################
-#próba napisania uniwersalej funkcji write2jpg
+#prÃ³ba napisania uniwersalej funkcji write2jpg
 write2jpg <- function(object, ...)
 	UseMethod("write2jpg")
 
@@ -797,7 +797,7 @@ latt2jpg<-function(indata, gvec, fname){
 }
 
 #######################################################################################################
-#Funkcja meanverr oblicza ¶redni± z list list wyników 
+#Funkcja meanverr oblicza Å›redniÄ… z list list wynikÃ³w 
 meanverr<-function(lverr,jmax,imax){
 	verr<-c()
 	for(i in 1:imax){
@@ -818,9 +818,9 @@ meanverr<-function(lverr,jmax,imax){
 
 #######################################################################################################
 ##################################################################################################
-#REGRESJA LINIOWA - redukcja parametrów i atrybutów, funkcje do eusialterlm.r
+#REGRESJA LINIOWA - redukcja parametrÃ³w i atrybutÃ³w, funkcje do eusialterlm.r
 #Stosujemy kryteria: 
-#BIC Bayes Information Criterion  -2maxlog-likelihood+plogn wybór mniejszych modeli
+#BIC Bayes Information Criterion  -2maxlog-likelihood+plogn wybÃ³r mniejszych modeli
 #AIC Akaike Information Cryterion -2 maxlog-likelihood + 2p
 #Ridge metoda wybiera jak najmniejsze parametry Beta regresji
 #dla liniowej regresji -2max loglikelihood = nlog(RSS/n)+constant 
@@ -906,8 +906,8 @@ rmse <- function(x,y) sqrt(mean((x-y)^2))
 
 
 ##################################################################################################
-#Funkcja pred.ridge predykcja z lm.ridge wewn±trz i DataSet z etykietami: 
-#podzia³ na zbiór treninuj±cy i testowy
+#Funkcja pred.ridge predykcja z lm.ridge wewnÄ…trz i DataSet z etykietami: 
+#podziaÅ‚ na zbiÃ³r treninujÄ…cy i testowy
 pred.ridge.etykiety<-function(moutput,mparvec,DataSet,etykiety){
 	mm<-apply(DataSet[etykiety,mparvec],2,mean)
 	trainx <- as.matrix(sweep(DataSet[etykiety,mparvec],2,mm))
@@ -926,7 +926,7 @@ pred.ridge.etykiety<-function(moutput,mparvec,DataSet,etykiety){
 }
 
 ##################################################################################################
-#Funkcja pred.ridge predykcja po lm.ridge - jak z ksi±¿ki
+#Funkcja pred.ridge predykcja po lm.ridge - jak z ksiÄ…Å¼ki
 pred.ridge1<-function(ridge.train,moutput,mparvec,DataSet){
 	mm<-apply(DataSet[,mparvec],2,mean)
 	trainx <- as.matrix(sweep(DataSet[,mparvec],2,mm))
@@ -989,7 +989,7 @@ ridge.lm <-function(fname,DataSet,moutput,mparvec,etykiety){
 }
 
 #### LASSO ############################################################################################
-# metoda LASSO redukuje wymiar i robi ridge optymalizacjê
+# metoda LASSO redukuje wymiar i robi ridge optymalizacjÄ™
 # s is the constraint sum |beta| < s, dla s infinity, beta takie samo jak OLS
 #######################################################################################################
 
@@ -1017,7 +1017,7 @@ lasso <-	function(formula,data,subset=NULL){
 
 
 #######################################################################################################
-#Funkcja lars.lm wybiera kompaktowy i w miarê dobry model regresji liniowej na podstawie lars i cv.lars
+#Funkcja lars.lm wybiera kompaktowy i w miarÄ™ dobry model regresji liniowej na podstawie lars i cv.lars
 #library lars
 lars.lm <-function(fname,DataSet,moutput,mparvec,etykiety){
 	DataSet.train <- DataSet[etykiety,]
@@ -1081,8 +1081,8 @@ lars.lm <-function(fname,DataSet,moutput,mparvec,etykiety){
 }
 
 #######################################################################################################
-#Funkcja evalbn wywo³uje z bnlearn funkcjê nFunction=c("iabm","gc","hc","fast.iabm","inter.iabm") 
-#tworzenia sieci bayesa i zwraca bn (sieæ) i bnfit (prawdopodobieñstwa lub regresje)  
+#Funkcja evalbn wywoÅ‚uje z bnlearn funkcjÄ™ nFunction=c("iabm","gc","hc","fast.iabm","inter.iabm") 
+#tworzenia sieci bayesa i zwraca bn (sieÄ‡) i bnfit (prawdopodobieÅ„stwa lub regresje)  
 evalbn<-function(fname,nFunction,oData){
 	mcall<-match.call()
 	jpeg(file=paste(fname,"_",nFunction,".jpg",sep=""),width = 1600, height = 1000, quality = 85, bg = "white")
@@ -1100,8 +1100,8 @@ evalbn<-function(fname,nFunction,oData){
 
 
 #######################################################################################################
-#Funkcja removenullbn usuwa puste kolumny z tablic prawdopodobieñstw bnfit sieci bayesa bn
-#uzyskanych metod± bnlearn za pomoc± mojej funkcji evalbn
+#Funkcja removenullbn usuwa puste kolumny z tablic prawdopodobieÅ„stw bnfit sieci bayesa bn
+#uzyskanych metodÄ… bnlearn za pomocÄ… mojej funkcji evalbn
 removenullbn<-function(bn,bnfit){
 	for(indx in 1:length(bnfit))
 	{
@@ -1141,7 +1141,7 @@ removenullbn<-function(bn,bnfit){
 }
 
 #######################################################################################################
-#Funkcja bn2gr przekszta³ca w naiwny i prosty sposób sieæ bayesa uzyskan± metod± bnlearn do sieci gRain
+#Funkcja bn2gr przeksztaÅ‚ca w naiwny i prosty sposÃ³b sieÄ‡ bayesa uzyskanÄ… metodÄ… bnlearn do sieci gRain
 bn2gr<-function(bn,bnfit){
 	bnlearn::modelstring(bn)
 	library(deal)
@@ -1216,7 +1216,7 @@ clust_plot<-function(tname,tvect,DataSetm,etykiety)
 }
 
 #######################################################################################################
-#Funkcja clust_multiplot wypisuje kombinacje klaster, a zdyskretyzowane warto¶ci 
+#Funkcja clust_multiplot wypisuje kombinacje klaster, a zdyskretyzowane wartoÅ›ci 
 clust_multiplot<-function(tmeth,DataSetd,DataSetm,etykiety)
 {
 	for(i in 1:length(names(DataSetd)))
@@ -1274,7 +1274,7 @@ hist3d<-function(x,y=NULL,nclass="auto",alpha=1,col="#ff0000",scale=10)
 
 
 #######################################################################################################
-#Funkcja zapisz_cloud zapisuje wykres ISOMDS z dwóch wzorców w pliku jpeg
+#Funkcja zapisz_cloud zapisuje wykres ISOMDS z dwÃ³ch wzorcÃ³w w pliku jpeg
 zapisz_cloud <- function (nDataSetds, fname, wzorzec1, wzorzec2, co, pc, scex)
 {
 	jpeg(file=paste(mypathout,fname,".jpg",sep=""),width = 1200, height = 1000, quality = 55, bg = "white")

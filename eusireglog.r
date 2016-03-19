@@ -1,14 +1,14 @@
-# skrypt do zajêæ EU SI: Kruskal, lm, rpart
-# TODO: test, testowaæ
+# skrypt do zajÄ™Ä‡ EU SI: Kruskal, lm, rpart
+# TODO: test, testowaÄ‡
 # Licence LGPL  
-# Author: Piotr W±siewicz
+# Author: Piotr WÄ…siewicz
 ########################################################################################################
 
-#te ¶cie¿ki mypath i mypathout musz± istnieæ w systemie
-#to ¶cie¿ka do plików wykonywalnych z R pow³oki za pomoc± source("...")
+#te Å›cieÅ¼ki mypath i mypathout muszÄ… istnieÄ‡ w systemie
+#to Å›cieÅ¼ka do plikÃ³w wykonywalnych z R powÅ‚oki za pomocÄ… source("...")
 #mypath<-"/media/disk/guest/"
 mypath<-"/home/guest/workspace/iso/"
-#to ¶cie¿ka do plików graficznych uzyskiwanych za pomoc± funkcji plot i innych
+#to Å›cieÅ¼ka do plikÃ³w graficznych uzyskiwanych za pomocÄ… funkcji plot i innych
 mypathout<-paste(mypath,"rysunki/",sep="")
 dir.create(mypathout, showWarnings = TRUE, recursive = TRUE, mode = "0755")
 #Sys.chmod(paths, mode = "0755")
@@ -23,7 +23,7 @@ source(paste(mypath,"eusidatasets.r",sep=""))
 source(paste(mypath,"eusidataprep.r",sep=""))
 
 ##########################################################################################################
-#korelacje miêdzy atrybutami
+#korelacje miÄ™dzy atrybutami
 #for(cormethod in c("pearson","kendall","spearman")){
 for(cormethod in c("pearson")){
 	hier2jpg(cormethod,DataSet[,parvec],paste(mypathout,nData,"_hiercor_",cormethod,"_norm",sep=""))

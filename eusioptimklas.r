@@ -1,14 +1,14 @@
-# skrypt do zajêæ EU SI: Kruskal, lm, rpart
-# TODO: test, testowaæ
+# skrypt do zajÄ™Ä‡ EU SI: Kruskal, lm, rpart
+# TODO: test, testowaÄ‡
 # Licence LGPL  
-# Author: Piotr W±siewicz
+# Author: Piotr WÄ…siewicz
 ########################################################################################################
  
-#te ¶cie¿ki mypath i mypathout musz± istnieæ w systemie
-#to ¶cie¿ka do plików wykonywalnych z R pow³oki za pomoc± source("...")
+#te Å›cieÅ¼ki mypath i mypathout muszÄ… istnieÄ‡ w systemie
+#to Å›cieÅ¼ka do plikÃ³w wykonywalnych z R powÅ‚oki za pomocÄ… source("...")
 #mypath<-"/media/disk/guest/"
 mypath<-"/home/guest/workspace/iso/"
-#to ¶cie¿ka do plików graficznych uzyskiwanych za pomoc± funkcji plot i innych
+#to Å›cieÅ¼ka do plikÃ³w graficznych uzyskiwanych za pomocÄ… funkcji plot i innych
 mypathout<-paste(mypath,"rysunki/",sep="")
 dir.create(mypathout, showWarnings = TRUE, recursive = TRUE, mode = "0755")
 #Sys.chmod(paths, mode = "0755")
@@ -24,11 +24,11 @@ source(paste(mypath,"eusidataprep.r",sep=""))
 
 ##########################################################################################################
 #Kruskal dla normalnych danych
-#generujê z daisy ró¿nice miêdzy wierszami podanego zbioru i wprowadzam do isoMDS rzutuj±cego na dwa wymiary k=2 
+#generujÄ™ z daisy rÃ³Å¼nice miÄ™dzy wierszami podanego zbioru i wprowadzam do isoMDS rzutujÄ…cego na dwa wymiary k=2 
 parveckruskal=setdiff(names(DataSet),parnokruskal)
 nDataSets<-KruskelMDS(DataSet, parveckruskal, 2)
 
-# uzyskany zbiór punktów kolorujê ró¿nymi atrybutami podstawianymi do wzorzec i uzyskujê wizualizacjê cech
+# uzyskany zbiÃ³r punktÃ³w kolorujÄ™ rÃ³Å¼nymi atrybutami podstawianymi do wzorzec i uzyskujÄ™ wizualizacjÄ™ cech
 fname<-paste(mypathout,nData,"_MDSnorm_nrmdis",sep="")
 wzorzec1=DataSet$Type
 #pdm=1:length(unique(DataSet$Type))
@@ -102,7 +102,7 @@ DataSetm<-DataSet
 paroutput=c("Type")
 for(parvecforout in paroutput)
 {
-	cat(paste("\n \n BADAMY WA¯NO¦Æ ATRYBUTÓW W IDENTYFIKACJI WYJ¦CIOWEGO PARAMETRU: ",parvecforout,"\n"))
+	cat(paste("\n \n BADAMY WAÅ»NOÅšÄ† ATRYBUTÃ“W W IDENTYFIKACJI WYJÅšCIOWEGO PARAMETRU: ",parvecforout,"\n"))
 	dtree=evalwithattr("randomForest", parvecforout, parvectree,DataSetm,"DEFAULT")
 	print(prederror(dtree,nFunction, parvecforout, parvectree, DataSetm,"DEFAULT")$table)
 	print(prederror(dtree,nFunction, parvecforout, parvectree, DataSetm,"DEFAULT")$perror)

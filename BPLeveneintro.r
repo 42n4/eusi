@@ -1,7 +1,7 @@
-# zbiór funkcji do zajêæ EU SI testy wariancji bptest oraz levene.test
-# TODO: test, testowaæ
+# zbiÃ³r funkcji do zajÄ™Ä‡ EU SI testy wariancji bptest oraz levene.test
+# TODO: test, testowaÄ‡
 # Licence LGPL
-# Author: Piotr W±siewicz
+# Author: Piotr WÄ…siewicz
 ########################################################################################################
 
 help(bptest)

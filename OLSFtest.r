@@ -1,17 +1,17 @@
-# zbiór funkcji do zajêæ EU SI ordinary least squares 
-# TODO: test, testowaæ
+# zbiÃ³r funkcji do zajÄ™Ä‡ EU SI ordinary least squares 
+# TODO: test, testowaÄ‡
 # Licence LGPL 
-# Author: Piotr W±siewicz
+# Author: Piotr WÄ…siewicz
 ########################################################################################################
-#Ksi±¿ka po polsku: Daniel Larose "Metody i modele eksploracji danych" PWN 2006
+#KsiÄ…Å¼ka po polsku: Daniel Larose "Metody i modele eksploracji danych" PWN 2006
 #po angielsku: http://cran.r-project.org/doc/contrib/Faraway-PRA.pdf
 #Regresja liniowa: zasada KISS - Keep It Simple, Stupid
 #y~x <=> y=B0+B1x+e
-#zak³ócenia e maj±
-#rozk³ad normalny
-#s± niezale¿ne
-#maj± ¶rednie 0
-#maj± wariancjê niezale¿n± od x
+#zakÅ‚Ã³cenia e majÄ…
+#rozkÅ‚ad normalny
+#sÄ… niezaleÅ¼ne
+#majÄ… Å›rednie 0
+#majÄ… wariancjÄ™ niezaleÅ¼nÄ… od x
 
 
 ols <- function( y, x ){ 

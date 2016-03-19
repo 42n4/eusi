@@ -1,24 +1,24 @@
-# skrypt do zajêæ EU SI: lars, leaps
-# TODO: test, testowaæ
+# skrypt do zajÄ™Ä‡ EU SI: lars, leaps
+# TODO: test, testowaÄ‡
 # Licence LGPL  
-# Author: Piotr W±siewicz
+# Author: Piotr WÄ…siewicz
 ########################################################################################################
 
-#te ¶cie¿ki mypath i mypathout musz± istnieæ w systemie
-#to ¶cie¿ka do plików wykonywalnych z R pow³oki za pomoc± source("...")
+#te Å›cieÅ¼ki mypath i mypathout muszÄ… istnieÄ‡ w systemie
+#to Å›cieÅ¼ka do plikÃ³w wykonywalnych z R powÅ‚oki za pomocÄ… source("...")
 #mypath<-"/media/disk/guest/"
 mypath<-"/home/guest/workspace/iso/"
 
 #(mypath <- getwd())
 #if (!is.null(mypath)) setwd(mypath)
 
-#to ¶cie¿ka do plików graficznych uzyskiwanych za pomoc± funkcji plot i innych
+#to Å›cieÅ¼ka do plikÃ³w graficznych uzyskiwanych za pomocÄ… funkcji plot i innych
 mypathout<-paste(mypath,"rysunki/",sep="")
 dir.create(mypathout, showWarnings = TRUE, recursive = TRUE, mode = "0755")
 #Sys.chmod(paths, mode = "0755")
 
-#na koñcu tego pliku funkcje, w razie czego nale¿y je przenie¶æ tutaj, aby testowaæ krok po kroku, jak 
-#pokaza³em na wyk³adzie ;)
+#na koÅ„cu tego pliku funkcje, w razie czego naleÅ¼y je przenieÅ›Ä‡ tutaj, aby testowaÄ‡ krok po kroku, jak 
+#pokazaÅ‚em na wykÅ‚adzie ;)
 source(paste(mypath,"eusifunkcje.r",sep=""))
 
 ##########################################################################################################
@@ -30,7 +30,7 @@ source(paste(mypath,"eusidatasets.r",sep=""))
 source(paste(mypath,"eusidataprep.r",sep=""))
 
 ##################################################################################################
-#podzia³ danych na trenuj±ce i testowe
+#podziaÅ‚ danych na trenujÄ…ce i testowe
 etykiety <- sample(1:nrow(DataSet), round(nrow(DataSet)*0.7))
 DataSet.train <- DataSet[etykiety,]
 DataSet.test <- DataSet[-etykiety,]
@@ -65,7 +65,7 @@ p <- ncol(DataSet.train)-1
 
 leaps.lm.train <- leaps.lm(paste(mypathout,nData,"_lmbic_norm",sep=""),DataSet.train, moutput, mparvec,really.big=T);
 names(leaps.lm.train);
-# modele wybrane przez metodê BIC, validation, CV (cross validation)
+# modele wybrane przez metodÄ™ BIC, validation, CV (cross validation)
 summary(leaps.lm.train$bic.lm)
 summary(leaps.lm.train$validation.lm)
 summary(leaps.lm.train$cv.lm)
@@ -119,8 +119,8 @@ meanscl<-as.data.frame(t(meanvec))
 names(meanscl)<-rmeanstr[seq(1,10)]
 
 #################################################################################################
-#generuje rysunek z liniami b³êdami kolejnych metod znajdowania modelu lm, 
-#ni¿ej lepiej za wyj±tkiem Raw, bo jest podzielone
+#generuje rysunek z liniami bÅ‚Ä™dami kolejnych metod znajdowania modelu lm, 
+#niÅ¼ej lepiej za wyjÄ…tkiem Raw, bo jest podzielone
 
 fname=paste(mypathout,nData,"_lmall_norm",sep="")
 jpeg(file=paste(fname,".jpg",sep=""),width = 1200, height = 1000, quality = 55, bg = "white")
@@ -138,10 +138,10 @@ legend(70,mean(y)+sd(y),c(paste("Raw/",olsdiv,sep=""),"OLS","LeapsBIC","StepAIC"
 dev.off()
 
 
-#KONIEC PLIKU PONI¯EJ NOTATKI
+#KONIEC PLIKU PONIÅ»EJ NOTATKI
 
-#Przyk³ad z ksi±¿ki "Linear models with R" James Faraway
-#pozosta³e ze strony http://statisticsr.blogspot.com/
+#PrzykÅ‚ad z ksiÄ…Å¼ki "Linear models with R" James Faraway
+#pozostaÅ‚e ze strony http://statisticsr.blogspot.com/
 #oraz ze strony http://www.statmethods.net/stats/regression.html
 #mm<-apply(meatspec[1:172,-101],2,mean)
 #trainx <- as.matrix(sweep(meatspec[1:172,-101],2,mm))
