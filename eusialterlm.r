@@ -1,4 +1,4 @@
-# skrypt do zajêæ ISO WIT: lars, leaps
+# skrypt do zajêæ EU SI: lars, leaps
 # TODO: test, testowaæ
 # Licence LGPL  
 # Author: Piotr W±siewicz
@@ -19,15 +19,15 @@ dir.create(mypathout, showWarnings = TRUE, recursive = TRUE, mode = "0755")
 
 #na koñcu tego pliku funkcje, w razie czego nale¿y je przenie¶æ tutaj, aby testowaæ krok po kroku, jak 
 #pokaza³em na wyk³adzie ;)
-source(paste(mypath,"isowitfunkcje.r",sep=""))
+source(paste(mypath,"eusifunkcje.r",sep=""))
 
 ##########################################################################################################
 #nData<-"Glass"
 #nData<-"nihills"
 #nData<-"photocar"
 #nData<-"meatspec"
-source(paste(mypath,"isowitdatasets.r",sep=""))
-source(paste(mypath,"isowitdataprep.r",sep=""))
+source(paste(mypath,"eusidatasets.r",sep=""))
+source(paste(mypath,"eusidataprep.r",sep=""))
 
 ##################################################################################################
 #podzia³ danych na trenuj±ce i testowe

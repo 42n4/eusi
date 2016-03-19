@@ -1,4 +1,4 @@
-# zbiór funkcji do zajêæ ISO WIT lm with NA 
+# zbiór funkcji do zajêæ EU SI lm with NA 
 # TODO: test, testowaæ
 # Licence LGPL 
 # Author: Piotr W±siewicz

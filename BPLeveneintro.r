@@ -1,4 +1,4 @@
-# zbiór funkcji do zajêæ ISO WIT testy wariancji bptest oraz levene.test
+# zbiór funkcji do zajêæ EU SI testy wariancji bptest oraz levene.test
 # TODO: test, testowaæ
 # Licence LGPL
 # Author: Piotr W±siewicz

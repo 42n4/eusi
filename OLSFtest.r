@@ -1,4 +1,4 @@
-# zbiór funkcji do zajêæ ISO WIT ordinary least squares 
+# zbiór funkcji do zajêæ EU SI ordinary least squares 
 # TODO: test, testowaæ
 # Licence LGPL 
 # Author: Piotr W±siewicz

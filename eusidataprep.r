@@ -1,4 +1,4 @@
-# skrypt do zajêæ ISO WIT: wstêpne przetwarzanie danych zscore, discrete
+# skrypt do zajêæ EU SI: wstêpne przetwarzanie danych zscore, discrete
 # TODO: test, testowaæ
 # Licence LGPL  
 # Author: Piotr W±siewicz

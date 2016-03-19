@@ -1,4 +1,4 @@
-# zbiór funkcji do zajêæ ISO WIT 
+# zbiór funkcji do zajêæ EU SI 
 # TODO: test, testowaæ
 # Licence LGPL  
 # Author: Piotr W±siewicz
@@ -818,7 +818,7 @@ meanverr<-function(lverr,jmax,imax){
 
 #######################################################################################################
 ##################################################################################################
-#REGRESJA LINIOWA - redukcja parametrów i atrybutów, funkcje do isowitalterlm.r
+#REGRESJA LINIOWA - redukcja parametrów i atrybutów, funkcje do eusialterlm.r
 #Stosujemy kryteria: 
 #BIC Bayes Information Criterion  -2maxlog-likelihood+plogn wybór mniejszych modeli
 #AIC Akaike Information Cryterion -2 maxlog-likelihood + 2p

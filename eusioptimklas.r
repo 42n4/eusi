@@ -1,4 +1,4 @@
-# skrypt do zajêæ ISO WIT: Kruskal, lm, rpart
+# skrypt do zajêæ EU SI: Kruskal, lm, rpart
 # TODO: test, testowaæ
 # Licence LGPL  
 # Author: Piotr W±siewicz
@@ -13,14 +13,14 @@ mypathout<-paste(mypath,"rysunki/",sep="")
 dir.create(mypathout, showWarnings = TRUE, recursive = TRUE, mode = "0755")
 #Sys.chmod(paths, mode = "0755")
 
-source(paste(mypath,"isowitfunkcje.r",sep=""))
+source(paste(mypath,"eusifunkcje.r",sep=""))
 
 ##########################################################################################################
 #nData<-"Glass"
 #nData<-"nihills"
 #nData<-"photocar"
-source(paste(mypath,"isowitdatasets.r",sep=""))
-source(paste(mypath,"isowitdataprep.r",sep=""))
+source(paste(mypath,"eusidatasets.r",sep=""))
+source(paste(mypath,"eusidataprep.r",sep=""))
 
 ##########################################################################################################
 #Kruskal dla normalnych danych

@@ -1,4 +1,4 @@
-# skrypt do zajêæ ISO WIT: dane testowe
+# skrypt do zajêæ EU SI: dane testowe
 # TODO: test, testowaæ
 # Licence LGPL  
 # Author: Piotr W±siewicz
