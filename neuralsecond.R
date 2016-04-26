@@ -16,10 +16,9 @@ set.seed(seed.val)
 
 #num.vars<-1
 div<-3
-num.obs<-100/div
+num.obs<-200/div
 max.neurons<-100
 
-#rand.vars<-rnorm(num.obs)
 x1<-seq(1,num.obs,div)/10*div
 xx1<-seq(1,num.obs)/10*div
 
@@ -75,6 +74,7 @@ par(mfrow = c(3,1))
 #plot each model
 plot.nnet(mod1)
 plot(x1,y1,col="red")
+lines(xx1,yy1,col="green")
 lines(xx1,ypred)
 plot(errorvector)
 
