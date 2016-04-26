@@ -21,8 +21,10 @@ max.neurons<-100
 
 #rand.vars<-rnorm(num.obs)
 x1<-seq(1,num.obs,div)/10*div
+xx1<-seq(1,num.obs)/10*div
 
 y1<-sin(x1)
+yy1<-sin(xx1)
 dim(x1)
 plot(x1,y1)
 
@@ -40,19 +42,19 @@ par(mfrow = c(3,1))
 #plot each model
 plot.nnet(mod1)
 
-ypred<-predict(mod1,cbind(x1))
-plot(x1,ypred)
-kwadroznicy<-(y1-ypred)^2
-sumkwadrozn<-sqrt(sum((y1-ypred)^2))
-pierwkwadsumkwadrozn<-sqrt(sum((y1-ypred)^2))
+ypred<-predict(mod1,cbind(xx1))
+plot(xx1,ypred)
+kwadroznicy<-(yy1-ypred)^2
+sumkwadrozn<-sqrt(sum((yy1-ypred)^2))
+pierwkwadsumkwadrozn<-sqrt(sum((yy1-ypred)^2))
 pierwkwadsumkwadrozn
 
 errorlist<-list()
 for (i in 4:max.neurons){
 set.seed(seed.val)
 mod1<-nnet(rand.vars,resp,data=dat.in,size=i,linout=T,trace=FALSE)
-ypred<-predict(mod1,cbind(x1))
-error<-sqrt(sum((y1-ypred)^2))
+ypred<-predict(mod1,cbind(xx1))
+error<-sqrt(sum((yy1-ypred)^2))
 errorlist<-c(errorlist,error)
 }
 errorvector<-rapply(errorlist,c)
@@ -65,15 +67,15 @@ optimsize
 
 set.seed(seed.val)
 mod1<-nnet(rand.vars,resp,data=dat.in,size=optimsize+3,linout=T,trace=FALSE)
-ypred<-predict(mod1,cbind(x1))
-error<-sqrt(sum((y1-ypred)^2))
+ypred<-predict(mod1,cbind(xx1)) #uwaga xx1 , a nie x1
+error<-sqrt(sum((yy1-ypred)^2))
 error
 
 par(mfrow = c(3,1))
 #plot each model
 plot.nnet(mod1)
 plot(x1,y1,col="red")
-lines(x1,ypred)
+lines(xx1,ypred)
 plot(errorvector)
 
 
