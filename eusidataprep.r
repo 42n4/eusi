@@ -5,14 +5,14 @@
 ########################################################################################################
 
 #te atrybuty, które są zmiennymi ilościowymi i nie identyfikatorami
-parvec=setdiff(names(DataSet),parvecfactor)
-parvec=setdiff(parvec,parnokruskal)
+parvec=setdiff(names(DataSet),etykiety)
+parvec=setdiff(parvec,not2kruskal)
 
 #Zamieniam dowolne faktory na numeryczne faktory typu 1,2,3
 #DataSet<-normfactor(DataSet, parvecfactor)
 
 #potem faktoryzuję na wszelki wypadek kolumny, które są etykietami, mają już zdyskretyzowane wartości; ich wybór jest w wektorze parvecfactor
-DataSet<-factorto(DataSet, which(names(DataSet) %in% parvecfactor))
+DataSet<-factorto(DataSet, which(names(DataSet) %in% etykiety))
 
 #najpierw defaktoryzuję i oznaczam jako numeryczne kolumny z liczbami zmiennoprzecinkowymi i całkowitymi, tak na wszelki wypadek, gdyby csv źle się wczytał (w przypadku zbiorów data() to tylko ćwiczenie)
 DataSet<-defactor.numeric(DataSet, parvec)

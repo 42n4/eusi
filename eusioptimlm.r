@@ -37,7 +37,7 @@ try(latt2jpg(DataSetz[,parvec],DataSetzd[,vecfactorzesc],paste(mypathout,nData,"
 #REGRESJA LINIOWA
 nFunction="lm"
 #w mparvec zmienne niezależne do regresji
-mparvec=setdiff(names(DataSet),parvecnolm)
+mparvec=setdiff(names(DataSet),zalezne)
  
 ##########################################################################################################
 #alpha to krytyczna wartość prawdopodobieństwa p dla statystyk bp i f 
@@ -48,7 +48,7 @@ alpha<-0.1;
 nleven<--1; 
 #wybieramy dane normalne
 mDataSet<-DataSet
-lmabc_nobp<-combesteval("lm", paste(mypathout,nData,"_lmabc_nobp",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
+lmabc_nobp<-combesteval("lm", paste(mypathout,nData,"_lmabc_nobp",sep=""),mDataSet, zmiennaout, mparvec, nleven, alpha)
 #wybieramy dane zeskorowane
 #mDataSet<-DataSetz
 #lmabc_zebp<-combesteval("lm", paste(mypathout,nData,"_lmabc_zebp",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
@@ -62,7 +62,7 @@ lmabc_nobp<-combesteval("lm", paste(mypathout,nData,"_lmabc_nobp",sep=""),mDataS
 #brak testów wariancji
 nleven<-0; 
 mDataSet<-DataSet
-lmabc_nono<-combesteval("lm", paste(mypathout,nData,"_lmabc_nono",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
+lmabc_nono<-combesteval("lm", paste(mypathout,nData,"_lmabc_nono",sep=""),mDataSet, zmiennaout, mparvec, nleven, alpha)
 #mDataSet<-DataSetz
 #lmabc_zeno<-combesteval("lm", paste(mypathout,nData,"_lmabc_zeno",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
 #mDataSet<-DataSetm
@@ -73,7 +73,7 @@ lmabc_nono<-combesteval("lm", paste(mypathout,nData,"_lmabc_nono",sep=""),mDataS
 #leven
 nleven<-5; 
 mDataSet<-DataSet
-lmabc_nolt<-combesteval("lm", paste(mypathout,nData,"_lmabc_nolt",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
+lmabc_nolt<-combesteval("lm", paste(mypathout,nData,"_lmabc_nolt",sep=""),mDataSet, zmiennaout, mparvec, nleven, alpha)
 #mDataSet<-DataSetz
 #lmabc_zelt<-combesteval("lm", paste(mypathout,nData,"_lmabc_zelt",sep=""),mDataSet, moutput, mparvec, nleven, alpha)
 #mDataSet<-DataSetm
@@ -86,7 +86,7 @@ SPLINE<-"SPLINE";
 #bptest
 nleven<--1; 
 mDataSet<-DataSet
-lmbsp_nobp<-combesteval("lm", paste(mypathout,nData,"_lmbsp_nobp",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
+lmbsp_nobp<-combesteval("lm", paste(mypathout,nData,"_lmbsp_nobp",sep=""),mDataSet, zmiennaout, mparvec, nleven, alpha, SPLINE)
 #mDataSet<-DataSetz
 #lmbsp_zebp<-combesteval("lm", paste(mypathout,nData,"_lmbsp_zebp",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
 #mDataSet<-DataSetm
@@ -97,7 +97,7 @@ lmbsp_nobp<-combesteval("lm", paste(mypathout,nData,"_lmbsp_nobp",sep=""),mDataS
 #brak testów wariancji
 nleven<-0; 
 mDataSet<-DataSet
-lmbsp_nono<-combesteval("lm", paste(mypathout,nData,"_lmbsp_nono",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
+lmbsp_nono<-combesteval("lm", paste(mypathout,nData,"_lmbsp_nono",sep=""),mDataSet, zmiennaout, mparvec, nleven, alpha, SPLINE)
 #mDataSet<-DataSetz
 #lmbsp_zeno<-combesteval("lm", paste(mypathout,nData,"_lmbsp_zeno",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
 #mDataSet<-DataSetm
@@ -108,7 +108,7 @@ lmbsp_nono<-combesteval("lm", paste(mypathout,nData,"_lmbsp_nono",sep=""),mDataS
 #leven
 nleven<-5; 
 mDataSet<-DataSet
-lmbsp_nolt<-combesteval("lm", paste(mypathout,nData,"_lmbsp_nolt",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
+lmbsp_nolt<-combesteval("lm", paste(mypathout,nData,"_lmbsp_nolt",sep=""),mDataSet, zmiennaout, mparvec, nleven, alpha, SPLINE)
 #mDataSet<-DataSetz
 #lmbsp_zelt<-combesteval("lm", paste(mypathout,nData,"_lmbsp_zelt",sep=""),mDataSet, moutput, mparvec, nleven, alpha, SPLINE)
 #mDataSet<-DataSetm

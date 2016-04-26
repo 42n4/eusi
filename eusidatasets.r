@@ -22,81 +22,81 @@ DataSet<-get(nData)
 ##########################################################################################################
 if(nData=="glass"){
 	#te atrybuty, co są faktorami, zmiennymi jakościowymi z kategoriami, etykietami
-	parvecfactor=c("Type")
+	etykiety=c("Type")
 	#kruskal
 	#w parnokruskal to co zostanie nie wysłane do isoMDS(daisy) np. parnokruskal=c("Type")
-	parnokruskal=c()
+	not2kruskal=c()
 	#atrybut pojedyńczy do zescorowania po jego dyskretnych wartościach
 	vecfactorzesc=c("Type")
 	#atrybuty w plotMDS do kolorowania powstałych punktów 
-	parvecol<-names(DataSet)
+	zmiennain<-names(DataSet)
 	#zmienne drzewa
 	#zmienne, które nie wchodzą do drzewa m.in. jego liście, target, cel optymalizacji drzewa
-	parvecnotree=c("Type")
+	not2tree=c("Type")
 	#liść drzewa, etykieta
-	paroutputree=c("Type")
+	liscie=c("Type")
 	#zmienne zależne i inne zbędne w regresji
-	parvecnolm=c("Type","RI")
+	zalezne=c("Type","RI")
 	#wybieramy zmienną zależną, target dla regresji, zwykle zmiennoprzecinkowy
-	moutput<-"RI"
+	zmiennaout<-"RI"
 }
 
 ##########################################################################################################
 
 if(nData=="nihills"){
-	parvecfactor=c()
+	etykiety=c()
 	#kruskal
-	parnokruskal=c()
-	parvecol<-names(DataSet)
+	not2kruskal=c()
+	zmiennain<-names(DataSet)
 	#zmienne drzewa
-	parvecnotree=c('time')
-	paroutputree=c('time')
+	not2tree=c('time')
+	liscie=c('time')
 	#zmienne zależne i inne zbędne w regresji
-	parvecnolm=c("time")
-	moutput<-"time"
+	zalezne=c("time")
+	zmiennaout<-"time"
 } 
 
 ##########################################################################################################
 if(nData=="photocar"){
-	parvecfactor=c("group","event","tumor")
+	etykiety=c("group","event","tumor")
 	vecfactorzesc=c("event")
 	#kruskal
-	parnokruskal=c()
-	parvecol<-names(DataSet)
+	not2kruskal=c()
+	zmiennain<-names(DataSet)
 	#zmienne drzewa
-	parvecnotree=c("group")
-	paroutputree=c("group")
+	not2tree=c("group")
+	liscie=c("group")
 	#zmienne zależne i inne zbędne w regresji
 	#parvecnolm=c("time","group","tumor","event")
-	parvecnolm=c("time")
-	moutput<-"time"
+	zalezne=c("time")
+	zmiennaout<-"time"
 }
 ##########################################################################################################
 if(nData=="meatspec"){
-	parvecfactor=c("")
+	etykiety=c("")
 	vecfactorzesc=c("")
 	#kruskal
-	parnokruskal=c()
-	parvecol<-names(DataSet)
+	not2kruskal=c()
+	zmiennain<-names(DataSet)
 	#zmienne drzewa
-	parvecnotree=c("fat")
-	paroutputree=c("fat")
+	not2tree=c("fat")
+	liscie=c("fat")
 	#zmienne zależne i inne zbędne w regresji
-	parvecnolm=c("fat")
-	moutput<-"fat"
+	zalezne=c("fat")
+	zmiennaout<-"fat"
 }
 
 ##########################################################################################################
 if(nData=="skoliozaNIL1.csv"){
-	parvecfactor=c()
+	etykiety=c()
 	vecfactorzesc=c()
 	#kruskal
-	parnokruskal=c()
-	parvecol<-names(DataSet)
+	not2kruskal=c()
+	zmiennain<-names(DataSet)
 	#zmienne drzewa
-	parvecnotree=c("NI")
-	paroutputree=c("NI")
+	not2tree=c("NI")
+	liscie=c("NI")
 	#zmienne zależne i inne zbędne w regresji
-	parvecnolm=c("NI")
-	moutput<-"NI"
+	zalezne=c("NI")
+	zmiennaout<-"NI"
 }

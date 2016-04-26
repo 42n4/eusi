@@ -7,7 +7,7 @@
 #te ścieżki mypath i mypathout muszą istnieć w systemie
 #to ścieżka do plików wykonywalnych z R powłoki za pomocą source("...")
 #mypath<-"/media/disk/guest/"
-mypath<-"/home/guest/workspace/iso/"
+mypath<-"/home/guest/workspaceusi/sir"
 #to ścieżka do plików graficznych uzyskiwanych za pomocą funkcji plot i innych
 mypathout<-paste(mypath,"rysunki/",sep="")
 dir.create(mypathout, showWarnings = TRUE, recursive = TRUE, mode = "0755")

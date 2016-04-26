@@ -9,7 +9,7 @@ Sys.setlocale("LC_NUMERIC","C")
 #lista pakietów z CRAN-u
 #naprawić pakier gRain
 #pkglist<-c("gRain")
-pkglist<-c("TTR","TSPostgreSQL","modeest","flexclust","rgl","magic","snowfall","rsprng","bnlearn","snow","ggplot2","reshape","gbm","caret","arules","mboost","bestglm","ElemStatLearn","faraway","relaimpo","leaps","lars","bootstrap","DAAG","ff","biglm","bigmemory","splines","betareg","ellipse","nlme","MASS","leaps","car","lmtest","gregmisc","foreign","plyr","mlbench","boot","Hmisc","RWeka","ipred","klaR","ROCR","rpart","maptree","party","grid","lattice","latticeExtra","playwith","ada","randomForest","kknn","e1071","cluster","class","caret","fda","zoo","lattice","deal","RJDBC","cairoDevice","multicore","iterators","doMC","foreach","nws","PTAk","Rcpp","rrules","Boruta")
+pkglist<-c("devtools","TTR","TSPostgreSQL","modeest","flexclust","rgl","magic","snowfall","bnlearn","snow","ggplot2","reshape","gbm","arules","mboost","bestglm","ElemStatLearn","faraway","relaimpo","leaps","lars","bootstrap","DAAG","ff","biglm","bigmemory","splines","betareg","ellipse","nlme","MASS","leaps","lmtest","foreign","plyr","mlbench","boot","Hmisc","RWeka","ipred","klaR","ROCR","rpart","maptree","party","grid","lattice","latticeExtra","playwith","ada","randomForest","kknn","e1071","cluster","class","fda","zoo","lattice","deal","RJDBC","cairoDevice","iterators","doMC","foreach","nws","PTAk","Rcpp","Boruta")
 
 pkgcheck <- pkglist %in% row.names(installed.packages())
 for(i in pkglist[!pkgcheck]){
@@ -25,7 +25,7 @@ for(i in biolist[!biocheck]){
 	biocLite(i)
 }
 
-pkgrforge<-c("mlr","tm.plugin.dc","hive","EEG")
+pkgrforge<-c("mlr","tm.plugin.dc","hive")
 pkgcheck <- pkgrforge %in% row.names(installed.packages())
 for(i in pkgrforge[!pkgcheck]){
 	install.packages(i, repos="http://R-Forge.R-project.org")
@@ -33,7 +33,7 @@ for(i in pkgrforge[!pkgcheck]){
 
 pkgall<-c(pkglist,biolist,pkgrforge)
 
-for(i in c("gRain","bnlearn","car","lmtest","bestglm","leaps","lars","mda","xtable","lattice","TSPostgreSQL","RWeka","doMC","foreach","nws","ROCR","rpart","e1071","MASS","cluster","party","randomForest","PROcess"))
+for(i in c("bnlearn","lmtest","bestglm","leaps","lars","mda","xtable","lattice","TSPostgreSQL","RWeka","doMC","foreach","nws","ROCR","rpart","e1071","MASS","cluster","party","randomForest","PROcess"))
 { library(i, character.only = TRUE);}
 
 #pkgbyhand<-c("rparallel")

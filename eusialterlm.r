@@ -7,7 +7,7 @@
 #te ścieżki mypath i mypathout muszą istnieć w systemie
 #to ścieżka do plików wykonywalnych z R powłoki za pomocą source("...")
 #mypath<-"/media/disk/guest/"
-mypath<-"/home/guest/workspace/iso/"
+mypath<-"/home/guest/workspacesi/sir/"
 
 #(mypath <- getwd())
 #if (!is.null(mypath)) setwd(mypath)
@@ -34,36 +34,36 @@ source(paste(mypath,"eusidataprep.r",sep=""))
 etykiety <- sample(1:nrow(DataSet), round(nrow(DataSet)*0.7))
 DataSet.train <- DataSet[etykiety,]
 DataSet.test <- DataSet[-etykiety,]
-mparvec=setdiff(names(DataSet),parvecnolm)
+mparvec=setdiff(names(DataSet),zalezne)
 
 #set.seed(23123)
-lars.lm.train <- lars.lm(paste(mypathout,nData,"_lmlrs_norm",sep=""),DataSet,moutput,mparvec,etykiety);
+lars.lm.train <- lars.lm(paste(mypathout,nData,"_lmlrs_norm",sep=""),DataSet,zmiennaout,mparvec,etykiety);
 
-mean.lasso.AIC<-mean((DataSet[-etykiety,moutput] - lars.lm.train$bLARSAICfits[-etykiety])^2)
-mean.lasso.BIC<-mean((DataSet[-etykiety,moutput] - lars.lm.train$bLARSBICfits[-etykiety])^2)
-mean.lasso.bHat<-mean((DataSet[-etykiety,moutput] - lars.lm.train$bHatfits[-etykiety])^2)
+mean.lasso.AIC<-mean((DataSet[-etykiety,zmiennaout] - lars.lm.train$bLARSAICfits[-etykiety])^2)
+mean.lasso.BIC<-mean((DataSet[-etykiety,zmiennaout] - lars.lm.train$bLARSBICfits[-etykiety])^2)
+mean.lasso.bHat<-mean((DataSet[-etykiety,zmiennaout] - lars.lm.train$bHatfits[-etykiety])^2)
 mean.lasso.bHat
 mean.lasso.AIC
 
 
 
-ridge.lm.train <- ridge.lm(paste(mypathout,nData,"_lmrdg_norm",sep=""),DataSet,moutput,mparvec,etykiety);
+ridge.lm.train <- ridge.lm(paste(mypathout,nData,"_lmrdg_norm",sep=""),DataSet,zmiennaout,mparvec,etykiety);
 
-ridge.pred.cv <- pred.ridge(ridge.lm.train$ridge.train.cv,moutput,mparvec,DataSet)
-ridge.pred.best <- pred.ridge(ridge.lm.train$ridge.best,moutput,mparvec,DataSet)
-rmse.ridge.cv<-rmse(DataSet[-etykiety,moutput],ridge.pred.cv[-etykiety])
-mean.ridge.cv<-mean((DataSet[-etykiety,moutput] - ridge.pred.cv[-etykiety])^2)
-rmse.ridge.best<-rmse(DataSet[-etykiety,moutput],ridge.pred.best[-etykiety])
-mean.ridge.best<-mean((DataSet[-etykiety,moutput] - ridge.pred.best[-etykiety])^2)
+ridge.pred.cv <- pred.ridge(ridge.lm.train$ridge.train.cv,zmiennaout,mparvec,DataSet)
+ridge.pred.best <- pred.ridge(ridge.lm.train$ridge.best,zmiennaout,mparvec,DataSet)
+rmse.ridge.cv<-rmse(DataSet[-etykiety,zmiennaout],ridge.pred.cv[-etykiety])
+mean.ridge.cv<-mean((DataSet[-etykiety,zmiennaout] - ridge.pred.cv[-etykiety])^2)
+rmse.ridge.best<-rmse(DataSet[-etykiety,zmiennaout],ridge.pred.best[-etykiety])
+mean.ridge.best<-mean((DataSet[-etykiety,zmiennaout] - ridge.pred.best[-etykiety])^2)
 
-ridge.pred.cv1 <- pred.ridge1(ridge.lm.train$ridge.train.cv,moutput,mparvec,DataSet)
-ridge.pred.best1 <- pred.ridge1(ridge.lm.train$ridge.best,moutput,mparvec,DataSet)
-mean.ridge.cv1<-mean((DataSet[-etykiety,moutput] - ridge.pred.cv1[-etykiety])^2)
-mean.ridge.best1<-mean((DataSet[-etykiety,moutput] - ridge.pred.best1[-etykiety])^2)
+ridge.pred.cv1 <- pred.ridge1(ridge.lm.train$ridge.train.cv,zmiennaout,mparvec,DataSet)
+ridge.pred.best1 <- pred.ridge1(ridge.lm.train$ridge.best,zmiennaout,mparvec,DataSet)
+mean.ridge.cv1<-mean((DataSet[-etykiety,zmiennaout] - ridge.pred.cv1[-etykiety])^2)
+mean.ridge.best1<-mean((DataSet[-etykiety,zmiennaout] - ridge.pred.best1[-etykiety])^2)
 
 p <- ncol(DataSet.train)-1
 
-leaps.lm.train <- leaps.lm(paste(mypathout,nData,"_lmbic_norm",sep=""),DataSet.train, moutput, mparvec,really.big=T);
+leaps.lm.train <- leaps.lm(paste(mypathout,nData,"_lmbic_norm",sep=""),DataSet.train, zmiennaout, mparvec,really.big=T);
 names(leaps.lm.train);
 # modele wybrane przez metodę BIC, validation, CV (cross validation)
 summary(leaps.lm.train$bic.lm)
@@ -73,28 +73,28 @@ summary(leaps.lm.train$cv.lm)
 #Stepwise Regression
 #MASS pakiet
 oData<-DataSet #dane z procedury evalwithattr, niestety tu potrzebne
-fit <- evalwithattr("lm",moutput,mparvec,DataSet)
+fit <- evalwithattr("lm",zmiennaout,mparvec,DataSet)
 lmstep <- stepAIC(fit, direction="both")
 #lmstep$anova #nowe dodane dane 
-mean.lm.aic<-mean((DataSet[-etykiety,moutput] - predict(lmstep,DataSet)[-etykiety])^2)
-rmse.lm.aic<-rmse(DataSet[-etykiety,moutput],predict(lmstep,DataSet)[-etykiety])
+mean.lm.aic<-mean((DataSet[-etykiety,zmiennaout] - predict(lmstep,DataSet)[-etykiety])^2)
+rmse.lm.aic<-rmse(DataSet[-etykiety,zmiennaout],predict(lmstep,DataSet)[-etykiety])
 
 #y~1
-mean.lm.1<-mean((DataSet[-etykiety,moutput] - mean(DataSet[etykiety,moutput]))^2)
-rmse.lm.1<-rmse(DataSet[-etykiety,moutput],rep(mean(DataSet[etykiety,moutput]),nrow(DataSet[-etykiety,])))
+mean.lm.1<-mean((DataSet[-etykiety,zmiennaout] - mean(DataSet[etykiety,zmiennaout]))^2)
+rmse.lm.1<-rmse(DataSet[-etykiety,zmiennaout],rep(mean(DataSet[etykiety,zmiennaout]),nrow(DataSet[-etykiety,])))
 #bic.lm 
-mean.lm.bic<-mean((DataSet[-etykiety,moutput] - predict(leaps.lm.train$bic.lm,DataSet)[-etykiety])^2)
-rmse.lm.bic<-rmse(DataSet[-etykiety,moutput],predict(leaps.lm.train$bic.lm,DataSet)[-etykiety])
+mean.lm.bic<-mean((DataSet[-etykiety,zmiennaout] - predict(leaps.lm.train$bic.lm,DataSet)[-etykiety])^2)
+rmse.lm.bic<-rmse(DataSet[-etykiety,zmiennaout],predict(leaps.lm.train$bic.lm,DataSet)[-etykiety])
 #validation.lm 
-mean.lm.validation<-mean((DataSet[-etykiety,moutput] - predict(leaps.lm.train$validation.lm,DataSet)[-etykiety])^2)
-rmse.lm.validation<-rmse(DataSet[-etykiety,moutput],predict(leaps.lm.train$validation.lm,DataSet)[-etykiety])
+mean.lm.validation<-mean((DataSet[-etykiety,zmiennaout] - predict(leaps.lm.train$validation.lm,DataSet)[-etykiety])^2)
+rmse.lm.validation<-rmse(DataSet[-etykiety,zmiennaout],predict(leaps.lm.train$validation.lm,DataSet)[-etykiety])
 #cv.lm 
-mean.lm.cv<-mean((DataSet[-etykiety,moutput] - predict(leaps.lm.train$cv.lm,DataSet)[-etykiety])^2)
-rmse.lm.cv<-rmse(DataSet[-etykiety,moutput],predict(leaps.lm.train$cv.lm,DataSet)[-etykiety])
+mean.lm.cv<-mean((DataSet[-etykiety,zmiennaout] - predict(leaps.lm.train$cv.lm,DataSet)[-etykiety])^2)
+rmse.lm.cv<-rmse(DataSet[-etykiety,zmiennaout],predict(leaps.lm.train$cv.lm,DataSet)[-etykiety])
 #ols.lm
-lmfit <- evalwithattr("lm",moutput,mparvec,DataSet.train)
-mean.lm.ols<-mean((DataSet[-etykiety,moutput]-predict(lmfit,DataSet)[-etykiety])^2)
-rmse.lm.ols<-rmse(DataSet[-etykiety,moutput],predict(lmfit,DataSet)[-etykiety])
+lmfit <- evalwithattr("lm",zmiennaout,mparvec,DataSet.train)
+mean.lm.ols<-mean((DataSet[-etykiety,zmiennaout]-predict(lmfit,DataSet)[-etykiety])^2)
+rmse.lm.ols<-rmse(DataSet[-etykiety,zmiennaout],predict(lmfit,DataSet)[-etykiety])
 
 rmeanstr<-c("mean.lm.1",
 "mean.lm.ols",

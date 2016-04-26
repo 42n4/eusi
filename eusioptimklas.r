@@ -25,7 +25,7 @@ source(paste(mypath,"eusidataprep.r",sep=""))
 ##########################################################################################################
 #Kruskal dla normalnych danych
 #generuję z daisy różnice między wierszami podanego zbioru i wprowadzam do isoMDS rzutującego na dwa wymiary k=2 
-parveckruskal=setdiff(names(DataSet),parnokruskal)
+parveckruskal=setdiff(names(DataSet),not2kruskal)
 nDataSets<-KruskelMDS(DataSet, parveckruskal, 2)
 
 # uzyskany zbiór punktów koloruję różnymi atrybutami podstawianymi do wzorzec i uzyskuję wizualizację cech
@@ -34,15 +34,15 @@ wzorzec1=DataSet$Type
 #pdm=1:length(unique(DataSet$Type))
 #org=sort(unique(DataSet$Type))
 #wzorzec1=2
-plotMDS.for.chosen(fname, nDataSets, DataSetd, parvecol, wzorzec1) 
+plotMDS.for.chosen(fname, nDataSets, DataSetd, zmiennain, wzorzec1) 
 
 #Kruskal dla zeskorowanych danych
-parveckruskal=setdiff(names(DataSet),parnokruskal)
+parveckruskal=setdiff(names(DataSet),not2kruskal)
 nDataSets<-KruskelMDS(DataSetz, parveckruskal, 2)
 
 fname<-paste(mypathout,nData,"_MDSzesc_zscdis",sep="")
 wzorzec1=DataSet$Type
-plotMDS.for.chosen(fname, nDataSets, DataSetzd, parvecol, wzorzec1) 
+plotMDS.for.chosen(fname, nDataSets, DataSetzd, zmiennain, wzorzec1) 
 
 
 ##########################################################################################################
@@ -77,24 +77,24 @@ evalstr<-"DEFAULT"
 #evalstr<-'control=Weka_control(C=0.15)'
 percent<-90
 trials<-5
-paroutputree=c("Type")
+liscie=c("Type")
 parvectree<-setdiff(names(DataSet),c("Type"))
 mdet<-0;
 #while(!mdet){
 cat("\nDane ",nData," funkcja: ",nFunction," lisc: ",i,"\n")
-bl<-brutoptim.klas(mypathout,nData,nFunction,paroutputree,parvectree,percent,trials,evalstr)
+bl<-brutoptim.klas(mypathout,nData,nFunction,liscie,parvectree,percent,trials,evalstr)
 if(length(bl))
 {
 	#lres<-prederror(bl$bestclass,nFunction, paroutputree, parvectree, DataSet[-bl$betykiety,],evalstr)
-	lres<-prederror(bl$bestclass,nFunction, paroutputree, parvectree, DataSet,evalstr)
-	mdet<-det(matrix(lres$table, ncol=length(unique(DataSet[,paroutputree]))))
+	lres<-prederror(bl$bestclass,nFunction, liscie, parvectree, DataSet,evalstr)
+	mdet<-det(matrix(lres$table, ncol=length(unique(DataSet[,liscie]))))
 	print(bl$bestclass)
 	print(lres$table)
 	cat("Error:",lres$perror," Det:",mdet,"\n")
 	if(nFunction=="rpart")
-		zapisz_rpart(bl$bestclass,paste(mypathout,nData,"_Best_",nFunction,"_",paroutputree,sep=""))
+		zapisz_rpart(bl$bestclass,paste(mypathout,nData,"_Best_",nFunction,"_",liscie,sep=""))
 	if(nFunction=="J48") 
-		zapisz_weka(bl$bestclass,paste(mypathout,nData,"_Best_",nFunction,"_",paroutputree,sep=""))
+		zapisz_weka(bl$bestclass,paste(mypathout,nData,"_Best_",nFunction,"_",liscie,sep=""))
 }
 #}
 
