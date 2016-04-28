@@ -1,6 +1,9 @@
 #Tutoriale
 http://www.skilledup.com/articles/18-free-tutorials-learning-r-programming 
 http://www.statslectures.com/index.php/r-stats-videos-tutorials
+#DataMining in R
+http://www.rdatamining.com/
+http://www.rdatamining.com/examples
 
 #Jeden z wielu tutoriali QuickR
 http://www.statmethods.net/
