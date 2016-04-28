@@ -334,6 +334,7 @@ mydata <- data.frame(x1 = c(2, 2, 6, 4),
 mydata$sumx <-  mydata$x1 + mydata$x2
 mydata$meanx <- (mydata$x1 + mydata$x2) / 2
 
+rm(x1)
 # metoda 2
 attach(mydata)
 mydata$sumx <-  x1 + x2
@@ -385,8 +386,9 @@ y <- x[1] + x[2] + x[3] + x[4] # y równa się NA
 z <- sum(x) # y równa się NA
 z <-
   sum(x, na.rm = TRUE) # na.rm=TRUE usuwa brakujące wartości czyli NA
-newdata <- na.omit(leadership) # na.omit() usuwa wiersze z NA
-
+mydata$age[mydata$tmp == 6] <- NA
+newdata <- na.omit(mydata) # na.omit() usuwa wiersze z NA
+newdata
 
 #zapisz datę jako zmienną
 # x jest datą w formie tekstu
@@ -618,6 +620,7 @@ library(reshape)
 md <- melt(patientdata, id = (c('diabetes', 'status')))
 md
 cast(md, status ~ variable, mean)
+
 dev.off()
 #klasteryzacja w R np. K-means
 mdata <- mtcars[c('disp', 'hp')]
@@ -633,7 +636,7 @@ axis(1, pos = 0)
 axis(2, pos = 0)
 abline(v = 0, h = 0)
 kmeans.cluster <- factor(kmeans.res$cluster)
-# zainstaluj 'ade4' aby zwizualizować zbiory
+# zainstaluj 'ade4', aby zwizualizować zbiory
 library(ade4)
 s.class(
   mdata,
