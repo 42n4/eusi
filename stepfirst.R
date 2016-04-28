@@ -38,13 +38,13 @@ class(a)
 x <- c(1,2)
 rm(x)
 # usuń wszystkie zmienne z pamięci przestrzeni roboczej
-rm(list=ls(all=T))
+# rm(list=ls(all=T))
 rm(list=ls(pattern='^tmp')) # usuń zmienne z nazwami zaczynającymi się na 'tmp'
 # wyjdź z rstudia
-quit() # zapyta czy zapisać przestrzeń roboczą
+# quit() # zapyta czy zapisać przestrzeń roboczą
 
-Struktury danych
-#wektory mają tylko jeden typ danych
+# Struktury danych
+# wektory mają tylko jeden typ danych
 
 a <- c(1, 2, 5, 3, 6, -2, 4)
 a[3]  # 5
@@ -150,7 +150,7 @@ j <- 2
 patientdata[i, j]
 patientdata[[j]][i]
 patientdata[, j][i]
-as.datatype(patientdata[i, ][j]) # patientdata[i, ] i-ty wiersz jako ramka danych
+as.integer(patientdata[i, ][j]) # patientdata[i, ][j] i-ty wiersz jta kolumna jako integer
 patientdata$age[i]
 patientdata[i, 'age']  # i-ty wiersz kolumny age
 
@@ -168,15 +168,15 @@ patientdata$age
 table(patientdata$diabetes, patientdata$status)
 # dodaj kolumnę do ramki danych: metoda 1
 patientdata$new_col <- c(2:5)
+# usuń kolumnę z ramki danych: metoda 1
+patientdata$new_col <- NULL
 # dodaj kolumnę do ramki danych: metoda 2
 patientdata <- transform(patientdata, new_col=c(2:5))
+# usuń kolumnę z ramki danych: metoda 2
+patientdata <- transform(patientdata, new_col=NULL)
 # dodaj wiersz do ramki danych
 new_row <- data.frame(patientID=5, age=10, diabetes='Type3', status='Good')
 patientdata <- rbind(patientdata, new_row)
-# usuń kolumnę do ramki danych: metoda 1
-patientdata$new_col <- NULL
-# usuń kolumnę do ramki danych: metoda 2
-patientdata <- transform(patientdata, new_col=NULL)
 # usuń wiersz z ramki danych
 index <- 2
 patientdata <- patientdata[-index, ]
@@ -196,10 +196,12 @@ detach(mtcars) # usuń zbiór danych do ścieżki R wyszukiwania
 
 # mapa wektorów dyskretnych wartości [1...k]
 diabetes <- c('Type1', 'Type2', 'Type1', 'Type1')
-diabetes <- factor(diabetes) # Type1-1 Type2-2
+diabetes <- factor(diabetes) # Levels: Type1 Type2
 status <- c('Poor', 'Improved', 'Excellent', 'Poor') 
 status <- factor(status, ordered=TRUE) # Excellent-1 Improved-2 Poor-3
+status
 status2 <- factor(status, ordered=TRUE, levels=c('Poor', 'Improved', 'Excellent')) # Excellent-3 Improved-2 Poor-1
+status2
 
 # przykład pokazujący faktory zmienne jakościowe
 patientID <- c(1, 2, 3, 4)
@@ -226,21 +228,23 @@ mylist[[2]][1] # 25, pierwszy element drugiego argumentu z listy
 
 #wstawianie danych z pliku csv
 
-# czytaj plik csv
-signal <- read.table(fileDir, header=FALSE, sep=',')
+
 # exportuj dane do pliku csv
 write.table(data, 'data.csv', row.names=F, col.names=F, sep=',')
+# czytaj plik csv
+signal <- read.table('data.csv', header=FALSE, sep=',')
 
 #zapisz rysunki do plików
 
 # pierwszy rysunek
 pdf('graph1.pdf')
-plot()
+x2plot=seq(1:20)
+plot(sin(x2plot))
 dev.off()
 
 # drugi rysunek
 pdf('graph2.pdf')
-plot()
+plot(cos(x2plot))
 dev.off()
 
 #dwa wykresy na jednym rysunku
@@ -250,7 +254,7 @@ y2 <- 3*x
 plot(x, y1, type='l', col='red', xlab='day', ylab='Net Value')
 lines(x, y2, type='l', col='green')
 
-# etykietuj osie z pomocą legend(), lwd - grubość linii, bty='n' - brak ramki wokół
+# etykietuj linie z pomocą legend(), lwd - grubość linii, bty='n' - brak ramki wokół
 legend('topleft', legend=c('line 1', 'line 2'), col=c('red', 'green'), lwd=1, bty='n') 
 
 # rysuj funkcję
@@ -262,12 +266,13 @@ plot(f, -20*pi, 20*pi)
 #narysuj wiele rysunków w tym samym czasie
 
 # pierwszy rysunek
-plot()
+plot(f)
 # drugi rysunek
 # otwórz nowy rysunek
 dev.new()
 # przelączanie strzałkami z klawiatury
-plot() 
+plot(f(x2plot/20)) 
+dev.off()
 
 #Zarządzanie, manipulacja strukturami danych 
 
@@ -292,193 +297,208 @@ detach(mydata)
 # metoda 3
 mydata <- transform(mydata, sumx = x1 + x2, meanx = (x1+x2)/2)
 
-#2 recoding variables
+#zapisywanie zmiennych
 
 mydata <- data.frame(x1 = c(2, 2, 6, 4),
                      x2 = c(3, 4, 2, 8))
-# recoding variables
-# method 1
-#mydata$age[mydata$x1==2] <- 1
-#mydata$tmp <- mydata$x1 * mydata$x2
 
-# method 2
+# metoda 1
+mydata$age[mydata$x1==2] <- 1
+mydata$tmp <- mydata$x1 * mydata$x2
+mydata
+mydata$tmp <- NULL;
+mydata$age <- NULL;
+# metoda 2
 mydata <- within(mydata, {
-  age <- NA # create a new variable age for data frame mydata and intialize it as NA
+  age <- NA # utwórz nową zmienną age i zainicjalizuj ją NA (nullem z R)
   age[x1==2] <- 1
   tmp <- x1*x2
 })
+mydata
 
-3 renaming variables
+#zmiana nazw
 
-rename(dataframe, c(oldname1="newname1", oldname2="newname2",...))
-#names(dataframe) returns the variable names of the data frame as a vector
-names(dataframe)[2] <- "newname"
-# or use fix(dataframe) to rename variables in GUI
+#rename(dataframe, c(oldname1="newname1", oldname2="newname2",...))
+library(plyr)
+rename(mydata,c(tmp="temp"))
+#names(dataframe) zwraca wektor nazw zmiennych
+names(mydata)[3] <- "tmp"
+# lub użyj fix(dataframe) aby zmienić nazwy w gui
 
-4 missing values
+#manipulacja NA
 
-leadership$age[leadership$age==99] <- NA
-x < - c(1, 2, NA, 3)
-y <- x[1] + x[2] + x[3] + x[4] # y will be NA
-z <- sum(x) # z will be NA
-z <- sum(x, na.rm=TRUE) # na.rm=TRUE removes the missing values
-newdata <- na.omit(leadership) # na.omit() deletes any rows with missing data
+mydata$age[mydata$age==1] <- NA
+mydata
+mydata$age[is.na(mydata$age)] <- 55
+mydata
+x <- c(1, 2, NA, 3)
+y <- x[1] + x[2] + x[3] + x[4] # y równa się NA
+z <- sum(x) # y równa się NA
+z <- sum(x, na.rm=TRUE) # na.rm=TRUE usuwa brakujące wartości czyli NA
+newdata <- na.omit(leadership) # na.omit() usuwa wiersze z NA
 
-5 Date values
-(1) store character date as a data variable
 
-# x is character date
-# default input format is yyyy-mm-dd
-mydate <- as.Date(x, 'input_format')
+#zapisz datę jako zmienną
+# x jest datą w formie tekstu
+# format daty to %Y-%m-%d
+mydate <- as.Date('2016-04-28', '%Y-%m-%d')
+mydate
+class(mydate)
 
-(2) transform date to a specific format and to extract portions of dates
+#zapisz datę do formatu 
+# x jest datą w formie tekstu
+# format daty to %Y-%m-%d
+datechar<-format(mydate, format='%Y-%m-%d') 
+datechar
+class(datechar)
 
-# x is a date variable
-# default output format is yyyy-mm-dd
-mydate <- format(x, format='output_format') 
+#policz okres czasu w sekundach, minutach, godzinach, dniach lub tygodniach
+# dataX and dataY są zmiennymi dat
+interval <- difftime('2016-04-01', '2016-04-28', units='weeks')
+interval
 
-(3) calculate a time interval and express it in seconds, minutes, hours, days, or weeks,
+#Sys.Date() zwraca dzisiejszą datę w postaci obiektu Date, date() zwraca datę i czas w postaci łańcucha znaków
 
-# dataX and dataY are data variables
-interval <- difftime(dateX, dateY, units='weeks')
-
-(4) Sys.Date() returns today's date and date() returns the current date and time
-
-# record the running time of a program
+# zapisz czas programu
 t1 <- proc.time()
-code 
+for (i in 1:1000) {
+  cat('.')
+}
 t2 <- proc.time()
-time_elapsed <- (t2-t1)[[3]] # the elapsed time
-time_elapsed <- as.numeric((t2-t1)[3]) # the elapsed time, the same as the above value
+time_elapsed <- (t2-t1)[[3]] # okres czasu
+time_elapsed
+time_elapsed <- as.numeric((t2-t1)[3]) # okres czasu
+time_elapsed
 
-6 Type conversion (page 84)
-is.datatype() return TRUE or FALSE
-as.datatype() converts the argument to that type
+# typ konwersji
+#is.datatype() #zwraca TRUE or FALSE, gdzie datatype np. integer tzn. is.integer
+#as.datatype() #konwertuje do typu danych, gdzie datatype np. integer tzn. is.integer
 
-7 Sort data frame (By default, the sorting order is ascending)
+#sortuje ramkę danych, domyślnie rosnąco
+# sortuj wiersze od najmłodszych do najstarszych
+newdata <- patientdata[order(patientdata$age),]
 
-# sort the rows from youngest to oldest
-newdata <- leadership[order(leadership$age),]
+# sortuj wiersze osobno dla kobiet i mężczyzn, od najmłodszych do najstarszych 
+attach(patientdata)
+newdata <- patientdata[order(diabetes, age), ]
+detach(patientdata)
+newdata
 
-# sort the rows from female to male, and from youngest to oldest within each gender
-attach(leadership)
-newdata <- leadership[order(gender, age), ]
-detach(leadership)
+# sortuj wiersze osobno dla kobiet i mężczyzn, od najstarszych do najmłodszych
+attach(patientdata)
+newdata <- patientdata[order(diabetes, -age), ]
+detach(patientdata)
+newdata
 
-# sort the rows from female to male, and from oldest to youngest within each gender
-attach(leadership)
-newdata <- leadership[order(gender, -age), ]
-detach(leadership)
 
-8 Merge data sets
-(1) add columns
+#Łączenie danych: dodawanie kolumn
+# połącz kolumnami patientdata i newdata po ID 
+total <- merge(patientdata, newdata, by="patientID")
+total
+# połącz kolumnami patientdata i newdata po ID i Country
+total <- merge(patientdata, newdata, by=c('patientID', 'diabetes'))
+total
+# połącz kolumnami patientdata i newdata muszą mieć tą samą ilość wierszy
+total <- cbind(patientdata, newdata)
+total
 
-# merge dataframeA and dataframeB by ID (inner join)
-total <- merge(dataframeA, dataframeB, by="ID")
-# merge dataframeA and dataframeB by ID and Country (inner join)
-total <- merge(dataframeA, dataframeB, by=c('ID', 'Country'))
-# horizontally concatenate dataframeA and dataframeB
-# dataframeA and dataframeB must have the same number of rows and the row order should be the same
-total <- cbind(dataframeA, dataframeB)
+newdata$patientID<-newdata$patientID+10
+#Łączenie danych: dodawanie wierszy
+# połącz dwie ramki z tą samą liczbą kolumn
+total <- rbind(patientdata, newdata)
+total
 
-(2) add rows
-
-# the two data frames must have the same variables
-total <- rbind(dataframeA, dataframeB)
-
-9 Subsetting data sets
-(1) Keeping variables
-
+#wyodrębnianie podzbiorów
 c1 <- c(1, 2, 3)
 c2 <- c(4, 5, 6)
 c3 <- c(7, 8, 9)
 data <- data.frame(c1, c2, c3)
-newdata <- data[1]
-newdata <- data['c1']
-x <- c('c1', 'c2)
-newdata <- data[x]
-newdata <- data[, 1]
-newdata <- data[, 1:2]
-newdata <- data[, c(1:2)]
-newdata <- data[1,]
-newdata <- data[1:2,]
+data[1]
+data['c1']
+x <- c('c1', 'c2')
+data[x]
+data[, 1]
+data[, 1:2]
+data[, c(1:2)]
+data[1,]
+data[1:2,]
 
-(2) Excluding variables
+#wyodrębnianie zmiennych z ramki (kolumn)
+# usuń zmienne age, diabetes
+myvars <- names(total) %in% c('age', 'diabetes')
+myvars
+newdata <- total[!myvars]
+newdata
+# usuń 2 i 3-ą kolumnę
+newdata <- total[c(-2, -3)]
+newdata
+# usuń zmienne age, diabetes
+total$age <- total$diabetes <- NULL
+total
 
-# delete variables q3 and q4
-myvars <- names(leadership) %in% c('q3', 'q4')
-newdata <- leadership[!myvars]
-# delete the 8th and 9th variables
-newdata <- leadership[c(-8, -9)]
-# delete variables q3 and q4
-leadership$q3 <- leadership$q4 <- NULL
+#wybieranie podzbiorów
+patientdata[1:3,]
+patientdata[which(patientdata$status=='Poor' & patientdata$age<30),]
+attach(patientdata)
+patientdata[which(status=='Poor' & age<30),]
+detach(patientdata)
 
-(3) Selecting observations
-
-newdata <- leadership[1:3,]
-newdata <- leadership[which(leadership$gender=='M' & leadership$age>30),]
-attach(leadership)
-newdata <- leadership[which(gender=='M' & age>30),]
-
-leadership$date <- as.Date(leadership$date, '%m/%d/%y')
+patientdata$date<-Sys.Date()
+patientdata
+patientdata$date <- as.Date(patientdata$date, '%m/%d/%y')
+patientdata
 startdate <- as.Date('2009-01-01')
-enddate <- as.Date('2009-10-31')
-newdata <- leadership[which(leadership$date>=startdate & leadership$date<=enddate),]
+enddate <- as.Date('2017-10-31')
+patientdata[which(patientdata$date>=startdate & patientdata$date<=enddate),]
 
 # use package dplyr (install first)
-newdata <- filter(leadership, gender=='M' & age>30)
+library(dplyr)
+newdata <- filter(patientdata, status=='Poor' & age<30)
+newdata
 
-(4) The subset() function
+# subset() 
+subset(patientdata, age>=35 | age<24, select=c(age,status))
+subset(patientdata, status=='Poor' & age<30, select=patientID:date)
 
-newdata <- subset(leadership, age>=35 | age<24, select=c(q1, q2, q3, q4))
-newdata <- subset(leadership, gender=='M' | age>25, select=gender:q4)
+#losowa próba sample
+sample(1:nrow(patientdata), 3, replace=FALSE)
+patientdata[sample(1:nrow(patientdata), 3, replace=FALSE), ]
 
-(5) Random samples
-
-mysample <- leadership[sample(1:nrow(leadership), 3, replace=FALSE), ]
-
-(6) Using SQL to manipulate data frames
-
+#używanie sqla
 library('sqldf')
-newdf <- sq1df('select * from mtcars where carb=1 order by mpg', row.names=TRUE)
-newdf <- sqldf('select avg(mpg) as avg_mpg, avg(disp) as avg_disp, gear from mtcars where cyl in (4, 6) group by gear')
+head(mtcars)
+sqldf('select * from mtcars where carb=1 order by mpg', row.names=TRUE)
+sqldf('select avg(mpg) as avg_mpg, avg(disp) as avg_disp, gear from mtcars where cyl in (4, 6) group by gear')
 
-10 Conversion between string and variable name
-
-# string to variable name
-assign('test', 10) # same as test <- 10
+#konwersja pomiędzy łancuchem znaków i zmienną
+# łańcuch do zmiennej
+assign('test', 10) # taki sam efekt jak po: test <- 10
 x <- 'test'
-assign(x, 5) # same as test <- 5
+assign(x, 5) # taki sam efekt jak po: test <- 5
 
-# variable name to string
+# nazwa zmiennej do łańcucha
 x <- 5
-var.name <- deparse(substitute(x)) # var.name will be "x"
+var.name <- deparse(substitute(x)) # var.name równa się "x"
 
-Advanced data management
+#Zaawansowana obsługa danych
+#matematyczne funkcje: sqrt(x), floor(x), log(x), exp(x)
+#statystyczne funkcje: mean(x), median(x), sd(x), var(x), range(x), sum(x), scale(x, center=TRUE, scale=TRUE)
+#funkcje probabilistyczne: 
+#[dpqr]distribution_abbrebiation (d=density, p=distribution function, q=quantile function, r=random generation)
+#runif()- próba o równomiernym rozkładzie
+#set.seed(5): ustaw seed na jakąś jedną wartość np. 5, aby uzyskać te same wyniki
+#fukcje znakowe: 
+#nchar(x), nzchar(x), substr(x, start, stop), grep(pattern, x, ignore.case=FALSE, fixed=FALSE)
+#sub(pattern, replacement, x, ignore.case=FALSE, fixed=FALSE), strsplit(x, split, fixed=FALSE)
+#paste(..., sep=""), toupper(x), tolower(x)
+#inne funkcje:
+#length(x), seq(from, to, by), rep(x, n), cut(x, n), pretty(x, n), cat(.., file='myfile', append=FALSE)
+#uruchom funckje na macierzach i ramkach
+#apply(x, MARGIN, FUN, ...)
+#x to dane, MARGIN indeks rozmiaru, 1 oznacza wiersze, 2 oznacza kolumny, FUN jest funkcją, a  ... jej dodatkowymi argumentami
 
-1 Numerical and character functions
-
-Mathematical functions
-sqrt(x), floor(x), log(x), exp(x)
-Statistical functions
-mean(x), median(x), sd(x), var(x), range(x), sum(x), scale(x, center=TRUE, scale=TRUE)
-Probability functions (page 96)
-[dpqr]distribution_abbrebiation (d=density, p=distribution function, q=quantile function, r=random generation)
-runif(): uniform distribution on the interval 0 to 1
-set.seed(5): set seed to make the results reproducible
-Character functions
-nchar(x), nzchar(x), substr(x, start, stop), grep(pattern, x, ignore.case=FALSE, fixed=FALSE)
-sub(pattern, replacement, x, ignore.case=FALSE, fixed=FALSE), strsplit(x, split, fixed=FALSE)
-paste(..., sep=""), toupper(x), tolower(x)
-Other useful functions
-length(x), seq(from, to, by), rep(x, n), cut(x, n), pretty(x, n), cat(.., file='myfile', append=FALSE)
-Apply functions to matrices and data frames
-apply(x, MARGIN, FUN, ...)
-x is the data object, MARGIN is the dimension index, 1 indicates rows, 2 indicates columns, FUN is a function you specify, and ... are any parameters you want to pass to FUN
-
-2 Control flow
-
-if/else, ifelse, switch
+#kontrola przepływu danych
+#if/else, ifelse, switch
 
 score <- 0.6
 if (score > 0.5) {
@@ -487,30 +507,29 @@ if (score > 0.5) {
   outcome2 <- 'not passed'
 }
 outcome <- ifelse(score>0.5, 'passed', 'not passed')
-switch(expr, ...)
+#switch(expr, ...)
 
-Note:
-  "... When the if statement is not in a block the else, if present, must appear on the same line as statement1. Otherwise the new line at the end of statement1 yields a syntactically complete statement that is evaluated. ..."
 
-for, while
-for (var in seq) statement
-while (cond) statement
+#for, while
+#for (var in seq) statement
+#while (cond) statement
 
 for (i in 1:10) {
   print('hello world')
 }
-# pay attention to the following example, it will print 1 and 0
-for (i in 1:0) {
+# wypisze od 1 do 10
+for (i in 1:10) {
   print(i)
 }
 
+# wypisze 10 razy 'witaj'
 i <- 10
 while(i>=0) {
-  print('hello world')
+  print('witaj')
   i <- i-1
 }
 
-3 User-defined functions
+#funkcje użytkownika
 myfunction <- function(arg1, arg2, ...) {
   statements
   return(object)
@@ -533,31 +552,31 @@ mystats <- function(x, parametric=TRUE, print=FALSE) {
   return(result)
 }
 
-4 Aggregation and restructuring
+#agregacja i zmiana struktur
+#aggregate(x, by, FUN)
+#x to obiekt danych, by - lista zmiennych, i FUN  funkcja agregacyjna 
+#reshape
+#install.packages('reshape', depend=T)
+library('reshape')
+md<-melt(patientdata, id=(c('diabetes', 'status')))
+md
+cast(md, status~variable, mean)
 
-aggregate(x, by, FUN)
-x is the data object to be collapsed, by is a list of variables that will be crossed to form the new observations, and FUN is the scalar function used to calculate summary statistics that will make up the new observation values.
-reshape
-install.packages('reshape'), library('reshape')
-melt(data, id=(c('id', 'time'))), cast(md, id~variable, mean)
-
-Clustering in R
-
-K-means clustering
-
-signal.return <- data.frame(signal.value, return.rate)
-kmeans.res <- kmeans(signal.return, 3) # 3 clusters, give each observation a label
-plot(signal.return, xaxt='n', yaxt='n', xlab='Signal Value', ylab='Return')
+#klasteryzacja w R np. K-means 
+mdata<-mtcars[c('disp','hp')]
+kmeans.res <- kmeans(mdata, 3) # 3 zbiory odrębnych danych
+plot(mdata, xaxt='n', yaxt='n',xlab="X",ylab="Y")
 axis(1, pos=0)
 axis(2, pos=0)
 abline(v=0, h=0)
 kmeans.cluster <- factor(kmeans.res$cluster)
-# need to install package 'ade4' to visualize the clusters
-s.class(signal.return, fac=kmeans.cluster, add.plot=TRUE, col=seq(1, nlevels(kmeans.cluster), 1))
+# zainstaluj 'ade4' aby zwizualizować zbiory
+library(ade4)
+s.class(mdata, fac=kmeans.cluster, add.plot=TRUE, col=seq(1, nlevels(kmeans.cluster), 1))
 
 
 
-#stepfirst
+#krok pierwszy
 fn <- function (x) {
   ifelse(x>46 & x<52, 1, 0)
 }    
@@ -569,7 +588,7 @@ fn <- function (x,y) {
 datagrid <- expand.grid(i = 40:60, j = 0:20)
 res <- fn(datagrid$i, datagrid$j)
 
-#An other option is to use the functions for the apply-family
+#funkcje w różnych odmianach apply 
 
 fn <- function (x) {
   ifelse(x>46 & x<52, 1, 0)
@@ -584,7 +603,7 @@ res <- apply(datagrid, 1, function(z){
   fn(z["i"], z["j"])
 }) 
 
-#or you can use a nested loop
+#zagnieżdżona pętla
 
 res <-NULL 
 for (i in 40:60){
