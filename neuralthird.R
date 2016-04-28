@@ -35,9 +35,9 @@ cortest <- cor(rand.vars)
 corrplot(cortest, method = "circle")
 
 #output variables
-parms <- runif(num.vars, -10, 10)
+parms <- runif(num.vars,-10, 10)
 y1 <- rand.vars %*% matrix(parms) + rnorm(num.obs, sd = 20)
-parms2 <- runif(num.vars, -10, 10)
+parms2 <- runif(num.vars,-10, 10)
 y2 <- rand.vars %*% matrix(parms2) + rnorm(num.obs, sd = 20)
 
 #final datasets
@@ -64,6 +64,7 @@ mod2 <- neuralnet(form.in, data = dat.in, hidden = 10)
 #mlp function from RSNNS package
 library(RSNNS)
 set.seed(seed.val)
+
 mod3 <- mlp(rand.vars, resp, size = 10, linOut = T)
 
 #import the function from Github
