@@ -7,6 +7,10 @@ http://www.rdatamining.com/examples
 
 #Jeden z wielu tutoriali QuickR
 http://www.statmethods.net/
+#W skrócie cały R
+http://personality-project.org/r/r.guide.html
+#szybki wstęp
+http://www.datasciencecentral.com/m/blogpost?id=6448529:BlogPost:415828
 #np. jedna z metod
 http://www.statmethods.net/management/reshape.html
 
