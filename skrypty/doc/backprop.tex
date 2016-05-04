@@ -17,6 +17,7 @@
 \usepackage{rotating}      
 \usepackage{color}
 \usepackage{verbatim}
+\usepackage{neuralnetwork}
 
 \usepackage{tikz}
 
@@ -126,15 +127,15 @@ Propagacja wsteczna – podstawowy algorytm uczenia nadzorowanego wielowarstwowy
 \item[]
 \underline{Funkcja błędu aproksymacji:}
 \begin{align*}
-F &= \sum_{p \in P} \ ^pE \ \ \ \text{gdzie $p$ jest elementem w zbiorze trenującym $P$} \\
-^p E &= \frac{1}{2} \sum_{j \in M} \left(\hat{y}_m - y_m \right)^2 \ \ \ \text{with $\hat{y}_m$ trenuje $m$ wyjście $y_m$}
+F &= \sum_{p \in P} \ ^pE \ \ \ \text{, gdzie $p$ jest elementem w zbiorze trenującym $P$} \\
+^p E &= \frac{1}{2} \sum_{j \in M} \left(\hat{y}_m - y_m \right)^2 \ \ \ \text{, gdzie $\hat{y}_m$ trenuje $m$ wyjście $y_m$}
 \end{align*}
 
 \item[]
 \underline{Funkcje wag - współczynników połączeń między neuronami:}
 \begin{align*}
-^p \vartriangle w_{hm} &\sim - \nabla_w \cdot \ ^p E \ \ \ \text{gdzie $w_{hm}$ jest wagą połączenia z neuronu $h$ do neuronu $m$} \\
-\vartriangle w_{hm} &= - \eta \textcolor{red}{\frac{\partial E \left( w_{hm} \right) }{ \partial w_{hm}} } \ \ \ \text{gdzie $\eta$ jest współczynnikiem uczenia się}
+^p \vartriangle w_{hm} &\sim - \nabla_w \cdot \ ^p E \ \ \ \text{, gdzie $w_{hm}$ jest wagą połączenia z neuronu $h$ do neuronu $m$} \\
+\vartriangle w_{hm} &= - \eta \textcolor{red}{\frac{\partial E \left( w_{hm} \right) }{ \partial w_{hm}} } \ \ \ \text{, gdzie $\eta$ jest współczynnikiem uczenia się}
 \end{align*}
 
 \item[]
@@ -319,6 +320,37 @@ at (\i) {$f_{\i}(e)$};
     \node[annot,left of=hl] {Wejściowa warstwa};
     \node[annot,right of=hl] {Wyjściowa warstwa};
 \end{tikzpicture}
+
+    \begin{neuralnetwork}[height=2.5, layertitleheight=0, nodespacing=2.8cm, layerspacing=1.7cm]
+        \newcommand{\nodetextclear}[2]{}
+        \newcommand{\nodetextxnb}[2]{\ifnum0=#2 \else $x_#2$ \fi}
+        \newcommand{\logiclabel}[1]{\,{$\scriptstyle#1$}\,}
+        \newcommand{\nodetextY}[2]{$y$}
+        \newcommand{\linklabelsU}[4]{\logiclabel{+1}}
+        \newcommand{\linklabelsA}[4]{\ifnum0=#2 \logiclabel{+3} \else \logiclabel{-2} \fi}
+        \setdefaultnodetext{\nodetextclear}
+        % Input layer
+        \inputlayer[count=2, bias=false, text=\nodetextxnb]
+        % links to first hidden layer from input layer
+        \hiddenlayer[count=3, bias=false, exclude={1, 3}]
+            \link[from layer=0, to layer=1, from node=1, to node=2, label=\linklabelsA]
+            \link[from layer=0, to layer=1, from node=2, to node=2, label=\linklabelsA]
+        \hiddenlayer[count=2, bias=true, biaspos=center]
+        % links to second hidden layer from input and first hidden layer
+            \link[from layer=0, to layer=2, from node=1, to node=1, label=\linklabelsA]
+            \link[from layer=1, to layer=2, from node=2, to node=1, label=\linklabelsA]
+            \link[from layer=1, to layer=2, from node=2, to node=2, label=\linklabelsA]
+            \link[from layer=0, to layer=2, from node=2, to node=2, label=\linklabelsA]
+        \outputlayer[count=1, text=\nodetextY]
+        % links to output layer from second hidden layer
+            \link[from layer=2, to layer=3, from node=1, to node=1, label=\linklabelsA]
+            \link[from layer=2, to layer=3, from node=2, to node=1, label=\linklabelsA]
+        % links from bias node
+            \link[from layer=2, to layer=1, from node=0, to node=2, label=\linklabelsA]
+            \link[from layer=2, to layer=2, from node=0, to node=1, label=\linklabelsA]
+            \link[from layer=2, to layer=2, from node=0, to node=2, label=\linklabelsA]
+            \link[from layer=2, to layer=3, from node=0, to node=1, label=\linklabelsA]
+    \end{neuralnetwork}
 
 \end{center}
 \end{document}
