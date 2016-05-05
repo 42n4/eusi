@@ -3,6 +3,7 @@ https://www.kaggle.com/competitions
 
 #kurs maszynowego uczenia w Octave 
 https://www.coursera.org/learn/machine-learning/home/welcome
+http://www.holehouse.org/mlclass/index.html
 https://github.com/emersonmoretto/mlclass-ex1
 https://github.com/schneems/Octave
 #kurs maszynowego uczenia - python
@@ -14,6 +15,8 @@ https://www.datacamp.com/courses?utm_source=machine_learning_post
 #DataMining in R
 http://www.rdatamining.com/
 http://www.rdatamining.com/examples
+#kursy statystycznego uczenia się
+http://www.r-bloggers.com/online-class-on-statistical-learning/
 
 #Tutoriale języka R
 http://www.skilledup.com/articles/18-free-tutorials-learning-r-programming 

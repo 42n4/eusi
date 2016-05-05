@@ -15,9 +15,9 @@ end
 
 function [theta, J_history] = gradientDescent(X, y, theta, alpha, num_iters)
 %GRADIENTDESCENT liczy spadek gradientu i znajduje optymalne parametry
-%   theta = GRADIENTDESENT(X, y, theta, alpha, num_iters) updates theta by 
-%   taking num_iters gradient steps with learning rate alpha
-
+%theta = GRADIENTDESENT(X, y, theta, alpha, num_iters) 
+%zmienia theta poprzez kolejne odejmowanie gradientu * współczynnik alfa
+%https://www.coursera.org/learn/machine-learning/lecture/kCvQc/gradient-descent-for-linear-regression
 % Inicjalizacja
 m = length(y); % ilość przykładów trenujących
 J_history = zeros(num_iters, 1);
