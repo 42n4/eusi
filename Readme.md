@@ -19,32 +19,35 @@ http://www.rdatamining.com/examples
 ###kursy statystycznego uczenia się
 http://www.r-bloggers.com/online-class-on-statistical-learning/
 
-#Tutoriale języka R
+###Tutoriale języka R
 http://www.skilledup.com/articles/18-free-tutorials-learning-r-programming 
 http://www.statslectures.com/index.php/r-stats-videos-tutorials
-#Jeden z wielu tutoriali QuickR
+###Jeden z wielu tutoriali QuickR
 http://www.statmethods.net/
-#W skrócie cały R
+###W skrócie cały R
 http://personality-project.org/r/r.guide.html
-#szybki wstęp
+###szybki wstęp
 http://www.datasciencecentral.com/m/blogpost?id=6448529:BlogPost:415828
-#np. jedna z metod
+###np. jedna z metod
 http://www.statmethods.net/management/reshape.html
 
-#porównanie R z pythonem
+###porównanie R z pythonem
 https://www.dataquest.io/blog/python-vs-r/
 
 http://www.r-bloggers.com/visualizing-neural-networks-from-the-nnet-package/ 
 http://www.r-bloggers.com/in-depth-introduction-to-machine-learning-in-15-hours-of-expert-videos/
 
-#książka http://www-bcf.usc.edu/~gareth/ISL/code.html
-#rozwiązania
+###książka 
+http://www-bcf.usc.edu/~gareth/ISL/code.html
+###rozwiązania
 https://github.com/asadoughi/stat-learning
 
-#2-dim maps http://www.r-bloggers.com/self-organising-maps-for-customer-segmentation-using-r-2/
-#tutorials http://www.r-bloggers.com/how-to-learn-r-2/
+###2-dim maps 
+http://www.r-bloggers.com/self-organising-maps-for-customer-segmentation-using-r-2/
+###tutorials 
+http://www.r-bloggers.com/how-to-learn-r-2/
 
-#podstawy R
+###podstawy R
 https://github.com/jincheng9/R-in-Action
 
 
