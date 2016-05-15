@@ -1,21 +1,22 @@
-#do projektu serwer zadań do rozwiązania z podpowiedziami
+###do projektu serwer zadań do rozwiązania z podpowiedziami
 https://www.kaggle.com/competitions
 
-#kurs maszynowego uczenia w Octave 
+###kurs maszynowego uczenia w Octave 
 https://www.coursera.org/learn/machine-learning/home/welcome
 http://www.holehouse.org/mlclass/index.html
 https://github.com/emersonmoretto/mlclass-ex1
 https://github.com/schneems/Octave
-#kurs maszynowego uczenia - python
+
+###kurs maszynowego uczenia - python
 https://www.udacity.com/course/intro-to-machine-learning--ud120
 https://github.com/antran89/ud120-projects
 https://github.com/zfz/ud120
-#kurs maszynowego uczenia w R
+###urs maszynowego uczenia w R
 https://www.datacamp.com/courses?utm_source=machine_learning_post
-#DataMining in R
+###DataMining in R
 http://www.rdatamining.com/
 http://www.rdatamining.com/examples
-#kursy statystycznego uczenia się
+###kursy statystycznego uczenia się
 http://www.r-bloggers.com/online-class-on-statistical-learning/
 
 #Tutoriale języka R
