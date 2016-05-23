@@ -162,35 +162,66 @@ for( i in seq_along(c()))       print(i)# poprawna forma pętli odporna na błą
 
 
 #MACIERZ: dwuwymiarowa tablica tego samego typu zmiennych
-cells <- c(1, 26, 24, 68)
-cells
-matrix(cells) # kolumnowy, pionowy wektor
-t(t(cells))   # transponowany dwa razy wektor to to samo co kolumnowy wektor
-rnames <- c('R1', 'R2')
-cnames <- c('C1', 'C2')
-# wypełnij macierz po wierszach
-matrix(
-  cells,
-  nrow = 2,
-  ncol = 2,
-  byrow = TRUE,
-  dimnames = list(rnames, cnames)
-)
-# wypełnij macierz po kolumnach, to domyślne ustawienie
-matrix(
-  cells,
-  nrow = 2,
-  ncol = 2,
-  byrow = FALSE,
-  dimnames = list(rnames, cnames)
-)
-# użyj macierzy indeksów
+# użyj indeksów macierzy 
 x <- matrix(1:16, nrow = 4)
 x
 x[2, ]        #drugi wiersz
 x[, 2]        #druga kolumna
 x[1, 4]       #pole z 1 wiersza i 4 kolumny
 x[1, c(3, 4)] #pola z 1 wiersza i 3 oraz 4 kolumny
+nrow(x)       #liczba wierszy macierzy
+ncol(x)       #liczba kolumn macierzy
+dim(x)        #wymiary macierzy c(nrow(x),ncol(x))
+length(x)     #nrow(x)*ncol(x)
+rowMeans(x)   #średnie liczone po wierszach
+colMeans(x)   #średnie liczone po kolumnach
+rowSums(x)    #sumy liczone po wierszach
+colSums(x)    #sumy liczone po kolumnach
+t(x)          #transponowana macierz x
+det(x)        #wyznacznik macierzy w tym przypadku 0 - macierz sosbliwa
+#tworzenie kolumny 4x1 z wektora i nazwanej macierzy 2x2
+cells <- c(1, 6, 4, 8)
+cells
+matrix(cells) # kolumnowy, pionowy wektor
+t(t(cells))   # transponowany dwa razy wektor to to samo co kolumnowy wektor
+rnames <- c('R1', 'R2')
+cnames <- c('C1', 'C2')
+# wypełnij macierz po kolumnach, to domyślne ustawienie
+colmatrix<-matrix(
+  cells,
+  nrow = 2,
+  ncol = 2,
+  byrow = FALSE,
+  dimnames = list(rnames, cnames)
+)
+colmatrix
+rownames(colmatrix) #nazwy wierszy
+colnames(colmatrix) #nazwy kolumn
+c(colmatrix)        #konwersja do wektora spowrotem do oryginalnej postaci wektora cells
+# wypełnij macierz po wierszach 
+rowmatrix<-matrix(
+  cells,
+  nrow = 2,
+  ncol = 2,
+  byrow = TRUE,
+  dimnames = list(rnames, cnames)
+)
+rowmatrix
+c(rowmatrix)        #konwersja do wektora, ale innego niż początkowy wektor cells
+# macierzowe mnożenie np.: iloczyn pierwszego wiersza i kolumny pierwszej 
+# to wymnożenie ich elementów i suma iloczynów
+# efektem jest element c(1,1) nowej wynikowej macierzy, dla 1 wiersza i 2 kolumny - c(1,2)
+colmatrix %*% rowmatrix #mnożenie macierzy: wierszy pierwszej przez kolumny drugiej
+colmatrix *   rowmatrix #mnożenie element colmatrix[i,j] z odpowiadającym elementem rowmatrix[i,j]
+crossprod(colmatrix,rowmatrix)   #mnożenie macierzy transponowanej przez zwykłą t(colmatrix) %*% rowmatrix
+tcrossprod(colmatrix,rowmatrix)  #mnożenie macierzy zwykłej przez transponowaną colmatrix %*% t(rowmatrix)
+solve(colmatrix)                 #odwrócona macierz
+solve(colmatrix,rowmatrix)       #rozwiązanie równania colmatrix %*% X = rowmatrix
+solve(rowmatrix,colmatrix)       #rozwiązanie równania rowmatrix %*% X = colmatrix
+solve(rowmatrix,rowmatrix)       #przekształcenie na tą samą macierz poprzez macierz diagonalną identycznościowa X=diag(2)
+diag(2)                          #macierz diagonalna identycznościowa
+det(colmatrix %*% rowmatrix)     #det(A · B) = detA · detB
+det(colmatrix) %*% det(rowmatrix)#det(A · B) = detA · detB
 
 
 #TABLICA ARRAY: podobna do macierzy matrix, ale może mieć więcej wymiarów
