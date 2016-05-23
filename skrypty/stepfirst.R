@@ -240,17 +240,22 @@ mlist['wiek']           #element wiek, w tym przypadku lista (nie używać, kied
 mlist[2]                #element wiek, w tym przypadku lista (nie używać, kiedy potrzebny wektor)
 typeof(mlist[['wiek']]) #typ double  
 typeof(mlist['wiek'])   #typ lista
-mlist[[2]][1]           #25, pierwszy element drugiego argumentu z listy wiek
+mlist[[2]][[1]]         #25, pierwszy element drugiego argumentu wektora wiek z listy mlist
 as.list(h)              #konwersja do listy
 nlist<-as.list(h)       
 list(mlist,nlist)       #lista dwóch list
 plist<-list(mlist,nlist)
-print(plist)            #wypisz listę
-str(plist)              #struktura listy
-dput(plist)             #kod w R listy
-#cat(plist)              uwaga! to nie działa!
+print(plist)            #wypisz listę dwóch list
+str(plist)              #struktura listy dwóch list
+dput(plist)             #kod w R listy dwóch list
+#cat(plist)             uwaga! cat z listą nie działa!
 #nadpisuje wartości dwóch elementów listy o nazwach tytul i wiek
 mlist[names(mlist) %in% c('tytul','wiek')]<-c('Nadpisany element listy',list(c(2,4,6,7)))
+lapply(mlist,FUN=length)#zastosuj funkcję length do każdego elementu listy mlist i zwróć LISTĘ długości argumentów
+sapply(mlist,FUN=length)#zastosuj funkcję length do każdego elementu listy mlist i zwróć WEKTOR długości argumentów
+ylist<-list(a=1, b=3, c=5, d=6)
+sapply(ylist, FUN=function(x,p) x^p, p=2)   #wynik potęgi do p=2 wynik to wektor 1,9,25,36
+sapply(ylist, FUN=function(x,p) x^p, p=2:3) #wynik potęgi do p=2 wynik to macierz 2 wierszowa 1,9,25,36 i 1,27,125,216
 
 
 #TABLICA ARRAY: podobna do macierzy matrix, ale może mieć więcej wymiarów
