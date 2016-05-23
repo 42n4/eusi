@@ -226,7 +226,16 @@ diag(2)                          #macierz diagonalna identycznościowa
 det(colmatrix %*% rowmatrix)     #det(A · B) = detA · detB
 det(colmatrix) %*% det(rowmatrix)#det(A · B) = detA · detB
 
-#Lista: uporządkowany zbiór obiektów o możliwych różnych typach
+#TABLICA ARRAY: podobna do macierzy matrix, ale może mieć więcej wymiarów
+dim1 <- c('A1', 'A2')
+dim2 <- c('B1', 'B2', 'B3')
+dim3 <- c('C1', 'C2', 'C3', 'C4')
+z <- array(1:24, c(2, 3, 4), dimnames = list(dim1, dim2, dim3))
+z
+z[1, 2, 3] #wartość komórki z jednego pola trójwymiarowej macierzy
+
+
+#LISTA: uporządkowany zbiór obiektów o możliwych różnych typach
 g <- 'Moja pierwsza lista'
 h <- c(25, 26, 18, 39)
 j <- matrix(1:10, nrow = 5)
@@ -258,84 +267,154 @@ sapply(ylist, FUN=function(x,p) x^p, p=2)   #wynik potęgi do p=2 wynik to wekto
 sapply(ylist, FUN=function(x,p) x^p, p=2:3) #wynik potęgi do p=2 wynik to macierz 2 wierszowa 1,9,25,36 i 1,27,125,216
 
 
-#TABLICA ARRAY: podobna do macierzy matrix, ale może mieć więcej wymiarów
-dim1 <- c('A1', 'A2')
-dim2 <- c('B1', 'B2', 'B3')
-dim3 <- c('C1', 'C2', 'C3', 'C4')
-z <- array(1:24, c(2, 3, 4), dimnames = list(dim1, dim2, dim3))
-z
-z[1, 2, 3] #wartość komórki z jednego pola trójwymiarowej macierzy
 
-
-#RAMKA DANYCH: kolumny mogą mieć różne typy
-patientID <- c(1, 2, 3, 4)
-age <- c(25, 34, 28, 52)
-diabetes <- c('Type1', 'Type2', 'Type1', 'Type1')
+#RAMKA DANYCH: kolumny z różnymi typami
+pacjent_id <- c(1, 2, 3, 4)
+wiek <- c(25, 34, 28, 52)
+cukrzyca <- c('Type1', 'Type2', 'Type1', 'Type1')
 status <- c('Poor', 'Improved', 'Excellent', 'Poor')
-patientdata <- data.frame(patientID, age, diabetes, status)
-x <- nrow(patientdata)
-y <- ncol(patientdata)
-size <-
-  dim(patientdata) # rozmiar to wektor z liczbą wierszy i kolumn
+pacjenci <- data.frame(pacjent_id, wiek, cukrzyca, status)
+nrow(pacjenci)        # ilość wierszy
+ncol(pacjenci)        # ilość kolumn
+dim(pacjenci)         # rozmiar to wektor z liczbą wierszy i kolumn c(nrow(pacjenci),ncol(pacjenci))
+# podaj wiersz lub kolumnę ramki danych
+i <- 1; j <- 2
+pacjenci[i,]               # i-ty wiersz jako ramka danych
+pacjenci[, j]              # j-ta kolumna jako wektor
+pacjenci[, 'wiek']         # kolumna 'wiek' jako wektor
+pacjenci[['wiek']]         # kolumna 'wiek' jako wektor
+pacjenci$wiek              # kolumna 'wiek' jako wektor
+pacjenci[j]                # j-ta kolumna jako ramka danych
+pacjenci['wiek']           # kolumna 'wiek' jako ramka danych
 # podaj ij-ty element ramki danych
-i <- 1
-j <- 2
-patientdata[i, j]
-patientdata[[j]][i]
-patientdata[, j][i]
-as.integer(patientdata[i,][j]) # patientdata[i, ][j] i-ty wiersz jta kolumna jako integer
-patientdata$age[i]
-patientdata[i, 'age']  # i-ty wiersz kolumny age
-
-# podaj wiersz i kolumnę ramki danych
-patientdata[2,] # drugi wiersz jako ramka danych
-patientdata[, 2] # druga kolumna jako wektor
-patientdata[, 'age'] # kolumna age jako wektor
-patientdata$age # kolumna age jako wektor
-patientdata[['age']] # kolumna age jako wektor
-patientdata['age'] # kolumna age jako ramka danych
-
-patientdata[1:2] # pierwsze dwie kolumny jako ramka danych
-patientdata[c('diabetes', 'status')]
-patientdata$age
-table(patientdata$diabetes, patientdata$status)
-# dodaj kolumnę do ramki danych: metoda 1
-patientdata$new_col <- c(2:5)
-# usuń kolumnę z ramki danych: metoda 1
-patientdata$new_col <- NULL
-# dodaj kolumnę do ramki danych: metoda 2
-patientdata <- transform(patientdata, new_col = c(2:5))
-# usuń kolumnę z ramki danych: metoda 2
-patientdata <- transform(patientdata, new_col = NULL)
-# dodaj wiersz do ramki danych
-new_row <-
+as.integer(pacjenci[i,][j])# pacjenci[i, ][j] i-ty wiersz jta kolumna jako integer
+pacjenci[i, j]             # komórka z i tego wiersza i j-tej kolumny
+pacjenci[[i, j]]           # komórka z i tego wiersza i j-tej kolumny
+pacjenci[[j]][i]           # komórka z i tego wiersza i j-tej kolumny
+pacjenci[, j][i]           # komórka z i tego wiersza i j-tej kolumny
+pacjenci$wiek[i]           # komórka z i tego wiersza i kolumny wiek 
+pacjenci[i, 'wiek']        # i-ty wiersz kolumny wiek
+pacjenci[i, i:j]           # dwie komórki z i tego wiersza i oraz i-tej i j-tej kolumny, to NIE działa na [[i, i:j]]
+pacjenci[1:2]              # pierwsze dwie kolumny jako ramka danych
+pacjenci[c('cukrzyca', 'status')]
+index <- 2
+pacjenci[-index,]          # usuń 2 wiersz z ramki danych
+#Wybieranie podzbiorów
+pacjenci[1:3, ]            # trzy pierwsze wiersze - pacjenci
+pacjenci[which(pacjenci$status == 'Poor' & pacjenci$wiek < 30), ] #pacjenci stan kiepski i wiek poniżej 30
+library(plyr); library(dplyr) # use package dplyr (install first)
+filter(pacjenci, status == 'Poor' & wiek < 30) # subset()
+subset(pacjenci, wiek >= 35 | wiek < 24, select = c(wiek, status))
+subset(pacjenci, status == 'Poor' & wiek < 30, select = pacjent_id:date)
+#Sortowanie
+pacjenci[order(pacjenci$wiek), ]                 # sortuj wiersze od najmłodszych do najstarszych, domyślnie rosnąco
+attach(pacjenci)
+spacjenci <- pacjenci[order(cukrzyca, wiek),]    # sortuj wiersze osobno dla kobiet i mężczyzn, od najmłodszych do najstarszych
+detach(pacjenci)
+spacjenci
+attach(pacjenci)
+spacjenci <- pacjenci[order(cukrzyca,-wiek),]    # sortuj wiersze osobno dla kobiet i mężczyzn, od najstarszych do najmłodszych
+detach(pacjenci)
+spacjenci
+#Łączenie danych: dodawanie wierszy
+new_row <-                                       #nowy wiersz
   data.frame(
-    patientID = 5,
-    age = 10,
-    diabetes = 'Type3',
+    pacjent_id = 5,
+    wiek = 10,
+    cukrzyca = 'Type3',
     status = 'Good'
   )
-patientdata <- rbind(patientdata, new_row)
-# usuń wiersz z ramki danych
-index <- 2
-patientdata <- patientdata[-index,]
-#
-# attach, detach, with
-# attach, detach nie pracują na tych samych nazwach zmiennych, użyj "with"
-summary(mtcars$mpg)
-plot(mtcars$mpg, mtcars$disp)
-plot(mtcars$mpg, mtcars$wt)
-attach(mtcars) # dodaj zbiór danych do ścieżki R wyszukiwania
-summary(mpg)
-plot(mpg, disp)
-plot(mpg, wt)
-detach(mtcars) # usuń zbiór danych do ścieżki R wyszukiwania
+pacjenci <- rbind(pacjenci, new_row)             # RBIND dodaje nowy wiersz do ramki danych
+spacjenci<- rbind(spacjenci, new_row)            # to samo z kopią posortowanych - spacjenci
+spacjenci$pacjent_id <- spacjenci$pacjent_id + 10#inne identyfikatory w spacjenci
+rbind(pacjenci, spacjenci)                       # połącz dwie ramki z tą samą liczbą kolumn
+#Łączenie danych: dodawanie kolumn 
+pacjenci$new_col <- c(2:6)                       # dodaj kolumnę do ramki danych: metoda 1
+pacjenci$new_col <- NULL                         # usuń kolumnę z ramki danych: metoda 1
+pacjenci <- transform(pacjenci, new_col = c(2:6))# dodaj kolumnę do ramki danych: metoda 2
+pacjenci <- transform(pacjenci, new_col = NULL)  # usuń kolumnę z ramki danych: metoda 2
+merge(pacjenci, spacjenci, by = "pacjent_id")    # połącz kolumnami pacjenci i spacjenci po ID
+merge(pacjenci, spacjenci, by = c('pacjent_id', 'cukrzyca')) # połącz kolumnami pacjenci i spacjenci po ID i Country
+cbind(pacjenci, spacjenci)                       # CBIND połącz kolumnami pacjenci i spacjenci muszą mieć tą samą ilość wierszy
+#Usuwanie kolumn
+myvars <- names(spacjenci) %in% c('wiek', 'cukrzyca')# wyodrębnianie zmiennych (kolumn) wiek, cukrzyca z ramki 
+myvars
+spacjenci[!myvars]                               # usuń zmienne wiek, cukrzyca
+spacjenci$wiek <- spacjenci$cukrzyca <- NULL     # usuń zmienne wiek, cukrzyca
+spacjenci[c(-2,-3)]                              # usuń 2 i 3-ą kolumnę
+#Dodawanie dat
+pacjenci$date <- Sys.Date()
+pacjenci
+pacjenci$date <- as.Date(pacjenci$date, '%m/%d/%y')
+pacjenci
+startdate <- as.Date('2009-01-01')
+enddate <- as.Date('2017-10-31')
+pacjenci[which(pacjenci$date >= startdate & pacjenci$date <= enddate), ]
+#Losowa próba sample
+sample(1:nrow(pacjenci), 3, replace = FALSE)
+pacjenci[sample(1:nrow(pacjenci), 3, replace = FALSE),]
 
-#Faktor zmienna jakościowa, czynnikowa: dyskretne lub porządkowe dane
+table(pacjenci$cukrzyca, pacjenci$status)        #wygeneruj statystyki przecięcia dwóch kolumn
 
+# Dodawanie nowych zmiennych do ramki danych
+# mamy trzy metody
+df <- data.frame(x1 = c(2, 2, 6, 4),
+                 x2 = c(3, 4, 2, 8))
+# metoda 1
+df$sumx <-  df$x1 + df$x2
+df$meanx <- (df$x1 + df$x2) / 2
+rm(x1)
+# metoda 2
+attach(df)
+df$sumx <-  x1 + x2
+df$meanx <- (x1 + x2) / 2
+detach(df)
+# metoda 3
+df <- transform(df, sumx = x1 + x2, meanx = (x1 + x2) / 2)
+
+#Zapisywanie zmiennych
+df <- data.frame(x1 = c(2, 2, 6, 4), x2 = c(3, 4, 2, 8))
+# metoda 1
+df$wiek[df$x1 == 2] <- 1
+df$tmp <- df$x1 * df$x2
+df
+df$tmp <- NULL
+df$wiek <- NULL
+# metoda 2
+df <- within(df, {
+  wiek <-
+    NA # utwórz nową zmienną wiek i zainicjalizuj ją NA (nullem z R)
+  wiek[x1 == 2] <- 1
+  tmp <- x1 * x2
+})
+df
+
+#zmiana nazw
+#rename(dataframe, c(oldname1="newname1", oldname2="newname2",...))
+library(plyr)
+rename(df, c(tmp = "temp"))
+#names(dataframe) zwraca wektor nazw zmiennych
+names(df)[3] <- "tmp"
+# lub użyj fix(dataframe) aby zmienić nazwy w gui
+
+#manipulacja NA
+df$wiek[df$wiek == 1] <- NA
+df
+df$wiek[is.na(df$wiek)] <- 55
+df
+x <- c(1, 2, NA, 3)
+y <- x[1] + x[2] + x[3] + x[4] # y równa się NA
+z <- sum(x) # y równa się NA
+z <-sum(x, na.rm = TRUE) # na.rm=TRUE usuwa brakujące wartości czyli NA
+df$wiek[df$tmp == 6] <- NA
+na.omit(df) # na.omit() usuwa wiersze z NA
+
+
+#FAKTOR zmienna jakościowa, czynnikowa: dyskretne lub porządkowe dane
 # mapa wektorów dyskretnych wartości [1...k]
-diabetes <- c('Type1', 'Type2', 'Type1', 'Type1')
-diabetes <- factor(diabetes) # Levels: Type1 Type2
+cukrzyca <- c('Type1', 'Type2', 'Type1', 'Type1')
+cukrzyca <- factor(cukrzyca) # Levels: Type1 Type2
+cukrzyca
 status <- c('Poor', 'Improved', 'Excellent', 'Poor')
 status <-
   factor(status, ordered = TRUE) # Excellent-1 Improved-2 Poor-3
@@ -347,15 +426,15 @@ status2 <-
 status2
 
 # przykład pokazujący faktory zmienne jakościowe
-patientID <- c(1, 2, 3, 4)
-age <- c(25, 34, 28, 52)
-diabetes <- c("Type1", "Type2", 'Type1', 'Type1')
+pacjent_id <- c(1, 2, 3, 4)
+wiek <- c(25, 34, 28, 52)
+cukrzyca <- c("Type1", "Type2", 'Type1', 'Type1')
 status <- c('Poor', 'Improved', 'Excellent', 'Poor')
-diabetes <- factor(diabetes)
+cukrzyca <- factor(cukrzyca)
 status <- factor(status, ordered = TRUE)
-patientdata <- data.frame(patientID, age, diabetes, status)
-str(patientdata)
-summary(patientdata)
+pacjenci <- data.frame(pacjent_id, wiek, cukrzyca, status)
+str(pacjenci)
+summary(pacjenci)
 
 
 #wstawianie danych z pliku csv
@@ -426,73 +505,6 @@ dev.off()
 
 #Zarządzanie, manipulacja strukturami danych
 
-#dodawanie nowych zmiennych do ramki danych
-
-mydata <- data.frame(x1 = c(2, 2, 6, 4),
-                     x2 = c(3, 4, 2, 8))
-
-# dodawanie nowych zmiennych do ramki danych
-# mamy trzy metody
-
-# metoda 1
-mydata$sumx <-  mydata$x1 + mydata$x2
-mydata$meanx <- (mydata$x1 + mydata$x2) / 2
-
-rm(x1)
-# metoda 2
-attach(mydata)
-mydata$sumx <-  x1 + x2
-mydata$meanx <- (x1 + x2) / 2
-detach(mydata)
-
-# metoda 3
-mydata <- transform(mydata, sumx = x1 + x2, meanx = (x1 + x2) / 2)
-
-#zapisywanie zmiennych
-
-mydata <- data.frame(x1 = c(2, 2, 6, 4),
-                     x2 = c(3, 4, 2, 8))
-
-# metoda 1
-mydata$age[mydata$x1 == 2] <- 1
-mydata$tmp <- mydata$x1 * mydata$x2
-mydata
-mydata$tmp <- NULL
-
-mydata$age <- NULL
-
-# metoda 2
-mydata <- within(mydata, {
-  age <-
-    NA # utwórz nową zmienną age i zainicjalizuj ją NA (nullem z R)
-  age[x1 == 2] <- 1
-  tmp <- x1 * x2
-})
-mydata
-
-#zmiana nazw
-
-#rename(dataframe, c(oldname1="newname1", oldname2="newname2",...))
-library(plyr)
-rename(mydata, c(tmp = "temp"))
-#names(dataframe) zwraca wektor nazw zmiennych
-names(mydata)[3] <- "tmp"
-# lub użyj fix(dataframe) aby zmienić nazwy w gui
-
-#manipulacja NA
-
-mydata$age[mydata$age == 1] <- NA
-mydata
-mydata$age[is.na(mydata$age)] <- 55
-mydata
-x <- c(1, 2, NA, 3)
-y <- x[1] + x[2] + x[3] + x[4] # y równa się NA
-z <- sum(x) # y równa się NA
-z <-
-  sum(x, na.rm = TRUE) # na.rm=TRUE usuwa brakujące wartości czyli NA
-mydata$age[mydata$tmp == 6] <- NA
-newdata <- na.omit(mydata) # na.omit() usuwa wiersze z NA
-newdata
 
 #zapisz datę jako zmienną
 # x jest datą w formie tekstu
@@ -530,98 +542,16 @@ time_elapsed
 #is.datatype() #zwraca TRUE or FALSE, gdzie datatype np. integer tzn. is.integer
 #as.datatype() #konwertuje do typu danych, gdzie datatype np. integer tzn. is.integer
 
-#sortuje ramkę danych, domyślnie rosnąco
-# sortuj wiersze od najmłodszych do najstarszych
-newdata <- patientdata[order(patientdata$age), ]
-
-# sortuj wiersze osobno dla kobiet i mężczyzn, od najmłodszych do najstarszych
-attach(patientdata)
-newdata <- patientdata[order(diabetes, age),]
-detach(patientdata)
-newdata
-
-# sortuj wiersze osobno dla kobiet i mężczyzn, od najstarszych do najmłodszych
-attach(patientdata)
-newdata <- patientdata[order(diabetes,-age),]
-detach(patientdata)
-newdata
-
-
-#Łączenie danych: dodawanie kolumn
-# połącz kolumnami patientdata i newdata po ID
-total <- merge(patientdata, newdata, by = "patientID")
-total
-# połącz kolumnami patientdata i newdata po ID i Country
-total <- merge(patientdata, newdata, by = c('patientID', 'diabetes'))
-total
-# połącz kolumnami patientdata i newdata muszą mieć tą samą ilość wierszy
-total <- cbind(patientdata, newdata)
-total
-
-newdata$patientID <- newdata$patientID + 10
-#Łączenie danych: dodawanie wierszy
-# połącz dwie ramki z tą samą liczbą kolumn
-total <- rbind(patientdata, newdata)
-total
-
-#wyodrębnianie podzbiorów
-c1 <- c(1, 2, 3)
-c2 <- c(4, 5, 6)
-c3 <- c(7, 8, 9)
-data <- data.frame(c1, c2, c3)
-data[1]
-data['c1']
-x <- c('c1', 'c2')
-data[x]
-data[, 1]
-data[, 1:2]
-data[, c(1:2)]
-data[1, ]
-data[1:2, ]
-
-#wyodrębnianie zmiennych z ramki (kolumn)
-# usuń zmienne age, diabetes
-myvars <- names(total) %in% c('age', 'diabetes')
-myvars
-newdata <- total[!myvars]
-newdata
-# usuń 2 i 3-ą kolumnę
-newdata <- total[c(-2,-3)]
-newdata
-# usuń zmienne age, diabetes
-total$age <- total$diabetes <- NULL
-total
-
-#wybieranie podzbiorów
-patientdata[1:3, ]
-patientdata[which(patientdata$status == 'Poor' &
-                    patientdata$age < 30), ]
-attach(patientdata)
-patientdata[which(status == 'Poor' & age < 30), ]
-detach(patientdata)
-
-patientdata$date <- Sys.Date()
-patientdata
-patientdata$date <- as.Date(patientdata$date, '%m/%d/%y')
-patientdata
-startdate <- as.Date('2009-01-01')
-enddate <- as.Date('2017-10-31')
-patientdata[which(patientdata$date >= startdate &
-                    patientdata$date <= enddate), ]
-
-# use package dplyr (install first)
-library(dplyr)
-newdata <- filter(patientdata, status == 'Poor' & age < 30)
-newdata
-
-# subset()
-subset(patientdata, age >= 35 | age < 24, select = c(age, status))
-subset(patientdata, status == 'Poor' &
-         age < 30, select = patientID:date)
-
-#losowa próba sample
-sample(1:nrow(patientdata), 3, replace = FALSE)
-patientdata[sample(1:nrow(patientdata), 3, replace = FALSE),]
+# attach, detach, with
+# attach, detach nie pracują na tych samych nazwach zmiennych, użyj "with"
+summary(mtcars$mpg)
+plot(mtcars$mpg, mtcars$disp)
+plot(mtcars$mpg, mtcars$wt)
+attach(mtcars) # dodaj zbiór danych do ścieżki R wyszukiwania
+summary(mpg)
+plot(mpg, disp)
+plot(mpg, wt)
+detach(mtcars) # usuń zbiór danych do ścieżki R wyszukiwania
 
 #używanie sqla
 library(sqldf)
@@ -721,7 +651,7 @@ mystats <- function(x,
 #reshape
 #install.packages('reshape', depend=T)
 library(reshape)
-md <- melt(patientdata, id = (c('diabetes', 'status')))
+md <- melt(pacjenci, id = (c('cukrzyca', 'status')))
 md
 cast(md, status ~ variable, mean)
 
