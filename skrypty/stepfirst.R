@@ -397,7 +397,7 @@ rename(df, c(tmp = "temp"))
 names(df)[3] <- "tmp"
 # lub użyj fix(dataframe) aby zmienić nazwy w gui
 
-#manipulacja NA
+#Manipulacja NA
 df$wiek[df$wiek == 1] <- NA
 df
 df$wiek[is.na(df$wiek)] <- 55
