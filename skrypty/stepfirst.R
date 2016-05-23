@@ -166,7 +166,7 @@ for( i in seq_along(c()))       print(i)# poprawna forma pętli odporna na błą
 x <- matrix(1:16, nrow = 4)
 x
 x[2, ]        #drugi wiersz
-x[, 2]        #druga kolumna
+x[, 3]        #trzecia kolumna
 x[1, 4]       #pole z 1 wiersza i 4 kolumny
 x[1, c(3, 4)] #pola z 1 wiersza i 3 oraz 4 kolumny
 nrow(x)       #liczba wierszy macierzy
@@ -206,22 +206,51 @@ rowmatrix<-matrix(
   byrow = TRUE,
   dimnames = list(rnames, cnames)
 )
-rowmatrix
+rowmatrix           #wychodzi to samo co t(colmatrix) - transponowana macierz colmatrix
 c(rowmatrix)        #konwersja do wektora, ale innego niż początkowy wektor cells
 # macierzowe mnożenie np.: iloczyn pierwszego wiersza i kolumny pierwszej 
 # to wymnożenie ich elementów i suma iloczynów
 # efektem jest element c(1,1) nowej wynikowej macierzy, dla 1 wiersza i 2 kolumny - c(1,2)
-colmatrix %*% rowmatrix #mnożenie macierzy: wierszy pierwszej przez kolumny drugiej
+colmatrix %*% rowmatrix #mnożenie macierzy: wierszy pierwszej przez kolumny drugiej 
+#wynik to np. macierz M o rozmiarach 2x2, jeśli wejściowe są też 2x2
+#M[1,1]=colmatrix[1,] %*% rowmatrix[,1] M[1,2]=colmatrix[1,] %*% rowmatrix[,2]
+#M[2,1]=colmatrix[2,] %*% rowmatrix[,1] M[2,2]=colmatrix[2,] %*% rowmatrix[,2] 
 colmatrix *   rowmatrix #mnożenie element colmatrix[i,j] z odpowiadającym elementem rowmatrix[i,j]
 crossprod(colmatrix,rowmatrix)   #mnożenie macierzy transponowanej przez zwykłą t(colmatrix) %*% rowmatrix
 tcrossprod(colmatrix,rowmatrix)  #mnożenie macierzy zwykłej przez transponowaną colmatrix %*% t(rowmatrix)
 solve(colmatrix)                 #odwrócona macierz
-solve(colmatrix,rowmatrix)       #rozwiązanie równania colmatrix %*% X = rowmatrix
-solve(rowmatrix,colmatrix)       #rozwiązanie równania rowmatrix %*% X = colmatrix
+solve(colmatrix,rowmatrix)       #rozwiązanie X równania colmatrix %*% X = rowmatrix
+solve(rowmatrix,colmatrix)       #rozwiązanie X równania rowmatrix %*% X = colmatrix
 solve(rowmatrix,rowmatrix)       #przekształcenie na tą samą macierz poprzez macierz diagonalną identycznościowa X=diag(2)
 diag(2)                          #macierz diagonalna identycznościowa
 det(colmatrix %*% rowmatrix)     #det(A · B) = detA · detB
 det(colmatrix) %*% det(rowmatrix)#det(A · B) = detA · detB
+
+#Lista: uporządkowany zbiór obiektów o możliwych różnych typach
+g <- 'Moja pierwsza lista'
+h <- c(25, 26, 18, 39)
+j <- matrix(1:10, nrow = 5)
+k <- c('jeden', 'dwa', 'trzy')
+mlist <- list(tytul = g, wiek = h, j, k)
+mlist
+mlist[[2]]              #drugi element listy wiek jako wektor
+mlist[['wiek']]         #element wiek, w tym przypadku wektor
+mlist$wiek              #element wiek, w tym przypadku wektor
+mlist['wiek']           #element wiek, w tym przypadku lista (nie używać, kiedy potrzebny wektor)
+mlist[2]                #element wiek, w tym przypadku lista (nie używać, kiedy potrzebny wektor)
+typeof(mlist[['wiek']]) #typ double  
+typeof(mlist['wiek'])   #typ lista
+mlist[[2]][1]           #25, pierwszy element drugiego argumentu z listy wiek
+as.list(h)              #konwersja do listy
+nlist<-as.list(h)       
+list(mlist,nlist)       #lista dwóch list
+plist<-list(mlist,nlist)
+print(plist)            #wypisz listę
+str(plist)              #struktura listy
+dput(plist)             #kod w R listy
+#cat(plist)              uwaga! to nie działa!
+#nadpisuje wartości dwóch elementów listy o nazwach tytul i wiek
+mlist[names(mlist) %in% c('tytul','wiek')]<-c('Nadpisany element listy',list(c(2,4,6,7)))
 
 
 #TABLICA ARRAY: podobna do macierzy matrix, ale może mieć więcej wymiarów
@@ -323,17 +352,6 @@ patientdata <- data.frame(patientID, age, diabetes, status)
 str(patientdata)
 summary(patientdata)
 
-#Lista: uporządkowany zbiór danych
-
-g <- 'My First List'
-h <- c(25, 26, 18, 39)
-j <- matrix(1:10, nrow = 5)
-k <- c('one', 'two', 'three')
-mylist <- list(title = g, ages = h, j, k)
-mylist
-mylist[[2]]
-mylist[['ages']]
-mylist[[2]][1] # 25, pierwszy element drugiego argumentu z listy
 
 #wstawianie danych z pliku csv
 # exportuj dane do pliku csv
