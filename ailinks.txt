@@ -47,8 +47,6 @@ https://github.com/asadoughi/stat-learning
 
 ###podstawy R https://github.com/jincheng9/R-in-Action
 
-
-
 ###do sprawdzenia później
 http://www.inside-r.org/packages/cran/rockchalk/docs/mvrnorm
 http://www.sthda.com/english/wiki/visualize-correlation-matrix-using-correlogram
