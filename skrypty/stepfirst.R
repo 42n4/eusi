@@ -1,7 +1,8 @@
-#Zasady ogólne:
-#indeksy w R zaczynają się od 1, a nie od 0
-#wielkość liter ma znaczenie
-# funkcja pomocy w R
+# Zasady ogólne:
+# indeksy w R zaczynają się od 1, a nie od 0
+# wielkość liter ma znaczenie
+# w rstudio kursor myszy na nazwie funkcji i F1 wywołują opis funkcji
+# funkcja pomocy w R 
 help(kmeans) # opisuje funkcje kmeans
 help(pi) # opisuje stałą pi
 # podaj aktualny roboczy katalog
@@ -20,7 +21,7 @@ source('file.R', echo = TRUE)
 # wypisz litery i zmienne
 i <- 10
 cat(i, "th interation...\n", sep = "") # sep="" means that there is no space between the input parameters
-# sprawdź strukturę danych
+# sprawdź strukturę danych w tym przypadku wektor
 vec <- c(1:10)
 str(vec)
 # podaj pierwszych 6 i ostatnich 6 elementów
@@ -44,82 +45,131 @@ rm(list = ls(pattern = '^tmp')) # usuń zmienne z nazwami zaczynającymi się na
 # quit() # zapyta czy zapisać przestrzeń roboczą
 
 # Struktury danych
-# wektory mają tylko jeden typ danych
+# WEKTORY mają tylko jeden typ danych
+# indeksy w R zaczynają się od 1, a nie od 0
 
 a <- c(1, 2, 5, 3, 6,-2, 4)
-a[3]  # 5
-a[c(1, 3, 5)] # 1 5 6
-a[2:6] # 2 5 3 6 -2
-b <-
-  replicate(10, 2) # generuje wektor z długością 10, wszystkie elementy to 2
-b <-
-  rep(2, 10) # generuje wektor z długością 10, wszystkie elementy to 2
-b <- seq(1, 10) # b równa się 1, 2, 3, 4, 5, 6, 7, 8, 9 10
-b <- seq(1, 10, 2) # b równa się 1, 3, 5, 7, 9
+a[3]                  # 5
+a[c(1, 3, 5)]         # 1 5 6
+a[2:6]                # 2 5 3 6 -2
+b <- replicate(10, 2) # generuje wektor z długością 10, wszystkie elementy to 2
+b <- rep(2, 10)       # generuje wektor z długością 10, wszystkie elementy to 2
+b <- 1:10             # b równa się 1, 2, 3, 4, 5, 6, 7, 8, 9 10
+b <- seq(1, 10)       # b równa się 1, 2, 3, 4, 5, 6, 7, 8, 9 10
+b <- seq(1, 10, 2)    # b równa się 1, 3, 5, 7, 9
+b <- seq(0, 1, 0.1)   # b równa się 0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0
+b <- seq(from=0, to=1, by=0.1) # b równa się 0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0
 # dodaj element do wektora: metoda 1
 e <- 10
 a <- c(a, e)
 # dodaj element do wektora: metoda 2
 a <- append(a, e)
+a <- append(a, e, 2)  #dodaj e na pozycji 2+1 czyli 3
+a <- append(a, e, 0)  #dodaj e na pozycji 0+1 czyli 1
 # dodaj element do wektora: metoda 3
 a[length(a) + 1] <- e
 # usuń element z wektora
 index <- 2
-a <- a[-index] # usuń drugi element z wektora
-index <- c(2, 5)
-a <- a[-index] # usuń drugi i piąty element z wektora
+a <- a[-index]        # usuń drugi element z wektora
+a[-1]                 # wypisz wektor bez pierwszego elementu
+a[-length(a)]         # wypisz wektor bez ostatniego elementu
+a[-c(2, 5)]           # usuń drugi i piąty element z wektora
+a                     #c( 10,  1,    2,     10,   5,   3,     6,   -2,    4,    10,   10,   10)
+a > 3                 # TRUE FALSE FALSE  TRUE  TRUE FALSE  TRUE FALSE  TRUE  TRUE  TRUE  TRUE      
+a[a>3]                # wypisz elementy wektora większe od 3
+a[a==10]              # wypisz elementy wektora równe 10
+a[a>1 & a < length(a)]# wypisz elementy wektora większe od 1, a mniejsze od długości a
+# wektor z nazwanymi elementami
+s<-c(jeden=1,dwa=2,trzy=3)
+names(s)     #nazwy elementów
+s[["trzy"]]  #wybiera element o nazwie "trzy"
 # znajdź indeks pierwszego pasującego elementu
-# dla przykładu, znajdź 10-ty indeks w wektorze vec <- c(1, 10, 2, 10).
+# dla przykładu, znajdź indeks 10-tki w wektorze vec <- c(1, 10, 2, 10).
 # match(10, vec) zwróci 2, następny indeks dla 10 nie będzie zwracany
-vec <- c(2:10)
-e <- 3
-e2 <- c(3, 5)
-index <- match(e, vec)
-index
-which(vec %in% e)
-index2 <- match(e2, vec)
-index2
-which(vec %in% e2)
+vec <- c(10, 2:10)
+e  <- 10
+e2 <- c(10, 5)
+match(e, vec)     #podaje na którym miejscu znajduje się pierwsze wystąpienie e  w wektorze vec
+which(vec %in% e) #podaje na którym miejscu znajduje się e w wektorze vec we wszystkich wystąpieniach
+match(e2, vec)    #podaje na którym miejscu znajduje się pierwsze wystąpienie e2 w wektorze vec
+which(vec %in% e2)#podaje na którym miejscu znajduje się e2 w wektorze vec we wszystkich wystąpieniach
 # sprawdź, czy element znajduje się w wektorze
 e3 <- 1
-is_in <- !is.na(match(e3, vec))
-is_in <- e3 %in% vec
+!is.na(match(e3, vec)) #czy element e3 znajduje się w wektorze vec
+e3 %in% vec            #czy element e3 znajduje się w wektorze vec 
 
 # elementy z wektoru c1 nie znajdujące się w c2
 c1 <- c(1, 2, 3)
 c2 <- c(2, 3, 5)
 c1[!(c1 %in% c2)] # 1
-setdiff(c1, c2) # 1
+setdiff(c1, c2)   # 1
 # elementy z wektoru c2 nie znajdujące się w c1
 c2[!(c2 %in% c1)] # 5
-setdiff(c2, c1) # 5
+setdiff(c2, c1)   # 5
 
 # oblicz ile jest nie powtarzających się numerów
 vec <- c(1, 2, 3, 2)
 nlevels(factor(vec)) # zwraca 3
-length(unique(vec)) # zwraca 3
+length(unique(vec))  # zwraca 3
+
+# operatory są dostosowane do wektorów - element z elementem na tym samym miejscu
+c(1,3,5) + c(5,3,1)   #-> 6,6,6
+c(1,3,5) - c(5,3,1)   #-> -4,0,4
+c(1,3,5) * c(5,3,1)   #-> 5,9,5
+c(2)     * c(5,3,1)   #-> 10,6,2
+c(1,3,5) / c(5,3,1)   #-> 0.2,1.0,5.0
+c(1,3,5)%/%c(5,3,1)   #-> 0,1,5  dzielenie całkowite
+c(1,3,5) %%c(5,3,1)   #-> 1,0,0  mod - reszta całkowita z dzielenia
+c(1,3,5) ^ c(5,3,1)   #-> 1,27,5 podnoszenie do potęgi
+c(1,3,5) **c(5,3,1)   #-> 1,27,5 podnoszenie do potęgi
+c(1,3,5)%in%c(5,3,1)  #-> TRUE,TRUE,TRUE
+# obliczenia na wektorach - element * element i ich suma
+c(1,3,5) %*% c(5,3,1) #-> 19
+
+#sortowanie elementów wektora
+sort(a)
+sort(a, decreasing = TRUE) 
 
 # liczba znaków w ciągu (łańcuchu znaków)
 x <- 'abc'
-num <- nchar(x)
+numc <- nchar(x)
+numc
 
 # znajdź pozycję znaku w ciągu
-loc <-
-  gregexpr(pattern = '\"', "abc\"defg") # \" jest pojedyńczym znakiem, loc jest listą
+# \" jest pojedyńczym znakiem, loc jest listą
+loc <- gregexpr(pattern = '\"', "abc\"defg") 
 cat('Pozycja znaku: ', loc[[1]][1], '\n')
 
 # konwersja łańcucha znaków do całkowitej
+# 1 sposób
 x <- 123
-x <- paste(x) # x równa się '123'
+x <- paste(x)  # x równa się "123"
 x <- strtoi(x) # x równa się 123
+# 2 sposób
+x <- 123
+x <- as.character(x)  # x równa się "123"
+x <- as.integer(x)    # x równa się 123, także as.numeric(x) jako zmiennoprzecinkowa
 
-#Macierz: dwuwymiarowa tablica
+#uwaga! 
+c(5,'a')  # się konwertuje domyślnie na c('5','a')
+e<-c(5)
+e[2]<-'a' # się konwertuje domyślnie na c('5','a')
+e 
+typeof(1:2) == typeof(c(1,2))     # FALSE pierwszy typ integer - drugie double
+for( i in 1:length(c()))        print(i)# 1 0 niby pusty wektor, a może coś wypisać 
+for( i in seq_len(length(c()))) print(i)# poprawna forma pętli odporna na błąd pustego wektora
+for( i in seq_along(c()))       print(i)# poprawna forma pętli odporna na błąd pustego wektora
 
+
+#MACIERZ: dwuwymiarowa tablica tego samego typu zmiennych
 cells <- c(1, 26, 24, 68)
+cells
+matrix(cells) # kolumnowy, pionowy wektor
+t(t(cells))   # transponowany dwa razy wektor to to samo co kolumnowy wektor
 rnames <- c('R1', 'R2')
 cnames <- c('C1', 'C2')
 # wypełnij macierz po wierszach
-mymatrix <- matrix(
+matrix(
   cells,
   nrow = 2,
   ncol = 2,
@@ -127,7 +177,7 @@ mymatrix <- matrix(
   dimnames = list(rnames, cnames)
 )
 # wypełnij macierz po kolumnach, to domyślne ustawienie
-mymatrix <- matrix(
+matrix(
   cells,
   nrow = 2,
   ncol = 2,
@@ -135,24 +185,24 @@ mymatrix <- matrix(
   dimnames = list(rnames, cnames)
 )
 # użyj macierzy indeksów
-x <- matrix(1:10, nrow = 2)
+x <- matrix(1:16, nrow = 4)
 x
-x[2, ]
-x[, 2]
-x[1, 4]
-x[1, c(4, 5)]
+x[2, ]        #drugi wiersz
+x[, 2]        #druga kolumna
+x[1, 4]       #pole z 1 wiersza i 4 kolumny
+x[1, c(3, 4)] #pola z 1 wiersza i 3 oraz 4 kolumny
 
-#Tablica array: podobna do macierzy matrix, ale może mieć więcej wymiarów
 
+#TABLICA ARRAY: podobna do macierzy matrix, ale może mieć więcej wymiarów
 dim1 <- c('A1', 'A2')
 dim2 <- c('B1', 'B2', 'B3')
 dim3 <- c('C1', 'C2', 'C3', 'C4')
 z <- array(1:24, c(2, 3, 4), dimnames = list(dim1, dim2, dim3))
 z
-z[1, 2, 3]
+z[1, 2, 3] #wartość komórki z jednego pola trójwymiarowej macierzy
 
-#Ramka danych: kolumny mogą mieć różne typy
 
+#RAMKA DANYCH: kolumny mogą mieć różne typy
 patientID <- c(1, 2, 3, 4)
 age <- c(25, 34, 28, 52)
 diabetes <- c('Type1', 'Type2', 'Type1', 'Type1')
