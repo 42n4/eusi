@@ -35,6 +35,10 @@ tail(data)
 # podaj typ zmiennych
 a <- c(1, 2)
 class(a)
+# typ konwersji
+#is.datatype() #zwraca TRUE or FALSE, gdzie datatype np. integer tzn. is.integer
+#as.datatype() #konwertuje do typu danych, gdzie datatype np. integer tzn. is.integer
+#
 # usuń zmienne z pamięci przestrzeni roboczej
 x <- c(1, 2)
 rm(x)
@@ -44,10 +48,11 @@ rm(list = ls(pattern = '^tmp')) # usuń zmienne z nazwami zaczynającymi się na
 # wyjdź z rstudia
 # quit() # zapyta czy zapisać przestrzeń roboczą
 
-# Struktury danych
+
+
+# STRUKTURY DANYCH
 # WEKTORY mają tylko jeden typ danych
 # indeksy w R zaczynają się od 1, a nie od 0
-
 a <- c(1, 2, 5, 3, 6,-2, 4)
 a[3]                  # 5
 a[c(1, 3, 5)]         # 1 5 6
@@ -437,8 +442,8 @@ str(pacjenci)
 summary(pacjenci)
 
 
-#wstawianie danych z pliku csv
-# exportuj dane do pliku csv
+#ZAPIS DO PLIKÓW
+#exportuj dane do pliku csv
 write.table(
   data,
   'data.csv',
@@ -447,11 +452,10 @@ write.table(
   sep = ','
 )
 
-# czytaj plik csv
+#wstawianie danych z pliku csv
 signal <- read.table('data.csv', header = FALSE, sep = ',')
 
 #zapisz rysunki do plików
-
 # pierwszy rysunek
 pdf('graph1.pdf')
 x2plot = seq(1:20)
@@ -503,9 +507,7 @@ dev.new()
 plot(f(x2plot / 20))
 dev.off()
 
-#Zarządzanie, manipulacja strukturami danych
-
-
+#DATA
 #zapisz datę jako zmienną
 # x jest datą w formie tekstu
 # format daty to %Y-%m-%d
@@ -538,9 +540,6 @@ time_elapsed
 time_elapsed <- as.numeric((t2 - t1)[3]) # okres czasu
 time_elapsed
 
-# typ konwersji
-#is.datatype() #zwraca TRUE or FALSE, gdzie datatype np. integer tzn. is.integer
-#as.datatype() #konwertuje do typu danych, gdzie datatype np. integer tzn. is.integer
 
 # attach, detach, with
 # attach, detach nie pracują na tych samych nazwach zmiennych, użyj "with"
