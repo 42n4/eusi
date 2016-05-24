@@ -297,6 +297,7 @@ pacjenci <- data.frame(pacjent_id, wiek, cukrzyca, stan)
 nrow(pacjenci)        # ilość wierszy
 ncol(pacjenci)        # ilość kolumn
 dim(pacjenci)         # rozmiar to wektor z liczbą wierszy i kolumn c(nrow(pacjenci),ncol(pacjenci))
+rownames(pacjenci) <- seq_len(nrow(pacjenci)) #na wszelki wypadek nazywa wiersze ich indeksami
 # podaj wiersz lub kolumnę ramki danych
 i <- 1; j <- 2
 pacjenci[i,]               # i-ty wiersz jako ramka danych
@@ -374,9 +375,6 @@ subset(pacjenci,date >= startdate & date <= enddate)
 #Losowa próba sample
 sample(1:nrow(pacjenci), 3, replace = FALSE)
 pacjenci[sample(1:nrow(pacjenci), 3, replace = FALSE),]
-
-table(pacjenci$cukrzyca, pacjenci$stan)        #wygeneruj statystyki przecięcia dwóch kolumn
-
 # Dodawanie nowych zmiennych do ramki danych
 # mamy trzy metody
 df <- data.frame(x1 = c(2, 2, 6, 4), x2 = c(3, 4, 2, 8))
@@ -426,28 +424,42 @@ na.omit(df)                    # na.omit() usuwa wiersze z NA
 df[!is.na(df$wiek),]           # też usuwa wiersze z NA
 
 
-#FAKTOR zmienna jakościowa, czynnikowa: dyskretne lub porządkowe dane
-# mapa wektorów dyskretnych wartości [1...k]
+#FAKTOR - etykiety, zmienna jakościowa (niemierzalna), czynnikowa: dyskretne lub porządkowe dane
+#zmienne jakościowe (niemierzalne) – np. kolor oczu, płeć, grupa krwi
+#porządkowe (quasi-ilościowe) – np. klasyfikacja wzrostu: (niski, średni, wysoki)
+#skokowe (dyskretne) – np. ilość posiadanych dzieci, ilość gospodarstw domowych, wiek (w rozumieniu ilości skończonych lat)
+#mapa wektorów dyskretnych wartości [1...k]
+#nie można faktorów dodawać, mnożyć
+#nie działa operator $, używa się pojedyńczych [] z indeksem np. levels(x)[1]
 cukrzyca <- c('Typ1', 'Typ2', 'Typ1', 'Typ1')
-cukrzyca <- factor(cukrzyca) # Levels: Typ1 Typ2
+cukrzyca <- factor(cukrzyca)          # Levels: Typ1 Typ2
 cukrzyca
 stan <- c('Kiepski', 'Poprawa', 'Wybitny', 'Kiepski')
 stan <-
-  factor(stan, ordered = TRUE) # Wybitny-3 Poprawa-2 Kiepski-1
+  factor(stan, ordered = TRUE)        # Wybitny-3 Poprawa-2 Kiepski-1
 stan
-status2 <-
+levels(stan)                          #pokazuje poziomy dyskretnej zmiennej stan
+stan2 <-
   factor(stan,
-         ordered = TRUE,
          levels = c('Wybitny', 'Poprawa', 'Kiepski')) # Wybitny-1 Poprawa-2 Kiepski-3
-status2
+stan2
+levels(stan2)                         #pokazuje poziomy dyskretnej zmiennej stan2, odwrotnie uporządkowane niż stan
+stan2 <- factor(c(as.character(stan2), 'Zalosny')) #dodaje nowy stan nie zdefiniowany
+levels(stan2)                         #widać w poziomach nowy stan
+#Dyskretyzacja zmiennej do poziomów
+i<-1:50+rnorm(50,0,5); i              #zmienna i
+k<-cut(i,5); k                        #generuje ze zmiennej i pięć poziomów zmiennej dyskretnej k
+levels(k)<-seq_len(length(levels(k))) #zmienia nazwy poziomów na bardziej czytelne
+levels(k)
 # przykład pokazujący faktory - zmienne jakościowe w ramce danych
 # definiują automatycznie przy tworzeniu ramki danych, jednak porządek będzie alfabetyczny
 pacjenci
 str(pacjenci)
 summary(pacjenci)
+table(pacjenci$cukrzyca, pacjenci$stan)        #wygeneruj statystyki przecięcia dwóch kolumn
 #Liczenie średnich po kolumnach i ich złączeniach
 #library(reshape)
-#melt i cast lub w jednym recast
+#melt i cast lub w jednym recast, ddply, aggregate czyli 4 METODY agregacji
 library(reshape)
 pacjenci$date <- NULL
 # dla każdej wartosci pary cukrzyca, stan wypisz w jednej kolumnie variable inne kolumny i ich wartości
@@ -466,6 +478,7 @@ ddply(pacjenci, .(cukrzyca,stan),
       summarise, N=length(wiek), 
       sredniaid=mean(pacjent_id),
       sredniawiek=mean(wiek))                 #policz srednie dla cukrzyca i stan po innych parametrach w jednym kroku
+aggregate(.~stan+cukrzyca,data=pacjenci,mean) #policz srednie dla cukrzyca i stan po innych parametrach w jednym kroku
 
 
 #RYSUNEK FUNKCJI
@@ -572,6 +585,7 @@ time_elapsed
 time_elapsed <- as.numeric((t2 - t1)[3]) # okres czasu
 time_elapsed
 
+
 #PROGRAMOWANIE, PĘTLE, FUNKCJE
 #kontrola przepływu danych
 #if/else, ifelse, switch
@@ -598,6 +612,8 @@ while (i >= 0) {
   print('witaj')
   i <- i - 1
 }
+for(i in seq_len(nrow(pacjenci))) #odporna na pustą ramkę pętla z seq_len(nrow)
+  print(pacjenci$wiek[i])
 #funkcje użytkownika
 #myfunction <- function(arg1, arg2, ...) {
 #  statements
@@ -684,8 +700,7 @@ s.class(
 
 
 
-
-#Zaawansowana obsługa danych
+#Zaawansowane przetwarzanie danych
 #matematyczne funkcje: sqrt(x), floor(x), log(x), exp(x)
 #statystyczne funkcje: mean(x), median(x), sd(x), var(x), range(x), sum(x), scale(x, center=TRUE, scale=TRUE)
 #funkcje probabilistyczne:
@@ -698,14 +713,6 @@ s.class(
 #paste(..., sep=""), toupper(x), tolower(x)
 #inne funkcje:
 #length(x), seq(from, to, by), rep(x, n), cut(x, n), pretty(x, n), cat(.., file='myfile', append=FALSE)
-#uruchom funckje na macierzach i ramkach
-#apply(x, MARGIN, FUN, ...)
-#x to dane, MARGIN indeks rozmiaru, 1 oznacza wiersze, 2 oznacza kolumny, FUN jest funkcją, a  ... jej dodatkowymi argumentami
-
-
-#agregacja i zmiana struktur
-#aggregate(x, by, FUN)
-#x to obiekt danych, by - lista zmiennych, i FUN  funkcja agregacyjna
 
 
 
