@@ -596,28 +596,30 @@ if (score > 0.5) {
   outcome2 <- 'not passed'
 }
 outcome <- ifelse(score > 0.5, 'passed', 'not passed')
-#for, while
-#for (var in seq) statement
-#while (cond) statement
-for (i in 1:10) {
-  print('hello world')
+#FOR, WHILE, SAPPLY
+for (i in 1:10) {                  #for (var in seq) statement
+  print('witaj')                   #wypisze 10 razy 'witaj'
 }
-# wypisze od 1 do 10
-for (i in 1:10) {
+sapply(1:10, function(i) {         #sapply - alternatywa dla for - wypisze 10 razy 'witaj'
+  print('witaj')                   #wypisze 10 razy 'witaj'
+})
+for (i in 1:10) {                  #pętla for wypisze od 1 do 10
   print(i)
 }
-# wypisze 10 razy 'witaj'
-i <- 10
-while (i >= 0) {
+sapply(1:10,function(i){print(i)}) #sapply - alternatywa dla for - wypisze od 1 do 10
+i <- 10                            #while (cond) statement - zaczyna od i=10
+while (i >= 0) {                   #wypisze 10 razy 'witaj'
   print('witaj')
   i <- i - 1
 }
-for(i in seq_len(nrow(pacjenci))) #odporna na pustą ramkę pętla z seq_len(nrow)
+for(i in seq_len(nrow(pacjenci)))  #odporna na pustą ramkę pętla z seq_len(nrow)
   print(pacjenci$wiek[i])
-#funkcje użytkownika
-#myfunction <- function(arg1, arg2, ...) {
-#  statements
-#  return(object)
+#FUNKCJE
+#mojafunkcja <- function(arg1, arg2, ...) {
+#  instrukcje
+#  return(obiekt)
+#  lub wystarczy do zwrócenia wartości
+#  obiekt
 #}
 #bardziej zaawansowana funkcja
 mystats <- function(x,
@@ -640,36 +642,29 @@ mystats <- function(x,
 }
 mystats(pacjenci$wiek,TRUE,TRUE)
 mystats(pacjenci$wiek,FALSE,TRUE)
-#funkcje z ifelse
-fn <- function (x) {
+#SAPPLY, APPLY - funkcje argumenty w różnych odmianach apply
+fn <- function (x) {                         #funkcja z jednym argumentem
   ifelse(x > 46 & x < 52, 1, 0)
 }
-fn(40:60)
-fn <- function (x, y) {
-  ifelse(x > 46 & x < 52 & y < 12, 1, 0)
+fn(40:60)                                    #wystarczy do funkcji wrzucić wektor
+sapply(40:60, fn)                            #to samo co wywołanie funkcji z wektorem na wejściu
+fn <- function (x, y) {                      #funkcja z dwoma argumentami
+  ifelse(x > 46 & x < 52 & y < 12, 1, 0)     
 }
-datagrid <- expand.grid(i = 40:60, j = 0:20)
-fn(datagrid$i, datagrid$j)
-#funkcje w różnych odmianach apply
-fn <- function (x) {
-  ifelse(x > 46 & x < 52, 1, 0)
-}
-sapply(40:60, fn)
-fn <- function (x, y) {
-  ifelse(x > 46 & x < 52 & y < 12, 1, 0)
-}
-datagrid <- expand.grid(i = 40:60, j = 0:20)
-apply(datagrid, 1, function(z) {
-  fn(z["i"], z["j"])
+#fn(datagrid$i, datagrid$j)                  #TO NIE DZIAŁA w przypadku dwóch argumentów
+datagrid <- expand.grid(i = 40:60, j = 0:20) #utwórz wszystkie kombinacje wartości i, j; najpierw łączymy j=0 z wszystkimi wartościami i 
+apply(datagrid, 1, function(z) {             #odpowiednik dwóch pętli pierwszej z j, drugiej z i
+  fn(z["i"], z["j"])                         #apply działa na macierzy, dla 1 (drugi argument) na wierszach, dla 2 na kolumnach
 })
-#zagnieżdżona pętla w pętli
-res <- NULL
-for (i in 40:60) {
-  for (j in 0:20) {
-    res <- c(res, fn(i, j))
+apply(datagrid,1,function(z){fn(z[1], z[2])})#skrócona wersja z indeksami, 1 oznacza pobór wierszy do funkcji fn
+res <- NULL                                  #zagnieżdżona pętla w pętli
+for (j in 0:20) {
+  for (i in 40:60) {                         #utwórz wszystkie kombinacje wartości i, j w zagnieżdżonej pętli w pętli
+    res <- c(res, fn(i, j))                  #expand.grid(i = 40:60, j = 0:20) najpierw łączymy j=0 z wszystkimi wartościami i 
   }
 }
 res
+
 
 
 
