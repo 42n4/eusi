@@ -1,3 +1,6 @@
+### tutorial wykładowy
+https://github.com/pwasiewi/eusi/blob/master/skrypty/01stepfirst.R
+
 ###do projektu serwer zadań do rozwiązania z podpowiedziami https://www.kaggle.com/competitions
 
 ###kurs maszynowego uczenia w Octave 
