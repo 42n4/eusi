@@ -1,6 +1,12 @@
 #R sieć neuronowa
 #https://en.wikipedia.org/wiki/Backpropagation
 #https://aimatters.wordpress.com/2015/12/19/a-simple-neural-network-in-octave-part-1/
+#Zamieszczone przykłady dadzą się uruchomić jeśli zainstalujecie pakiety R 
+#(w linuxie na roocie w konsoli R, żeby nie instalować na lokalnym koncie):
+pkglist<-c("clusterGeneration","corrplot","nnet","neuralnet","RSNNS","reshape","rockchalk","fifer","ade4","sqldf","plyr","dplyr")
+pkgcheck <- pkglist %in% row.names(installed.packages())
+pkglist[!pkgcheck]
+#for(i in pkglist[!pkgcheck]){install.packages(i,depend=TRUE)}
 #funkcja progowa sigmoidalna
 sigmoid <- function(x) {
   1.0 / (1.0 + exp(-x))
