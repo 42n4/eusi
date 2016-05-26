@@ -4,63 +4,47 @@
 # w rstudio kursor myszy na nazwie funkcji i F1 wywołują opis funkcji
 #Zamieszczone przykłady dadzą się uruchomić jeśli zainstalujecie wymienione pakiety R 
 #(w linuxie na roocie w konsoli R, żeby nie instalować na lokalnym koncie):
-pkglist<-c("reshape","ade4","sqldf","plyr","dplyr")
+pkglist<-c("reshape","ade4","sqldf","plyr","dplyr","party")
 pkgcheck <- pkglist %in% row.names(installed.packages())
 pkglist[!pkgcheck]
+#ODKOMENTUJ jak chcesz zainstalować biblioteki najlepiej w konsoli tekstowej R na koncie root w Linuxie
 #for(i in pkglist[!pkgcheck]){install.packages(i,depend=TRUE)}
 # funkcja pomocy w R 
-help(kmeans) # opisuje funkcje kmeans
-help(pi) # opisuje stałą pi
-# podaj aktualny roboczy katalog
-getwd()
-# ustaw roboczy katalog
-setwd()
-# utwórz katalog
-dir.create(foldername)
-# uruchom skrypt R
-source('file.R')
-# użyj print() do wypisania czegokolwiek na konsolę
-a <- 2
-print(a)
-# wypisz wszystkie komendy także na konsolę
-source('file.R', echo = TRUE)
-# wypisz litery i zmienne
-i <- 10
-cat(i, "ta zmienna...\n", sep = "") # sep="" means that there is no space between the input parameters
+#help(kmeans)                       # opisuje funkcje kmeans
+#?kmeans                            # opisuje funkcje kmeans
+#help(pi)                           # opisuje stałą pi
+getwd()                             # podaj aktualny roboczy katalog
+setwd()                             # ustaw roboczy katalog
+dir.create(foldername)              # utwórz katalog
+source('file.R')                    # uruchom skrypt R
+a <- 2; print(a)                    # użyj print() do wypisania czegokolwiek na konsolę
+source('file.R', echo = TRUE)       # wypisz wszystkie komendy także na konsolę
+i <- 10                             # wypisz litery i zmienne 
+cat(i, "ta zmienna...\n", sep = "") # sep="" oznacza brak spacji miedzy argumentami w cat
 #konwersja pomiędzy łancuchem znaków i zmienną
-# łańcuch do zmiennej
-assign('test', 10) # taki sam efekt jak po: test <- 10
-x <- 'test'
-assign(x, 5) # taki sam efekt jak po: test <- 5
-# nazwa zmiennej do łańcucha
-x <- 5
-var.name <- deparse(substitute(x)) # var.name równa się "x"
-# sprawdź strukturę danych w tym przypadku wektor
-vec <- c(1:10)
-str(vec)
-# podaj pierwszych 6 i ostatnich 6 elementów
-head(vec)
-tail(vec)
+assign('test', 10)                  # taki sam efekt jak po: test <- 10
+x <- 'test'                         # łańcuch do zmiennej
+assign(x, 5)                        # taki sam efekt jak po: test <- 5
+x <- 5                              # nazwa zmiennej do łańcucha poprzez deparse substitute
+var.name <- deparse(substitute(x))  # var.name równa się "x"
+vec <- c(1:10)                      # sprawdź strukturę danych w tym przypadku wektor
+str(vec)                            # struktura zmiennej
+head(vec)                           # podaj pierwszych 6 elementów
+tail(vec)                           # podaj ostatnich 6 elementów
 no <- c(1:3)
 grade <- c(89, 95, 100)
-data <- data.frame(no, grade)
-head(data)
-tail(data)
-# podaj typ zmiennych
-a <- c(1, 2)
-class(a)
+data <- data.frame(no, grade)       # ramka danych złożona z wektorów
+head(data)                          # pokaż 6 pierwszych wierszy
+tail(data)                          # pokaż 6 ostatnich wierszy
+a <- c(1, 2);class(a)               # typ zmiennej
 # typ konwersji
-#is.datatype() #zwraca TRUE or FALSE, gdzie datatype np. integer tzn. is.integer
-#as.datatype() #konwertuje do typu danych, gdzie datatype np. integer tzn. is.integer
-#
-# usuń zmienne z pamięci przestrzeni roboczej
-x <- c(1, 2)
-rm(x)
-# usuń wszystkie zmienne z pamięci przestrzeni roboczej
-# rm(list=ls(all=T))
-rm(list = ls(pattern = '^tmp')) # usuń zmienne z nazwami zaczynającymi się na 'tmp'
-# wyjdź z rstudia
-# quit() # zapyta czy zapisać przestrzeń roboczą
+#is.datatype()                      # zwraca TRUE or FALSE, gdzie datatype np. integer tzn. is.integer
+#as.datatype()                      # konwertuje do typu danych, gdzie datatype np. integer tzn. is.integer
+x <- c(1, 2); rm(x)                 # usuń zmienne z pamięci przestrzeni roboczej
+
+# rm(list=ls(all=T))                # usuń wszystkie zmienne z pamięci przestrzeni roboczej
+rm(list = ls(pattern = '^tmp'))     # usuń zmienne z nazwami zaczynającymi się na 'tmp'
+# quit()                            # wyjdź z rstudia (zapyta czy zapisać przestrzeń roboczą)
 
 
 
@@ -68,113 +52,93 @@ rm(list = ls(pattern = '^tmp')) # usuń zmienne z nazwami zaczynającymi się na
 # WEKTORY mają tylko jeden typ danych
 # indeksy w R zaczynają się od 1, a nie od 0
 a <- c(1, 2, 5, 3, 6,-2, 4)
-a[3]                  # 5
-a[c(1, 3, 5)]         # 1 5 6
-a[2:6]                # 2 5 3 6 -2
-b <- replicate(10, 2) # generuje wektor z długością 10, wszystkie elementy to 2
-b <- rep(2, 10)       # generuje wektor z długością 10, wszystkie elementy to 2
-b <- 1:10             # b równa się 1, 2, 3, 4, 5, 6, 7, 8, 9 10
-b <- seq(1, 10)       # b równa się 1, 2, 3, 4, 5, 6, 7, 8, 9 10
-b <- seq(1, 10, 2)    # b równa się 1, 3, 5, 7, 9
-b <- seq(0, 1, 0.1)   # b równa się 0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0
+a[3]                   # 5
+a[c(1, 3, 5)]          # 1 5 6
+a[2:6]                 # 2 5 3 6 -2
+b <- replicate(10, 2)  # generuje wektor z długością 10, wszystkie elementy to 2
+b <- rep(2, 10)        # generuje wektor z długością 10, wszystkie elementy to 2
+b <- 1:10              # b równa się 1, 2, 3, 4, 5, 6, 7, 8, 9 10
+b <- seq(1, 10)        # b równa się 1, 2, 3, 4, 5, 6, 7, 8, 9 10
+b <- seq(1, 10, 2)     # b równa się 1, 3, 5, 7, 9
+b <- seq(0, 1, 0.1)    # b równa się 0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0
 b <- seq(from=0, to=1, by=0.1) # b równa się 0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0
-# dodaj element do wektora: metoda 1
 e <- 10
-a <- c(a, e)
-# dodaj element do wektora: metoda 2
-a <- append(a, e)
-a <- append(a, e, 2)  #dodaj e na pozycji 2+1 czyli 3
-a <- append(a, e, 0)  #dodaj e na pozycji 0+1 czyli 1
-# dodaj element do wektora: metoda 3
-a[length(a) + 1] <- e
-# usuń element z wektora
-index <- 2
-a <- a[-index]        # usuń drugi element z wektora
-a[-1]                 # wypisz wektor bez pierwszego elementu
-a[-length(a)]         # wypisz wektor bez ostatniego elementu
-a[-c(2, 5)]           # usuń drugi i piąty element z wektora
-a                     #c( 10,  1,    2,     10,   5,   3,     6,   -2,    4,    10,   10,   10)
-a > 3                 # TRUE FALSE FALSE  TRUE  TRUE FALSE  TRUE FALSE  TRUE  TRUE  TRUE  TRUE      
-a[a>3]                # wypisz elementy wektora większe od 3
-a[a==10]              # wypisz elementy wektora równe 10
-a[a>1 & a < length(a)]# wypisz elementy wektora większe od 1, a mniejsze od długości a
-# wektor z nazwanymi elementami
-s<-c(jeden=1,dwa=2,trzy=3)
-names(s)     #nazwy elementów
-s[["trzy"]]  #wybiera element o nazwie "trzy"
+a <- c(a, e)           # dodaj element e do wektora: metoda 1
+a <- append(a, e)      # dodaj element do wektora: metoda 2  
+a <- append(a, e, 2)   # dodaj e na pozycji 2+1 czyli 3
+a <- append(a, e, 0)   # dodaj e na pozycji 0+1 czyli 1
+a[length(a) + 1] <- e  # dodaj element do wektora: metoda 3
+index <- 2             # usuń element z wektora, inicjalizacja indeksu
+a <- a[-index]         # usuń drugi element z wektora
+a[-1]                  # wypisz wektor bez pierwszego elementu
+a[-length(a)]          # wypisz wektor bez ostatniego elementu
+a[-c(2, 5)]            # usuń drugi i piąty element z wektora
+a                      #c( 10,  1,    2,     10,   5,   3,     6,   -2,    4,    10,   10,   10)
+a > 3                  # TRUE FALSE FALSE  TRUE  TRUE FALSE  TRUE FALSE  TRUE  TRUE  TRUE  TRUE      
+a[a>3]                 # wypisz elementy wektora większe od 3
+a[a==10]               # wypisz elementy wektora równe 10
+a[a>1 & a < length(a)] # wypisz elementy wektora większe od 1, a mniejsze od długości a
+s<-c(jeden=1,dwa=2,trzy=3)# wektor z nazwanymi elementami
+names(s)               #nazwy elementów
+s[["trzy"]]            #wybiera element o nazwie "trzy"
 # znajdź indeks pierwszego pasującego elementu
 # dla przykładu, znajdź indeks 10-tki w wektorze vec <- c(1, 10, 2, 10).
 # match(10, vec) zwróci 2, następny indeks dla 10 nie będzie zwracany
 vec <- c(10, 2:10)
 e  <- 10
 e2 <- c(10, 5)
-match(e, vec)     #podaje na którym miejscu znajduje się pierwsze wystąpienie e  w wektorze vec
-which(vec %in% e) #podaje na którym miejscu znajduje się e w wektorze vec we wszystkich wystąpieniach
-match(e2, vec)    #podaje na którym miejscu znajduje się pierwsze wystąpienie e2 w wektorze vec
-which(vec %in% e2)#podaje na którym miejscu znajduje się e2 w wektorze vec we wszystkich wystąpieniach
-# sprawdź, czy element znajduje się w wektorze
-e3 <- 1
+match(e, vec)          #podaje na którym miejscu znajduje się pierwsze wystąpienie e  w wektorze vec
+which(vec %in% e)      #podaje na którym miejscu znajduje się e w wektorze vec we wszystkich wystąpieniach
+match(e2, vec)         #podaje na którym miejscu znajduje się pierwsze wystąpienie e2 w wektorze vec
+which(vec %in% e2)     #podaje na którym miejscu znajduje się e2 w wektorze vec we wszystkich wystąpieniach
+e3 <- 1                # sprawdź, czy element znajduje się w wektorze
 !is.na(match(e3, vec)) #czy element e3 znajduje się w wektorze vec
 e3 %in% vec            #czy element e3 znajduje się w wektorze vec 
 
-# elementy z wektoru c1 nie znajdujące się w c2
 c1 <- c(1, 2, 3)
 c2 <- c(2, 3, 5)
-c1[!(c1 %in% c2)] # 1
-setdiff(c1, c2)   # 1
-# elementy z wektoru c2 nie znajdujące się w c1
-c2[!(c2 %in% c1)] # 5
-setdiff(c2, c1)   # 5
-
-# oblicz ile jest nie powtarzających się numerów
-vec <- c(1, 2, 3, 2)
-nlevels(factor(vec)) # zwraca 3
-length(unique(vec))  # zwraca 3
-
+c1[!(c1 %in% c2)]      # 1 - elementy z wektoru c1 nie znajdujące się w c2
+setdiff(c1, c2)        # 1 - druga metoda
+c2[!(c2 %in% c1)]      # 5 - elementy z wektoru c2 nie znajdujące się w c1
+setdiff(c2, c1)        # 5
+vec <- c(1, 2, 3, 2)   # oblicz ile jest nie powtarzających się numerów
+nlevels(factor(vec))   # zwraca 3
+length(unique(vec))    # zwraca 3
 # operatory są dostosowane do wektorów - element z elementem na tym samym miejscu
-c(1,3,5) + c(5,3,1)   #-> 6,6,6
-c(1,3,5) - c(5,3,1)   #-> -4,0,4
-c(1,3,5) * c(5,3,1)   #-> 5,9,5
-c(2)     * c(5,3,1)   #-> 10,6,2
-c(1,3,5) / c(5,3,1)   #-> 0.2,1.0,5.0
-c(1,3,5)%/%c(5,3,1)   #-> 0,1,5  dzielenie całkowite
-c(1,3,5) %%c(5,3,1)   #-> 1,0,0  mod - reszta całkowita z dzielenia
-c(1,3,5) ^ c(5,3,1)   #-> 1,27,5 podnoszenie do potęgi
-c(1,3,5) **c(5,3,1)   #-> 1,27,5 podnoszenie do potęgi
-c(1,3,5)%in%c(5,3,1)  #-> TRUE,TRUE,TRUE
+c(1,3,5) + c(5,3,1)    #-> 6,6,6
+c(1,3,5) - c(5,3,1)    #-> -4,0,4
+c(1,3,5) * c(5,3,1)    #-> 5,9,5
+c(2)     * c(5,3,1)    #-> 10,6,2
+c(1,3,5) / c(5,3,1)    #-> 0.2,1.0,5.0
+c(1,3,5)%/%c(5,3,1)    #-> 0,1,5  dzielenie całkowite
+c(1,3,5) %%c(5,3,1)    #-> 1,0,0  mod - reszta całkowita z dzielenia
+c(1,3,5) ^ c(5,3,1)    #-> 1,27,5 podnoszenie do potęgi
+c(1,3,5) **c(5,3,1)    #-> 1,27,5 podnoszenie do potęgi
+c(1,3,5)%in%c(5,3,1)   #-> TRUE,TRUE,TRUE
 # obliczenia na wektorach - element * element i ich suma
-c(1,3,5) %*% c(5,3,1) #-> 19
-
-#sortowanie elementów wektora
-sort(a)
+c(1,3,5) %*% c(5,3,1)  #-> 19
+sort(a)                #sortowanie elementów wektora
 sort(a, decreasing = TRUE) 
-
-# liczba znaków w ciągu (łańcuchu znaków)
 x <- 'abc'
-numc <- nchar(x)
+numc <- nchar(x)       # liczba znaków w ciągu (łańcuchu znaków)
 numc
-
 # znajdź pozycję znaku w ciągu
 # \" jest pojedyńczym znakiem, loc jest listą
 loc <- gregexpr(pattern = '\"', "abc\"defg") 
 cat('Pozycja znaku: ', loc[[1]][1], '\n')
-
 # konwersja łańcucha znaków do całkowitej
 # 1 sposób
 x <- 123
-x <- paste(x)  # x równa się "123"
-x <- strtoi(x) # x równa się 123
+x <- paste(x)          # x równa się "123"
+x <- strtoi(x)         # x równa się 123
 # 2 sposób
 x <- 123
-x <- as.character(x)  # x równa się "123"
-x <- as.integer(x)    # x równa się 123, także as.numeric(x) jako zmiennoprzecinkowa
-
+x <- as.character(x)   # x równa się "123"
+x <- as.integer(x)     # x równa się 123, także as.numeric(x) jako zmiennoprzecinkowa
 #uwaga! 
-c(5,'a')  # się konwertuje domyślnie na c('5','a')
-e<-c(5)
-e[2]<-'a' # się konwertuje domyślnie na c('5','a')
-e 
-typeof(1:2) == typeof(c(1,2))     # FALSE pierwszy typ integer - drugie double
+c(5,'a'); e<-c(5)      # się konwertuje domyślnie na c('5','a')
+e[2]<-'a'; e           # się konwertuje domyślnie na c('5','a')
+typeof(1:2) == typeof(c(1,2))           # FALSE pierwszy typ integer - drugie double
 for( i in 1:length(c()))        print(i)# 1 0 niby pusty wektor, a może coś wypisać 
 for( i in seq_len(length(c()))) print(i)# poprawna forma pętli odporna na błąd pustego wektora
 for( i in seq_along(c()))       print(i)# poprawna forma pętli odporna na błąd pustego wektora
@@ -512,6 +476,7 @@ legend(
 plot(f)           # pierwszy rysunek
 dev.new()         # otwórz drugi rysunek
 plot(f(x2plot/20))# przelączanie strzałkami z klawiatury
+Sys.sleep(2)                             #pauza na 2 sekundy
 dev.off()         # zamknij drugi rysunek
 # attach, detach
 # attach, detach nie pracują na tych samych nazwach zmiennych, użyj "with"
@@ -523,6 +488,7 @@ summary(mpg)
 plot(mpg, disp)
 plot(mpg, wt)
 detach(mtcars) # usuń zbiór danych do ścieżki R wyszukiwania
+Sys.sleep(2)                             #pauza na 2 sekundy
 
 #używanie sqla
 library(sqldf)
@@ -651,13 +617,13 @@ sapply(40:60, fn)                            #to samo co wywołanie funkcji z we
 fn <- function (x, y) {                      #funkcja z dwoma argumentami
   ifelse(x > 46 & x < 52 & y < 12, 1, 0)     
 }
-#fn(datagrid$i, datagrid$j)                  #TO NIE DZIAŁA w przypadku dwóch argumentów
 datagrid <- expand.grid(i = 40:60, j = 0:20) #utwórz wszystkie kombinacje wartości i, j; najpierw łączymy j=0 z wszystkimi wartościami i 
+#fn(datagrid$i, datagrid$j)                  #TO NIE DZIAŁA w przypadku dwóch argumentów
 apply(datagrid, 1, function(z) {             #odpowiednik dwóch pętli pierwszej z j, drugiej z i
   fn(z["i"], z["j"])                         #apply działa na macierzy, dla 1 (drugi argument) na wierszach, dla 2 na kolumnach
 })
 apply(datagrid,1,function(z){fn(z[1], z[2])})#skrócona wersja z indeksami, 1 oznacza pobór wierszy do funkcji fn
-res <- NULL                                  #zagnieżdżona pętla w pętli
+res <- NULL                                  #zagnieżdżona pętla w pętli - odpowiednik apply na datagrid
 for (j in 0:20) {
   for (i in 40:60) {                         #utwórz wszystkie kombinacje wartości i, j w zagnieżdżonej pętli w pętli
     res <- c(res, fn(i, j))                  #expand.grid(i = 40:60, j = 0:20) najpierw łączymy j=0 z wszystkimi wartościami i 
@@ -665,15 +631,29 @@ for (j in 0:20) {
 }
 res
 
+#Zaawansowane przetwarzanie danych
+#matematyczne funkcje: sqrt(x), floor(x), log(x), exp(x)
+#statystyczne funkcje: mean(x), median(x), sd(x), var(x), range(x), sum(x), scale(x, center=TRUE, scale=TRUE)
+#funkcje probabilistyczne:
+#[dpqr]distribution_abbrebiation (d=density, p=distribution function, q=quantile function, r=random generation)
+#runif()- próba o równomiernym rozkładzie (random generation)
+#set.seed(5): ustaw seed na jakąś jedną wartość np. 5, aby uzyskać te same wyniki
+#fukcje znakowe:
+#nchar(x), nzchar(x), substr(x, start, stop), grep(pattern, x, ignore.case=FALSE, fixed=FALSE)
+#sub(pattern, replacement, x, ignore.case=FALSE, fixed=FALSE), strsplit(x, split, fixed=FALSE)
+#paste(..., sep=""), toupper(x), tolower(x)
+#inne funkcje:
+#length(x), seq(from, to, by), rep(x, n), cut(x, n), pretty(x, n), cat(.., file='myfile', append=FALSE)
 
 
 
 #UCZENIE SIĘ MASZYN
-#klasteryzacja w R np. K-means
-dev.off()                        #na wszelki wypadek wyłączamy drugi rysunek
-mdata <- mtcars[c('disp', 'hp')]
-kmeans.res <- kmeans(mdata, 3)   # 3 zbiory odrębnych danych
-plot(
+#klasteryzacja w R np. K-means w dwóch wymiarach
+dev.off()                                 # na wszelki wypadek wyłączamy drugi rysunek
+mdata <- mtcars[c('disp', 'hp')]          # wybieramy 2 parametry z mtcars pojemność silnika i konie mechaniczne
+round(cor(mdata), 2)                      # sprawdzamy korelację wybranych kolumn, widać dużą korelację 
+kmeans.res <- kmeans(mdata, 3)            # 3 zbiory odrębnych danych
+plot(                                     #wizualizacja w 2D z plot, abline, ade4 s.class
   mdata,
   xaxt = 'n',
   yaxt = 'n',
@@ -692,22 +672,90 @@ s.class(
   add.plot = TRUE,
   col = seq(1, nlevels(kmeans.cluster), 1)
 )
+Sys.sleep(2)                             #pauza na 2 sekundy
+
+#klasteryzacja w R np. K-means w trzech wymiarach
+mdata3 <- mtcars[c('mpg','disp', 'hp')]  # wybieramy 3 parametry z mtcars ilość przejechanych mil na galon paliwa,
+mtcars[c('mpg','disp', 'hp')]            # a także pojemność silnika i konie mechaniczne (miary z USA)
+round(cor(mdata3), 2)                    # sprawdzamy korelację wybranych kolumn, widać dużą korelację
+                                         # tzn. wybrane parametry razem się zmniejszają lub zwiększają
+                                         # jeśli korelacja jest DODATNIA
+                                         # jeśli jest UJEMNA, to przy zwiększaniu jednej, druga maleje
+kmeans3.res <- kmeans(mdata3, 3)         # 3 zbiory odrębnych danych
+kmeans3.cluster <- factor(kmeans3.res$cluster)
+library(scatterplot3d)
+scatterplot3d(mdata3,color=kmeans3.cluster,pch=19)  #wizualizacja w 3D 
+library(rgl)
+#http://www.sthda.com/english/wiki/a-complete-guide-to-3d-visualization-device-system-in-r-r-software-and-data-visualization
+plot3d(mdata3, col=kmeans3.cluster, size = 10)      #wizualizacja w 3D interaktywna
+Sys.sleep(2)                             #pauza na 2 sekundy
 
 
+#klasteryzacja w R np. K-means w trzech obliczonych wymiarach z PCA  
+#http://planspace.org/2013/02/03/pca-3d-visualization-and-clustering-in-r/
+pc <- princomp(mtcars, cor=TRUE, scores=TRUE) #PCA obliczamy sztuczne 3 wymiary
+summary(pc)
+biplot(pc)
+plot(pc,type="lines")
+mdatapc<-pc$scores[,1:3]
+str(mdatapc)
+class(mdatapc)
+kmeanspc.res <- kmeans(mdatapc, 4)                  # 4 zbiory odrębnych danych
+kmeanspc.cluster <- factor(kmeanspc.res$cluster)
+scatterplot3d(mdatapc,color=kmeanspc.cluster,pch=19)#wizualizacja w 3D 
+r3dDefaults$windowRect <- c(0,50, 800, 800) 
+plot3d(mdatapc, col=kmeanspc.cluster, size = 10)    #wizualizacja w 3D interaktywna
+text3d(pc$scores[,1:3],texts=rownames(mtcars))      #dodajemy parametry z mtcars
+text3d(pc$loadings[,1:3], texts=rownames(pc$loadings), col="red")
+coords <- NULL
+for (i in 1:nrow(pc$loadings)) {
+  coords <- rbind(coords, rbind(c(0,0,0),pc$loadings[i,1:3]))
+}
+lines3d(coords, col="red", lwd=4)
+table(kmeans.cluster, kmeanspc.cluster)
+Sys.sleep(2)                                        #pauza na 2 sekundy
 
-#Zaawansowane przetwarzanie danych
-#matematyczne funkcje: sqrt(x), floor(x), log(x), exp(x)
-#statystyczne funkcje: mean(x), median(x), sd(x), var(x), range(x), sum(x), scale(x, center=TRUE, scale=TRUE)
-#funkcje probabilistyczne:
-#[dpqr]distribution_abbrebiation (d=density, p=distribution function, q=quantile function, r=random generation)
-#runif()- próba o równomiernym rozkładzie
-#set.seed(5): ustaw seed na jakąś jedną wartość np. 5, aby uzyskać te same wyniki
-#fukcje znakowe:
-#nchar(x), nzchar(x), substr(x, start, stop), grep(pattern, x, ignore.case=FALSE, fixed=FALSE)
-#sub(pattern, replacement, x, ignore.case=FALSE, fixed=FALSE), strsplit(x, split, fixed=FALSE)
-#paste(..., sep=""), toupper(x), tolower(x)
-#inne funkcje:
-#length(x), seq(from, to, by), rep(x, n), cut(x, n), pretty(x, n), cat(.., file='myfile', append=FALSE)
+#klasteryzacja w R np. hierarchiczne grupowanie
+mdata3 <- mtcars[c('mpg','disp', 'hp')]  # wybieramy 3 parametry z mtcars ilość przejechanych mil na galon paliwa,
+mtcars[c('mpg','disp', 'hp')]            # a także pojemność silnika i konie mechaniczne (miary z USA)
+di <- dist(mdata3, method="euclidean")
+tree <- hclust(di, method="ward")
+hcluster <- as.factor((cutree(tree, k=3)-2) %% 3 +1)
+# that modulo business just makes the coming table look nicer
+plot(tree, xlab="")
+rect.hclust(tree, k=3, border="red")
+table(hcluster, kmeanspc.cluster)
+Sys.sleep(2)   
+
+#https://planspacedotorg.wordpress.com/2013/07/24/clustered-r-squared-heat-maps-in-r/
+dissimilarity <- 1 - cor(mtcars)^2           #miara niepodobnych 1 - korelacja do kwadratu
+clustering <- hclust(as.dist(dissimilarity))
+plot(clustering)                             #grupowanie po niepodobieństwach
+order <- clustering$order
+oldpar <- par(no.readonly=TRUE); par(mar=c(0,0,0,0))
+image(dissimilarity[order, rev(order)], axes=FALSE)
+par(oldpar)
+clusterRsquared <- function(dataframe) {     #funkcja z miar niepodobieństw
+  dissimilarity <- 1 - cor(dataframe)^2
+  clustering <- hclust(as.dist(dissimilarity))
+  order <- clustering$order
+  oldpar <- par(no.readonly=TRUE); par(mar=c(0,0,0,0))
+  image(dissimilarity[order, rev(order)], axes=FALSE)
+  par(oldpar)
+  return(1 - dissimilarity[order, order])
+}
+round(clusterRsquared(mtcars),2)
+Sys.sleep(2) 
+round(clusterRsquared(mdata3),2)
+Sys.sleep(2) 
+
+
+#library(party)
+#ctree <- ctree(kmeans.cluster ~ mpg + disp + hp, data=mdata)
+# plot(ctree)
+#plot(ctree, type="simple")
+
+
 
 
 
