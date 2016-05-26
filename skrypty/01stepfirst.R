@@ -7,7 +7,7 @@
 pkglist<-c("reshape","ade4","sqldf","plyr","dplyr")
 pkglist<-c(pkglist,"party","rgl","scatterplot3d","fpc","pvclust","dendextend")
 pkglist<-c(pkglist,"nFactors","FactoMineR","randomForest","mclust")
-pkglist<-c(pkglist,"rpart","ipred","gbm","mda","klaR","kernlab")
+pkglist<-c(pkglist,"rpart","ipred","gbm","mda","klaR","kernlab","caret")
 #pkglist<-c(pkglist,"MASS","RWeka")
 pkgcheck <- pkglist %in% row.names(installed.packages())
 pkglist[!pkgcheck]
@@ -516,12 +516,12 @@ write.table(
 signal <- read.table('data.csv', header = FALSE, sep = ',')
 #RYSUNKI DO PLIKÓW
 # pierwszy rysunek plik
-pdf('graph1.pdf')
+pdf('plotgraph1.pdf')
 x2plot = seq(1:20)
 plot(sin(x2plot))
 dev.off()
 # drugi rysunek plik
-pdf('graph2.pdf')
+pdf('plotgraph2.pdf')
 plot(cos(x2plot))
 dev.off()
 
