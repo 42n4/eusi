@@ -32,6 +32,8 @@ http://personality-project.org/r/r.guide.html
 http://www.datasciencecentral.com/m/blogpost?id=6448529:BlogPost:415828 
 ###np. jedna z metod 
 http://www.statmethods.net/management/reshape.html
+###arules tutor
+http://michael.hahsler.net/research/arules_RUG_2015/demo/R_arules_demo_SQF2012.R
 
 ###R webinars
 https://vimeo.com/89562453
@@ -39,9 +41,14 @@ https://www.youtube.com/watch?v=7Jbb2ItbTC4 #caretwebinar
 http://www.r-bloggers.com/caret-webinar-materials/
 https://cran.r-project.org/web/packages/RSelenium/vignettes/OCRUG-webinar.html
 
+###docker R microsoft
+https://github.com/nuest/docker-mro
 
 ###porównanie R z pythonem 
 https://www.dataquest.io/blog/python-vs-r/
+###porównanie R Microsoft
+http://htmlpreview.github.io/?https://github.com/lixzhang/R-MRO-MRS/blob/master/Introduction_to_MRO_and_MRS.html
+http://mqasim.me/?p=68545
 
 ##rbloggers 
 http://www.r-bloggers.com/visualizing-neural-networks-in-r-update/
