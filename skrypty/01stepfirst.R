@@ -800,14 +800,24 @@ rect.hclust(tree, k=nc, border="red")
 table(hcluster, kmeanspc.cluster)
 Sys.sleep(2)                             #pauza na 2 sekundy 
 
-#Grupowanie klasteryzacja w R np. hierarchiczne grupowanie
-mydata <- mtcars
+#Grupowanie Mclust
+#https://cran.r-project.org/web/packages/mclust/vignettes/mclust.html
+mydata <- scaledcars
+library(mclust)
+fit <- Mclust(mydata)
+plot(fit, what = "BIC") 
+summary(fit) 
+Sys.sleep(2)                             #pauza na 2 sekundy
+
+#Grupowanie klasteryzacja w R: pvclust hierarchiczne grupowanie
+#wyniki wykorzystane w poniżej wyjaśnionych drzewach decyzyjnych
+mydata <- scaledcars
 #http://www.sigmath.es.osaka-u.ac.jp/shimo-lab/prog/pvclust/
 library(pvclust)
 fitpv <- pvclust(t(mydata), method.dist="euclidean", method.hclust="ward.D2", nboot=1000)
 plot(fitpv)
-pvrect(fitpv, alpha=.95) 
-pvgroup <- pvpick(fitpv, alpha=0.95) 
+pvrect(fitpv, alpha=.9) 
+pvgroup <- pvpick(fitpv, alpha=0.9) 
 mydata$fit <- NA
 for( i in seq_len(length(pvgroup$clusters))) mydata[pvgroup$clusters[[i]],]$fit = i
 mydata$fit
@@ -821,20 +831,59 @@ Sys.sleep(2)                             #pauza na 2 sekundy
 #fit %>% text
 #fit %>% pvrect
 
-#Grupowanie Mclust
-#https://cran.r-project.org/web/packages/mclust/vignettes/mclust.html
-mydata <- scaledcars
-library(mclust)
-fit <- Mclust(mydata)
-plot(fit, what = "BIC") 
-summary(fit) 
+#Drzewa decyzyjne rpart
+library(rpart)
+# hoduj drzewo
+mydata$fit <- factor(mydata$fit)
+mydatana <- mydata[is.na(mydata$fit),]  #stosuje mydata z pvclust poprzedni przykład
+mydatatr <- na.omit(mydata)             #uczę na przykładzie z etykietą fit != NA
+#?rpart.control                         #ustaw parametry rpart
+fitree <- rpart(fit ~ ., method="class", data=mydatatr, minsplit=2)
+#fitree <- rpart(fit ~ ., method="anova", data=mydata)
+printcp(fitree)                         # wyswietlam rezultaty
+plotcp(fitree)                          # vizualizuję krossvalidację
+summary(fitree)                         # podsumowanie
+# utwórz rysunek
+par(mar=c(0,5,3,5))
+plot(fitree, uniform=TRUE,
+     main="Decyzyjne drzewo dla mtcars z etykietą fit (pvclust)")
+text(fitree, use.n=TRUE, all=TRUE, cex=.8)
+#zapisz rysunek do pliku
+post(fitree, file = "treerpart1.pdf",
+     title = "Decyzyjne drzewo dla mtcars z etykietą fit (pvclust)")
+Sys.sleep(2)                            #pauza na 2 sekundy
+# przytnij drzewo
+pfitree<- prune(fitree, cp=   fit$cptable[which.min(fitree$cptable[,"xerror"]),"CP"])
+# utwórz rysunek
+plot(pfitree, uniform=TRUE,
+     main="Przycięte decyzyjne drzewo dla mtcars z etykietą fit (pvclust)")
+text(pfitree, use.n=TRUE, all=TRUE, cex=.8)
+#zapisz rysunek do pliku
+post(pfitree, file = "treerpart2.pdf",
+     title = "Przycięte decyzyjne drzewo dla mtcars z etykietą fit (pvclust)")
+predrest1 <- predict(fitree, mydatana)   #przewiduj etykietę zbioru z fit=NA
+predrest1
 Sys.sleep(2)                             #pauza na 2 sekundy
 
-
-#Drzewa Decyzyjne
-#library(party)
-#ctree <- ctree(kmeans.cluster ~ mpg + disp + hp, data=mdata)
-# plot(ctree)
+#Drzewa Decyzyjne ctree
+library(party)
+ctree <- ctree(fit ~ ., data=mydatatr, controls = 
+    ctree_control(mincriterion = 0,minbucket = 0,minsplit = 0,maxdepth = 100,savesplitstats = TRUE))
+plot(ctree)
 #plot(ctree, type="simple")
+post(pfitree, file = "treectree.pdf",
+     title = "Decyzyjne drzewo ctree dla mtcars z etykietą fit (pvclust)")
+predrest2 <- predict(ctree, mydatana)    #przewiduj etykietę zbioru z fit=NA
+predrest2
+Sys.sleep(2)                             #pauza na 2 sekundy
 
-
+#Drzewa Decyzyjne randomForest
+library(randomForest)
+fitforest <- randomForest(fit ~ ., data=mydatatr)
+print(fitforest) # view results
+importance(fitforest) # importance of each predictor 
+predrest3 <- predict(fitforest, mydatana)#przewiduj etykietę zbioru z fit=NA
+predrest3
+Sys.sleep(2)                             #pauza na 2 sekundy
+#UWAGA!!!! Można zauważyć, że wyniki etykietowania zbioru z nieznaną wartością fit z pvclust
+#predict1, predict2, predict3 są takie same
