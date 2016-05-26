@@ -665,6 +665,10 @@ round(cor(mydata), 2)                        # sprawdzamy korelację wybranych k
 # standaryzuj zmienne ciągłe
 scaledcars <- na.omit(mtcars)             # usuń niepełne wiersze z NA
 scaledcars[c('mpg','disp', 'hp','drat', 'wt','qsec' )] <- scale(scaledcars[c('mpg','disp', 'hp','drat', 'wt','qsec' )])
+#heatmap z odległości między wierszami
+distMatrix <- as.matrix(dist(scaledcars))
+heatmap(distMatrix)
+Sys.sleep(2)                             #pauza na 2 sekundy
 #heatmap z korelacji
 #https://planspacedotorg.wordpress.com/2013/07/24/clustered-r-squared-heat-maps-in-r/
 dissimilarity <- 1 - cor(mtcars)^2           #miara niepodobnych 1 - korelacja do kwadratu
@@ -684,9 +688,9 @@ clusterRsquared <- function(dataframe) {         #funkcja z miar niepodobieństw
   return(1 - dissimilarity[order, order])
 }
 round(clusterRsquared(mtcars),2)
-Sys.sleep(2) 
+Sys.sleep(2)                             #pauza na 2 sekundy
 #round(clusterRsquared(mdata3),2)
-#Sys.sleep(2) 
+#Sys.sleep(2)                             #pauza na 2 sekundy
 
 #Grupowanie klasteryzacja w R np. K-means w dwóch wymiarach
 mydata <- mtcars[c('disp', 'hp')]          # wybieramy 2 parametry mtcars pojemność silnika i konie mechaniczne
@@ -943,3 +947,5 @@ Sys.sleep(2)                             #pauza na 2 sekundy
 #earth(earth), knnreg(caret), glmnet(glmnet), lars(lars), glmnet(glmnet)
 #pcr(pls), plsr(pls)
 #http://machinelearningmastery.com/how-to-get-started-with-machine-learning-algorithms-in-r/
+
+
