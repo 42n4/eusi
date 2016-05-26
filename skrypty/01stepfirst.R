@@ -6,7 +6,9 @@
 #(w linuxie na roocie w konsoli R, żeby nie instalować na lokalnym koncie):
 pkglist<-c("reshape","ade4","sqldf","plyr","dplyr")
 pkglist<-c(pkglist,"party","rgl","scatterplot3d","fpc","pvclust","dendextend")
-pkglist<-c(pkglist,"nFactors","FactoMineR")
+pkglist<-c(pkglist,"nFactors","FactoMineR","randomForest","mclust")
+pkglist<-c(pkglist,"rpart","ipred","gbm","mda","klaR","kernlab")
+#pkglist<-c(pkglist,"MASS","RWeka")
 pkgcheck <- pkglist %in% row.names(installed.packages())
 pkglist[!pkgcheck]
 #ODKOMENTUJ jak chcesz zainstalować biblioteki najlepiej w konsoli tekstowej R na koncie root w Linuxie
@@ -810,7 +812,7 @@ summary(fit)
 Sys.sleep(2)                             #pauza na 2 sekundy
 
 #Grupowanie klasteryzacja w R: pvclust hierarchiczne grupowanie
-#wyniki wykorzystane w poniżej wyjaśnionych drzewach decyzyjnych
+#wyniki wykorzystane w poniżej wyjaśnionych drzewach decyzyjnych i klasyfikatorach
 mydata <- scaledcars
 #http://www.sigmath.es.osaka-u.ac.jp/shimo-lab/prog/pvclust/
 library(pvclust)
@@ -832,10 +834,13 @@ Sys.sleep(2)                             #pauza na 2 sekundy
 #fit %>% pvrect
 
 #Drzewa decyzyjne rpart
+#http://www.statmethods.net/advstats/cart.html
+#http://machinelearningmastery.com/non-linear-regression-in-r-with-decision-trees/
 library(rpart)
-# hoduj drzewo
-mydata$fit <- factor(mydata$fit)
-mydatana <- mydata[is.na(mydata$fit),]  #stosuje mydata z pvclust poprzedni przykład
+# hoduj drzewo na zbiorze trenującym mydatatr z etykietami fit 
+# potem je użyj na zbiorze mydatana do określenia brakujących etykiet fit
+mydata$fit <- factor(mydata$fit)        #stosuje mydata z pvclust poprzedni przykład
+mydatana <- mydata[is.na(mydata$fit),]  #zbiór z fit=NA z pvclust przycięcia
 mydatatr <- na.omit(mydata)             #uczę na przykładzie z etykietą fit != NA
 #?rpart.control                         #ustaw parametry rpart
 fitree <- rpart(fit ~ ., method="class", data=mydatatr, minsplit=2)
@@ -870,20 +875,71 @@ library(party)
 ctree <- ctree(fit ~ ., data=mydatatr, controls = 
     ctree_control(mincriterion = 0,minbucket = 0,minsplit = 0,maxdepth = 100,savesplitstats = TRUE))
 plot(ctree)
+pdf('treec.pdf')
+plot(ctree)
+dev.off()
 #plot(ctree, type="simple")
-post(pfitree, file = "treectree.pdf",
-     title = "Decyzyjne drzewo ctree dla mtcars z etykietą fit (pvclust)")
 predrest2 <- predict(ctree, mydatana)    #przewiduj etykietę zbioru z fit=NA
 predrest2
 Sys.sleep(2)                             #pauza na 2 sekundy
 
-#Drzewa Decyzyjne randomForest
+#Drzewa Decyzyjne randomForest - wiele drzew i głosowanie
+#zmienna liczba atrybutów dla każdej próby tworzenia drzewa
 library(randomForest)
 fitforest <- randomForest(fit ~ ., data=mydatatr)
-print(fitforest) # view results
-importance(fitforest) # importance of each predictor 
+print(fitforest)                         # zobacz rezultaty
+#summary(fitforest)
+importance(fitforest)                    # importance of each predictor 
 predrest3 <- predict(fitforest, mydatana)#przewiduj etykietę zbioru z fit=NA
 predrest3
 Sys.sleep(2)                             #pauza na 2 sekundy
+
+#Bootstrapped Aggregation (Bagging) drzewa na różnych próbkach i głosowanie
+library(ipred)
+fitbag <- bagging(fit~., data=mydatatr, control=rpart.control(minsplit=5))
+print(fitbag)                            #zobacz rezultaty
+#summary(fitbag)                         #zbyt duży zbiór to zakomentowane
+predrest4 <- predict(fitbag, mydatana)   #przewiduj etykietę zbioru z fit=NA
+predrest4
+Sys.sleep(2)                             #pauza na 2 sekundy
+
+#Mixture Discriminant Analysis
+library(mda)
+fitmda <- mda(fit~., data=mydatatr)
+print(fitmda)                            #zobacz rezultaty
+summary(fitmda)
+predrest5 <- predict(fitmda, mydatana)#przewiduj etykietę zbioru z fit=NA
+predrest5
+Sys.sleep(2)                             #pauza na 2 sekundy
+
+#Regularized Discriminant Analysis
+library(klaR)
+fitrda <- rda(fit~., data=mydatatr)
+print(fitrda)                            #zobacz rezultaty
+summary(fitrda)
+predrest6 <- predict(fitrda, mydatana)   #przewiduj etykietę zbioru z fit=NA
+predrest6
+Sys.sleep(2)                             #pauza na 2 sekundy
+
 #UWAGA!!!! Można zauważyć, że wyniki etykietowania zbioru z nieznaną wartością fit z pvclust
-#predict1, predict2, predict3 są takie same
+#predrest1, predrest2, predrest3, predrest4, predrest6 są takie same
+
+#Gradient Boosted Machine 
+#http://www.listendata.com/2015/07/gbm-boosted-models-tuning-parameters.html
+library(gbm)
+fitgbm <- gbm(fit~., data=mydatatr, distribution="gaussian", 
+              bag.fraction = 0.5, n.trees = 1000, interaction.depth =6, 
+              shrinkage = 0.1, n.minobsinnode = 1)
+print(fitgbm)                            #zobacz rezultaty
+summary(fitgbm)
+predrest7 <- predict(fitgbm, mydatana,n.trees = 10)   #przewiduj etykietę zbioru z fit=NA
+round(predrest7)
+Sys.sleep(2)                             #pauza na 2 sekundy
+#UWAGA !!! Tutaj wynik predrest7 od poprzednich predict, podobnie jak predrest5(mda)
+
+#Niesprawdzone w tym skrypcie funkcje funkcja(pakiet) m.in:
+#fda(mda), kernlab(ksvm), knn3(caret), naiveBayes(e1071), nnet(nnet), qda(MASS)
+#J48(RWeka), PART(RWeka), C5.0(C50), vglm(VGAM), lda(MASS), plsda(caret)
+#earth(earth), knnreg(caret), glmnet(glmnet), lars(lars), glmnet(glmnet)
+#pcr(pls), plsr(pls)
+#http://machinelearningmastery.com/how-to-get-started-with-machine-learning-algorithms-in-r/
