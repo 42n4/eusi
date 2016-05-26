@@ -12,7 +12,6 @@ https://www.coursera.org/learn/machine-learning/home/welcome
 http://www.holehouse.org/mlclass/index.html 
 https://github.com/emersonmoretto/mlclass-ex1 
 https://github.com/schneems/Octave
-
 ###kurs maszynowego uczenia - python 
 https://www.udacity.com/course/intro-to-machine-learning--ud120 
 https://github.com/antran89/ud120-projects 
