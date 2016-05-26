@@ -947,5 +947,9 @@ Sys.sleep(2)                             #pauza na 2 sekundy
 #earth(earth), knnreg(caret), glmnet(glmnet), lars(lars), glmnet(glmnet)
 #pcr(pls), plsr(pls)
 #http://machinelearningmastery.com/how-to-get-started-with-machine-learning-algorithms-in-r/
-
+#R webinars
+#https://vimeo.com/89562453
+#https://www.youtube.com/watch?v=7Jbb2ItbTC4 #caretwebinar
+#http://www.r-bloggers.com/caret-webinar-materials/
+#https://cran.r-project.org/web/packages/RSelenium/vignettes/OCRUG-webinar.html
 
