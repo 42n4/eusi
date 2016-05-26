@@ -651,19 +651,19 @@ res
 
 
 #UCZENIE SIĘ MASZYN
-set.seed(12459);                          #początkowa wartość random seed dla takich samych wyników
-dev.off()                                 # na wszelki wypadek wyłączamy drugi rysunek
+set.seed(12459);                         #początkowa wartość random seed dla takich samych wyników
+dev.off()                                # na wszelki wypadek wyłączamy drugi rysunek
 
 #Analiza Danych - korelacje i podobieństwa
 mydata<-mtcars
-cor(mydata)                                  #korelacje między zmiennymi
-round(cor(mydata), 2)                        # sprawdzamy korelację wybranych kolumn, widać dużą korelację
-                                             # tzn. wybrane parametry razem się zmniejszają lub zwiększają
-                                             # jeśli korelacja jest DODATNIA
-                                             # jeśli jest UJEMNA, to przy zwiększaniu jednej, druga maleje
+cor(mydata)                              #korelacje między zmiennymi
+round(cor(mydata), 2)                    # sprawdzamy korelację wybranych kolumn, widać dużą korelację
+                                         # tzn. wybrane parametry razem się zmniejszają lub zwiększają
+                                         # jeśli korelacja jest DODATNIA
+                                         # jeśli jest UJEMNA, to przy zwiększaniu jednej, druga maleje
 #image(cor(mtcars))
 # standaryzuj zmienne ciągłe
-scaledcars <- na.omit(mtcars)             # usuń niepełne wiersze z NA
+scaledcars <- na.omit(mtcars)            # usuń niepełne wiersze z NA
 scaledcars[c('mpg','disp', 'hp','drat', 'wt','qsec' )] <- scale(scaledcars[c('mpg','disp', 'hp','drat', 'wt','qsec' )])
 #heatmap z odległości między wierszami
 distMatrix <- as.matrix(dist(scaledcars))
@@ -671,14 +671,14 @@ heatmap(distMatrix)
 Sys.sleep(2)                             #pauza na 2 sekundy
 #heatmap z korelacji
 #https://planspacedotorg.wordpress.com/2013/07/24/clustered-r-squared-heat-maps-in-r/
-dissimilarity <- 1 - cor(mtcars)^2           #miara niepodobnych 1 - korelacja do kwadratu
+dissimilarity <- 1 - cor(mtcars)^2       #miara niepodobnych 1 - korelacja do kwadratu
 clustering <- hclust(as.dist(dissimilarity), method="ward.D2")
-plot(clustering)                             #grupowanie po niepodobieństwach
+plot(clustering)                         #grupowanie po niepodobieństwach
 order <- clustering$order
 oldpar <- par(no.readonly=TRUE); par(mar=c(0,0,0,0))
 image(dissimilarity[order, rev(order)], axes=FALSE)
 par(oldpar)
-clusterRsquared <- function(dataframe) {         #funkcja z miar niepodobieństw
+clusterRsquared <- function(dataframe) { #funkcja z miar niepodobieństw
   dissimilarity <- 1 - cor(dataframe)^2
   clustering <- hclust(as.dist(dissimilarity))
   order <- clustering$order
@@ -690,13 +690,13 @@ clusterRsquared <- function(dataframe) {         #funkcja z miar niepodobieństw
 round(clusterRsquared(mtcars),2)
 Sys.sleep(2)                             #pauza na 2 sekundy
 #round(clusterRsquared(mdata3),2)
-#Sys.sleep(2)                             #pauza na 2 sekundy
+#Sys.sleep(2)                            #pauza na 2 sekundy
 
 #Grupowanie klasteryzacja w R np. K-means w dwóch wymiarach
-mydata <- mtcars[c('disp', 'hp')]          # wybieramy 2 parametry mtcars pojemność silnika i konie mechaniczne
-round(cor(mydata), 2)                      # sprawdzamy korelację wybranych kolumn, widać dużą korelację 
-kmeans.res <- kmeans(mydata, 3)            # 3 zbiory odrębnych danych
-plot(                                     #wizualizacja w 2D z plot, abline, ade4 s.class
+mydata <- mtcars[c('disp', 'hp')]        # wybieramy 2 parametry mtcars pojemność silnika i konie mechaniczne
+round(cor(mydata), 2)                    # sprawdzamy korelację wybranych kolumn, widać dużą korelację 
+kmeans.res <- kmeans(mydata, 3)          # 3 zbiory odrębnych danych
+plot(                                    #wizualizacja w 2D z plot, abline, ade4 s.class
   mydata,
   xaxt = 'n',
   yaxt = 'n',
@@ -769,8 +769,8 @@ ap <- parallel(subject=nrow(mydata),var=ncol(mydata),
 nS <- nScree(x=ev$values, aparallel=ap$eigen$qevpea)
 plotnScree(nS) 
 Sys.sleep(2)                             #pauza na 2 sekundy 
-library(FactoMineR)                           # PCA Variable Factor Map
-result <- PCA(mydata)                         # graphs generated automatically 
+library(FactoMineR)                      # PCA Variable Factor Map
+result <- PCA(mydata)                    # graphs generated automatically 
 plot(result)
 Sys.sleep(2)                             #pauza na 2 sekundy
 pc <- princomp(mydata, cor=TRUE, scores=TRUE) #PCA obliczamy sztuczne 3 wymiary
@@ -780,7 +780,7 @@ plot(pc,type="lines")
 mdatapc<-pc$scores[,1:2]
 str(mdatapc)
 class(mdatapc)
-kmeanspc.res <- kmeans(mdatapc, 4)                  # 4 zbiory odrębnych danych
+kmeanspc.res <- kmeans(mdatapc, 4)       # 4 zbiory odrębnych danych
 kmeanspc.cluster <- factor(kmeanspc.res$cluster)
 scatterplot3d(mdatapc,color=kmeanspc.cluster,pch=19)#wizualizacja w 3D 
 r3dDefaults$windowRect <- c(0,50, 800, 800) 
@@ -793,14 +793,14 @@ for (i in 1:nrow(pc$loadings)) {
 }
 lines3d(coords, col="red", lwd=4)
 table(kmeans.cluster, kmeanspc.cluster)
-Sys.sleep(2)                                        #pauza na 2 sekundy
+Sys.sleep(2)                             #pauza na 2 sekundy
 
 #Grupowanie klasteryzacja w R np. hierarchiczne grupowanie
 nc <- 5
 di <- dist(mtcars, method="euclidean")
 tree <- hclust(di, method="ward.D2")
 hcluster <- as.factor((cutree(tree, k=nc)-2) %% nc +1)
-groups <- cutree(fit, k=nc)             # potnij drzewo na nc grup
+groups <- cutree(fit, k=nc)              # potnij drzewo na nc grup
 plot(tree, xlab="")
 rect.hclust(tree, k=nc, border="red")
 table(hcluster, kmeanspc.cluster)
@@ -843,15 +843,15 @@ Sys.sleep(2)                             #pauza na 2 sekundy
 library(rpart)
 # hoduj drzewo na zbiorze trenującym mydatatr z etykietami fit 
 # potem je użyj na zbiorze mydatana do określenia brakujących etykiet fit
-mydata$fit <- factor(mydata$fit)        #stosuje mydata z pvclust poprzedni przykład
-mydatana <- mydata[is.na(mydata$fit),]  #zbiór z fit=NA z pvclust przycięcia
-mydatatr <- na.omit(mydata)             #uczę na przykładzie z etykietą fit != NA
-#?rpart.control                         #ustaw parametry rpart
+mydata$fit <- factor(mydata$fit)         #stosuje mydata z pvclust poprzedni przykład
+mydatana <- mydata[is.na(mydata$fit),]   #zbiór z fit=NA z pvclust przycięcia
+mydatatr <- na.omit(mydata)              #uczę na przykładzie z etykietą fit != NA
+#?rpart.control                          #ustaw parametry rpart
 fitree <- rpart(fit ~ ., method="class", data=mydatatr, minsplit=2)
 #fitree <- rpart(fit ~ ., method="anova", data=mydata)
-printcp(fitree)                         # wyswietlam rezultaty
-plotcp(fitree)                          # vizualizuję krossvalidację
-summary(fitree)                         # podsumowanie
+printcp(fitree)                          # wyswietlam rezultaty
+plotcp(fitree)                           # vizualizuję krossvalidację
+summary(fitree)                          # podsumowanie
 # utwórz rysunek
 par(mar=c(0,5,3,5))
 plot(fitree, uniform=TRUE,
@@ -860,7 +860,7 @@ text(fitree, use.n=TRUE, all=TRUE, cex=.8)
 #zapisz rysunek do pliku
 post(fitree, file = "treerpart1.pdf",
      title = "Decyzyjne drzewo dla mtcars z etykietą fit (pvclust)")
-Sys.sleep(2)                            #pauza na 2 sekundy
+Sys.sleep(2)                             #pauza na 2 sekundy
 # przytnij drzewo
 pfitree<- prune(fitree, cp=   fit$cptable[which.min(fitree$cptable[,"xerror"]),"CP"])
 # utwórz rysunek
