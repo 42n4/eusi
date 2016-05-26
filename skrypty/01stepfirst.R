@@ -4,7 +4,9 @@
 # w rstudio kursor myszy na nazwie funkcji i F1 wywołują opis funkcji
 #Zamieszczone przykłady dadzą się uruchomić jeśli zainstalujecie wymienione pakiety R 
 #(w linuxie na roocie w konsoli R, żeby nie instalować na lokalnym koncie):
-pkglist<-c("reshape","ade4","sqldf","plyr","dplyr","party")
+pkglist<-c("reshape","ade4","sqldf","plyr","dplyr")
+pkglist<-c(pkglist,"party","rgl","scatterplot3d","fpc","pvclust","dendextend")
+pkglist<-c(pkglist,"nFactors","FactoMineR")
 pkgcheck <- pkglist %in% row.names(installed.packages())
 pkglist[!pkgcheck]
 #ODKOMENTUJ jak chcesz zainstalować biblioteki najlepiej w konsoli tekstowej R na koncie root w Linuxie
@@ -94,7 +96,6 @@ which(vec %in% e2)     #podaje na którym miejscu znajduje się e2 w wektorze ve
 e3 <- 1                # sprawdź, czy element znajduje się w wektorze
 !is.na(match(e3, vec)) #czy element e3 znajduje się w wektorze vec
 e3 %in% vec            #czy element e3 znajduje się w wektorze vec 
-
 c1 <- c(1, 2, 3)
 c2 <- c(2, 3, 5)
 c1[!(c1 %in% c2)]      # 1 - elementy z wektoru c1 nie znajdujące się w c2
@@ -648,13 +649,49 @@ res
 
 
 #UCZENIE SIĘ MASZYN
-#klasteryzacja w R np. K-means w dwóch wymiarach
+set.seed(12459);                          #początkowa wartość random seed dla takich samych wyników
 dev.off()                                 # na wszelki wypadek wyłączamy drugi rysunek
-mdata <- mtcars[c('disp', 'hp')]          # wybieramy 2 parametry z mtcars pojemność silnika i konie mechaniczne
-round(cor(mdata), 2)                      # sprawdzamy korelację wybranych kolumn, widać dużą korelację 
-kmeans.res <- kmeans(mdata, 3)            # 3 zbiory odrębnych danych
+
+#Analiza Danych - korelacje i podobieństwa
+mydata<-mtcars
+cor(mydata)                                  #korelacje między zmiennymi
+round(cor(mydata), 2)                        # sprawdzamy korelację wybranych kolumn, widać dużą korelację
+                                             # tzn. wybrane parametry razem się zmniejszają lub zwiększają
+                                             # jeśli korelacja jest DODATNIA
+                                             # jeśli jest UJEMNA, to przy zwiększaniu jednej, druga maleje
+#image(cor(mtcars))
+# standaryzuj zmienne ciągłe
+scaledcars <- na.omit(mtcars)             # usuń niepełne wiersze z NA
+scaledcars[c('mpg','disp', 'hp','drat', 'wt','qsec' )] <- scale(scaledcars[c('mpg','disp', 'hp','drat', 'wt','qsec' )])
+#heatmap z korelacji
+#https://planspacedotorg.wordpress.com/2013/07/24/clustered-r-squared-heat-maps-in-r/
+dissimilarity <- 1 - cor(mtcars)^2           #miara niepodobnych 1 - korelacja do kwadratu
+clustering <- hclust(as.dist(dissimilarity), method="ward.D2")
+plot(clustering)                             #grupowanie po niepodobieństwach
+order <- clustering$order
+oldpar <- par(no.readonly=TRUE); par(mar=c(0,0,0,0))
+image(dissimilarity[order, rev(order)], axes=FALSE)
+par(oldpar)
+clusterRsquared <- function(dataframe) {         #funkcja z miar niepodobieństw
+  dissimilarity <- 1 - cor(dataframe)^2
+  clustering <- hclust(as.dist(dissimilarity))
+  order <- clustering$order
+  oldpar <- par(no.readonly=TRUE); par(mar=c(0,0,0,0))
+  image(dissimilarity[order, rev(order)], axes=FALSE)
+  par(oldpar)
+  return(1 - dissimilarity[order, order])
+}
+round(clusterRsquared(mtcars),2)
+Sys.sleep(2) 
+#round(clusterRsquared(mdata3),2)
+#Sys.sleep(2) 
+
+#Grupowanie klasteryzacja w R np. K-means w dwóch wymiarach
+mydata <- mtcars[c('disp', 'hp')]          # wybieramy 2 parametry mtcars pojemność silnika i konie mechaniczne
+round(cor(mydata), 2)                      # sprawdzamy korelację wybranych kolumn, widać dużą korelację 
+kmeans.res <- kmeans(mydata, 3)            # 3 zbiory odrębnych danych
 plot(                                     #wizualizacja w 2D z plot, abline, ade4 s.class
-  mdata,
+  mydata,
   xaxt = 'n',
   yaxt = 'n',
   xlab = "X",
@@ -667,37 +704,74 @@ kmeans.cluster <- factor(kmeans.res$cluster)
 # zainstaluj 'ade4', aby zwizualizować zbiory
 library(ade4)
 s.class(
-  mdata,
+  mydata,
   fac = kmeans.cluster,
   add.plot = TRUE,
   col = seq(1, nlevels(kmeans.cluster), 1)
 )
+aggregate(mydata,by=list(kmeans.res$cluster),FUN=mean) # średnie w grupach widać zróżnicowanie
+groupk2 <- data.frame(mydata, kmeans.res$cluster) 
+Sys.sleep(2)                             #pauza na 2 sekundy
+library(cluster)
+clusplot(mydata, kmeans.res$cluster, color=TRUE, shade=TRUE,
+         labels=2, lines=0)
+Sys.sleep(2)                             #pauza na 2 sekundy
+library(fpc)
+plotcluster(mydata, kmeans.res$cluster) 
+#library(fpc)                 # porównanie dwóch grupowań
+#cluster.stats(mydata, fit$cluster, fit2$cluster) 
 Sys.sleep(2)                             #pauza na 2 sekundy
 
-#klasteryzacja w R np. K-means w trzech wymiarach
+#Grupowanie klasteryzacja w R : określanie ilości grup
+#http://www.statmethods.net/advstats/cluster.html
+mydata <- mtcars
+wss <- (nrow(mydata)-1)*sum(apply(mydata,2,var))   #oceń liczbę grup (klasterów)
+for (i in 2:15) wss[i] <- sum(kmeans(mydata,centers=i)$withinss)
+#$betweenss: suma kwadratów odległośći między clusterami. 
+#To jest średnia dystansów pomiędzy centrami klasterów
+#Jeśli chcemy osobno leżące klustery, wartość betweenss musi być jak największa.
+#$withinss: to jest suma odległości pomiędzy węzłami w klastrze. 
+#Jeśli chcemy osobno leżące klustery, wartość withinss musi być jak najmniejsza.
+#$tot.withinss = sum ( $withinss )
+#$totss = $tot.withinss + $betweenss
+plot(1:15, wss, type="b", xlab="Liczba grup", ylab="Suma wss")
+library(fpc)
+pamk(scaledcars)$nc   #liczba grup (klasterów) policzona automatycznie
+pamk(mydata)$nc       #liczba grup (klasterów) policzona automatycznie
+Sys.sleep(2)                             #pauza na 2 sekundy
+
+#Grupowanie klasteryzacja w R np. K-means w trzech wymiarach
 mdata3 <- mtcars[c('mpg','disp', 'hp')]  # wybieramy 3 parametry z mtcars ilość przejechanych mil na galon paliwa,
 mtcars[c('mpg','disp', 'hp')]            # a także pojemność silnika i konie mechaniczne (miary z USA)
-round(cor(mdata3), 2)                    # sprawdzamy korelację wybranych kolumn, widać dużą korelację
-                                         # tzn. wybrane parametry razem się zmniejszają lub zwiększają
-                                         # jeśli korelacja jest DODATNIA
-                                         # jeśli jest UJEMNA, to przy zwiększaniu jednej, druga maleje
 kmeans3.res <- kmeans(mdata3, 3)         # 3 zbiory odrębnych danych
 kmeans3.cluster <- factor(kmeans3.res$cluster)
 library(scatterplot3d)
-scatterplot3d(mdata3,color=kmeans3.cluster,pch=19)  #wizualizacja w 3D 
+scatterplot3d(mdata3,color=kmeans3.cluster,pch=19) #wizualizacja w 3D 
 library(rgl)
 #http://www.sthda.com/english/wiki/a-complete-guide-to-3d-visualization-device-system-in-r-r-software-and-data-visualization
-plot3d(mdata3, col=kmeans3.cluster, size = 10)      #wizualizacja w 3D interaktywna
-Sys.sleep(2)                             #pauza na 2 sekundy
+r3dDefaults$windowRect <- c(0,50, 800, 800) 
+plot3d(mdata3, col=kmeans3.cluster, size = 10)     #wizualizacja w 3D interaktywna
+Sys.sleep(2)                                       #pauza na 2 sekundy
 
-
-#klasteryzacja w R np. K-means w trzech obliczonych wymiarach z PCA  
+#Grupowanie klasteryzacja w R np. K-means w trzech obliczonych wymiarach z PCA  
 #http://planspace.org/2013/02/03/pca-3d-visualization-and-clustering-in-r/
-pc <- princomp(mtcars, cor=TRUE, scores=TRUE) #PCA obliczamy sztuczne 3 wymiary
+mydata<-mtcars
+library(nFactors)
+ev <- eigen(cor(mydata)) # get eigenvalues
+ap <- parallel(subject=nrow(mydata),var=ncol(mydata),
+               rep=100,cent=.05)
+nS <- nScree(x=ev$values, aparallel=ap$eigen$qevpea)
+plotnScree(nS) 
+Sys.sleep(2)                             #pauza na 2 sekundy 
+library(FactoMineR)                           # PCA Variable Factor Map
+result <- PCA(mydata)                         # graphs generated automatically 
+plot(result)
+Sys.sleep(2)                             #pauza na 2 sekundy
+pc <- princomp(mydata, cor=TRUE, scores=TRUE) #PCA obliczamy sztuczne 3 wymiary
 summary(pc)
 biplot(pc)
 plot(pc,type="lines")
-mdatapc<-pc$scores[,1:3]
+mdatapc<-pc$scores[,1:2]
 str(mdatapc)
 class(mdatapc)
 kmeanspc.res <- kmeans(mdatapc, 4)                  # 4 zbiory odrębnych danych
@@ -705,8 +779,8 @@ kmeanspc.cluster <- factor(kmeanspc.res$cluster)
 scatterplot3d(mdatapc,color=kmeanspc.cluster,pch=19)#wizualizacja w 3D 
 r3dDefaults$windowRect <- c(0,50, 800, 800) 
 plot3d(mdatapc, col=kmeanspc.cluster, size = 10)    #wizualizacja w 3D interaktywna
-text3d(pc$scores[,1:3],texts=rownames(mtcars))      #dodajemy parametry z mtcars
-text3d(pc$loadings[,1:3], texts=rownames(pc$loadings), col="red")
+text3d(pc$scores[,1:2],texts=rownames(mtcars))  #dodajemy parametry z mtcars
+text3d(pc$loadings[,1:2], texts=rownames(pc$loadings), col="red")
 coords <- NULL
 for (i in 1:nrow(pc$loadings)) {
   coords <- rbind(coords, rbind(c(0,0,0),pc$loadings[i,1:3]))
@@ -715,48 +789,52 @@ lines3d(coords, col="red", lwd=4)
 table(kmeans.cluster, kmeanspc.cluster)
 Sys.sleep(2)                                        #pauza na 2 sekundy
 
-#klasteryzacja w R np. hierarchiczne grupowanie
-mdata3 <- mtcars[c('mpg','disp', 'hp')]  # wybieramy 3 parametry z mtcars ilość przejechanych mil na galon paliwa,
-mtcars[c('mpg','disp', 'hp')]            # a także pojemność silnika i konie mechaniczne (miary z USA)
-di <- dist(mdata3, method="euclidean")
-tree <- hclust(di, method="ward")
-hcluster <- as.factor((cutree(tree, k=3)-2) %% 3 +1)
-# that modulo business just makes the coming table look nicer
+#Grupowanie klasteryzacja w R np. hierarchiczne grupowanie
+nc <- 5
+di <- dist(mtcars, method="euclidean")
+tree <- hclust(di, method="ward.D2")
+hcluster <- as.factor((cutree(tree, k=nc)-2) %% nc +1)
+groups <- cutree(fit, k=nc)             # potnij drzewo na nc grup
 plot(tree, xlab="")
-rect.hclust(tree, k=3, border="red")
+rect.hclust(tree, k=nc, border="red")
 table(hcluster, kmeanspc.cluster)
-Sys.sleep(2)   
+Sys.sleep(2)                             #pauza na 2 sekundy 
 
-#https://planspacedotorg.wordpress.com/2013/07/24/clustered-r-squared-heat-maps-in-r/
-dissimilarity <- 1 - cor(mtcars)^2           #miara niepodobnych 1 - korelacja do kwadratu
-clustering <- hclust(as.dist(dissimilarity))
-plot(clustering)                             #grupowanie po niepodobieństwach
-order <- clustering$order
-oldpar <- par(no.readonly=TRUE); par(mar=c(0,0,0,0))
-image(dissimilarity[order, rev(order)], axes=FALSE)
-par(oldpar)
-clusterRsquared <- function(dataframe) {     #funkcja z miar niepodobieństw
-  dissimilarity <- 1 - cor(dataframe)^2
-  clustering <- hclust(as.dist(dissimilarity))
-  order <- clustering$order
-  oldpar <- par(no.readonly=TRUE); par(mar=c(0,0,0,0))
-  image(dissimilarity[order, rev(order)], axes=FALSE)
-  par(oldpar)
-  return(1 - dissimilarity[order, order])
-}
-round(clusterRsquared(mtcars),2)
-Sys.sleep(2) 
-round(clusterRsquared(mdata3),2)
-Sys.sleep(2) 
+#Grupowanie klasteryzacja w R np. hierarchiczne grupowanie
+mydata <- mtcars
+#http://www.sigmath.es.osaka-u.ac.jp/shimo-lab/prog/pvclust/
+library(pvclust)
+fitpv <- pvclust(t(mydata), method.dist="euclidean", method.hclust="ward.D2", nboot=1000)
+plot(fitpv)
+pvrect(fitpv, alpha=.95) 
+pvgroup <- pvpick(fitpv, alpha=0.95) 
+mydata$fit <- NA
+for( i in seq_len(length(pvgroup$clusters))) mydata[pvgroup$clusters[[i]],]$fit = i
+mydata$fit
+Sys.sleep(2)                             #pauza na 2 sekundy
+#http://www.sthda.com/english/wiki/beautiful-dendrogram-visualizations-in-r-5-must-known-methods-unsupervised-machine-learning
+#pvclust and dendextend
+#plot(fit)
+#fit %>% as.dendrogram %>% 
+#  set("branches_k_color", k = 2, value = c("purple", "orange")) %>%
+#  plot
+#fit %>% text
+#fit %>% pvrect
+
+#Grupowanie Mclust
+#https://cran.r-project.org/web/packages/mclust/vignettes/mclust.html
+mydata <- scaledcars
+library(mclust)
+fit <- Mclust(mydata)
+plot(fit, what = "BIC") 
+summary(fit) 
+Sys.sleep(2)                             #pauza na 2 sekundy
 
 
+#Drzewa Decyzyjne
 #library(party)
 #ctree <- ctree(kmeans.cluster ~ mpg + disp + hp, data=mdata)
 # plot(ctree)
 #plot(ctree, type="simple")
-
-
-
-
 
 
