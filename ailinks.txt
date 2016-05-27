@@ -44,7 +44,7 @@ http://michael.hahsler.net/research/arules_RUG_2015/demo/R_arules_demo_SQF2012.R
  - http://www.r-bloggers.com/regularization-implementation-in-r-bais-and-variance-diagnosis/
  - https://github.com/eddelbuettel/rcppexamples
  - http://www.svm-tutorial.com/2014/10/support-vector-regression-r/
-
+ - http://www.r-bloggers.com/learning-kernels-svm/
 
 ###R webinars
 https://vimeo.com/89562453
