@@ -46,6 +46,7 @@ http://michael.hahsler.net/research/arules_RUG_2015/demo/R_arules_demo_SQF2012.R
  - http://www.svm-tutorial.com/2014/10/support-vector-regression-r/
  - http://www.r-bloggers.com/learning-kernels-svm/
  - http://www.r-bloggers.com/the-5th-tribe-support-vector-machines-and-caret/
+ - https://nsaunders.wordpress.com/2010/08/20/a-brief-introduction-to-apply-in-r/
  
 ###R webinars
 https://vimeo.com/89562453
