@@ -4,7 +4,7 @@ https://github.com/pwasiewi/eusi/blob/master/skrypty/01stepfirst.R
 ###do projektu serwer zadań do rozwiązania z podpowiedziami 
 https://www.kaggle.com/competitions
 
-### online R pomoc
+### online R pomoc - przykładowa funkcja mvrnorm
 http://www.inside-r.org/packages/cran/rockchalk/docs/mvrnorm
 
 ###kurs maszynowego uczenia w Octave 
@@ -39,6 +39,9 @@ http://www.datasciencecentral.com/m/blogpost?id=6448529:BlogPost:415828
 http://www.statmethods.net/management/reshape.html
 ###arules tutor
 http://michael.hahsler.net/research/arules_RUG_2015/demo/R_arules_demo_SQF2012.R
+
+###Opisy metod od postaw
+http://www.r-bloggers.com/regularization-implementation-in-r-bais-and-variance-diagnosis/
 
 ###R webinars
 https://vimeo.com/89562453
