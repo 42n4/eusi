@@ -933,9 +933,6 @@ predrest6 <- predict(fitrda, mydatana)   #przewiduj etykietę zbioru z fit=NA
 predrest6
 Sys.sleep(2)                             #pauza na 2 sekundy
 
-#UWAGA!!!! Można zauważyć, że wyniki etykietowania zbioru z nieznaną wartością fit z pvclust
-#predrest1, predrest2, predrest3, predrest4, predrest6 są takie same
-
 #Gradient Boosted Machine 
 #http://www.listendata.com/2015/07/gbm-boosted-models-tuning-parameters.html
 library(gbm)
@@ -947,7 +944,7 @@ summary(fitgbm)
 predrest7 <- predict(fitgbm, mydatana,n.trees = 10)   #przewiduj etykietę zbioru z fit=NA
 round(predrest7)
 Sys.sleep(2)                             #pauza na 2 sekundy
-#UWAGA !!! Tutaj wynik predrest7 od poprzednich predict, podobnie jak predrest5(mda)
+
 
 #Niesprawdzone w tym skrypcie funkcje funkcja(pakiet) m.in:
 #fda(mda), kernlab(ksvm), knn3(caret), naiveBayes(e1071), nnet(nnet), qda(MASS)
@@ -956,8 +953,41 @@ Sys.sleep(2)                             #pauza na 2 sekundy
 #pcr(pls), plsr(pls)
 #http://machinelearningmastery.com/how-to-get-started-with-machine-learning-algorithms-in-r/
 #R webinars
-#https://www.youtube.com/watch?v=7Jbb2ItbTC4 #caretwebinar
-#http://www.r-bloggers.com/caret-webinar-materials/
 #https://cran.r-project.org/web/packages/RSelenium/vignettes/OCRUG-webinar.html
 #https://vimeo.com/89562453
 
+#Klasyfikator ogólny dla 170 metod - CARET
+#http://topepo.github.io/caret/training.html
+#https://www.youtube.com/watch?v=7Jbb2ItbTC4 #caretwebinar
+#http://www.r-bloggers.com/caret-webinar-materials/
+library(caret)
+ctrl <- trainControl(method = "repeatedcv", repeats = 2, 
+                     classProbs = FALSE)
+gbmGrid <-  expand.grid(interaction.depth = 9, 
+                         n.trees = 100, shrinkage = 0.1, n.minobsinnode = 2)
+traingbm <- train(fit~., data=mydatatr,
+                 method = "gbm",
+                 verbose = FALSE,
+                 trControl = ctrl,
+                 tuneGrid = gbmGrid)
+print(traingbm)                          #zobacz rezultaty
+summary(traingbm)
+predrest8 <- predict(traingbm, mydatana,n.trees = 10) #przewiduj etykietę zbioru z fit=NA
+predrest8
+trellis.par.set(caretTheme())
+#plot(traingbm)
+#ggplot(traingbm)
+Sys.sleep(2)                             #pauza na 2 sekundy
+
+
+
+#UWAGA!!!! Można zauważyć, że wyniki etykietowania zbioru z nieznaną wartością fit z pvclust
+# dla różnych predrest? czasami są takie same, czasami różne
+predrest1
+predrest2
+predrest3
+predrest4
+predrest5
+predrest6
+predrest7
+predrest8
