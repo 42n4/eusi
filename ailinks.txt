@@ -80,6 +80,9 @@ http://www-bcf.usc.edu/~gareth/ISL/code.html
 ###rozwiązania 
 https://github.com/asadoughi/stat-learning
 
+###deep learning
+http://caffe.berkeleyvision.org/
+
 ###neural net
 http://datascienceplus.com/fitting-neural-network-in-r/
 https://gist.github.com/mick001/49fad7f4c6112d954aff
