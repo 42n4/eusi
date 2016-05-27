@@ -11,8 +11,9 @@ pkglist<-c(pkglist,"rpart","ipred","gbm","mda","klaR","kernlab","caret")
 #pkglist<-c(pkglist,"MASS","RWeka")
 pkgcheck <- pkglist %in% row.names(installed.packages())
 pkglist[!pkgcheck]
-#ODKOMENTUJ jak chcesz zainstalować biblioteki najlepiej w konsoli tekstowej R na koncie root w Linuxie
-#for(i in pkglist[!pkgcheck]){install.packages(i,depend=TRUE)}
+#ZAKOMENTUJ jeśli chcesz zainstalować biblioteki pod linuxem najlepiej w konsoli tekstowej R na koncie root
+for(i in pkglist[!pkgcheck]){install.packages(i,depend=TRUE)}
+
 # funkcja pomocy w R 
 #help(kmeans)                       # opisuje funkcje kmeans
 #?kmeans                            # opisuje funkcje kmeans
@@ -151,29 +152,28 @@ for( i in seq_along(c()))       print(i)# poprawna forma pętli odporna na błą
 # użyj indeksów macierzy 
 x <- matrix(1:16, nrow = 4)
 x
-x[2, ]        #drugi wiersz
-x[, 3]        #trzecia kolumna
-x[1, 4]       #pole z 1 wiersza i 4 kolumny
-x[1, c(3, 4)] #pola z 1 wiersza i 3 oraz 4 kolumny
-nrow(x)       #liczba wierszy macierzy
-ncol(x)       #liczba kolumn macierzy
-dim(x)        #wymiary macierzy c(nrow(x),ncol(x))
-length(x)     #nrow(x)*ncol(x)
-rowMeans(x)   #średnie liczone po wierszach
-colMeans(x)   #średnie liczone po kolumnach
-rowSums(x)    #sumy liczone po wierszach
-colSums(x)    #sumy liczone po kolumnach
-t(x)          #transponowana macierz x
-det(x)        #wyznacznik macierzy w tym przypadku 0 - macierz sosbliwa
+x[2, ]                 #drugi wiersz
+x[, 3]                 #trzecia kolumna
+x[1, 4]                #pole z 1 wiersza i 4 kolumny
+x[1, c(3, 4)]          #pola z 1 wiersza i 3 oraz 4 kolumny
+nrow(x)                #liczba wierszy macierzy
+ncol(x)                #liczba kolumn macierzy
+dim(x)                 #wymiary macierzy c(nrow(x),ncol(x))
+length(x)              #nrow(x)*ncol(x)
+rowMeans(x)            #średnie liczone po wierszach
+colMeans(x)            #średnie liczone po kolumnach
+rowSums(x)             #sumy liczone po wierszach
+colSums(x)             #sumy liczone po kolumnach
+t(x)                   #transponowana macierz x
+det(x)                 #wyznacznik macierzy w tym przypadku 0 - macierz sosbliwa
 #tworzenie kolumny 4x1 z wektora i nazwanej macierzy 2x2
 cells <- c(1, 6, 4, 8)
 cells
-matrix(cells) # kolumnowy, pionowy wektor
-t(t(cells))   # transponowany dwa razy wektor to to samo co kolumnowy wektor
+matrix(cells)          # kolumnowy, pionowy wektor
+t(t(cells))            # transponowany dwa razy wektor to to samo co kolumnowy wektor
 rnames <- c('R1', 'R2')
 cnames <- c('C1', 'C2')
-# wypełnij macierz po kolumnach, to domyślne ustawienie
-colmatrix<-matrix(
+colmatrix<-matrix(     # wypełnij macierz po kolumnach, to domyślne ustawienie
   cells,
   nrow = 2,
   ncol = 2,
@@ -181,19 +181,18 @@ colmatrix<-matrix(
   dimnames = list(rnames, cnames)
 )
 colmatrix
-rownames(colmatrix) #nazwy wierszy
-colnames(colmatrix) #nazwy kolumn
-c(colmatrix)        #konwersja do wektora spowrotem do oryginalnej postaci wektora cells
-# wypełnij macierz po wierszach 
-rowmatrix<-matrix(
+rownames(colmatrix)    #nazwy wierszy
+colnames(colmatrix)    #nazwy kolumn
+c(colmatrix)           #konwersja do wektora spowrotem do oryginalnej postaci wektora cells
+rowmatrix<-matrix(     # wypełnij macierz po wierszach 
   cells,
   nrow = 2,
   ncol = 2,
   byrow = TRUE,
   dimnames = list(rnames, cnames)
 )
-rowmatrix           #wychodzi to samo co t(colmatrix) - transponowana macierz colmatrix
-c(rowmatrix)        #konwersja do wektora, ale innego niż początkowy wektor cells
+rowmatrix              #wychodzi to samo co t(colmatrix) - transponowana macierz colmatrix
+c(rowmatrix)           #konwersja do wektora, ale innego niż początkowy wektor cells
 # macierzowe mnożenie np.: iloczyn pierwszego wiersza i kolumny pierwszej 
 # to wymnożenie ich elementów i suma iloczynów
 # efektem jest element c(1,1) nowej wynikowej macierzy, dla 1 wiersza i 2 kolumny - c(1,2)
@@ -228,23 +227,23 @@ j <- matrix(1:10, nrow = 5)
 k <- c('jeden', 'dwa', 'trzy')
 mlist <- list(tytul = g, wiek = h, j, k)
 mlist
-mlist[[2]]              #drugi element listy wiek jako wektor
-mlist[['wiek']]         #element wiek, w tym przypadku wektor
-mlist$wiek              #element wiek, w tym przypadku wektor
-mlist['wiek']           #element wiek, w tym przypadku lista (nie używać, kiedy potrzebny wektor)
-mlist[2]                #element wiek, w tym przypadku lista (nie używać, kiedy potrzebny wektor)
-typeof(mlist[['wiek']]) #typ double  
-typeof(mlist['wiek'])   #typ lista
-mlist[[2]][[1]]         #25, pierwszy element drugiego argumentu wektora wiek z listy mlist
-as.list(h)              #konwersja do listy
+mlist[[2]]             #drugi element listy wiek jako wektor
+mlist[['wiek']]        #element wiek, w tym przypadku wektor
+mlist$wiek             #element wiek, w tym przypadku wektor
+mlist['wiek']          #element wiek, w tym przypadku lista (nie używać, kiedy potrzebny wektor)
+mlist[2]               #element wiek, w tym przypadku lista (nie używać, kiedy potrzebny wektor)
+typeof(mlist[['wiek']])#typ double  
+typeof(mlist['wiek'])  #typ lista
+mlist[[2]][[1]]        #25, pierwszy element drugiego argumentu wektora wiek z listy mlist
+as.list(h)             #konwersja do listy
 nlist<-as.list(h)       
-list(mlist,nlist)       #lista dwóch list
+list(mlist,nlist)      #lista dwóch list
 plist<-list(mlist,nlist)
-print(plist)            #wypisz listę dwóch list
-str(plist)              #struktura listy dwóch list
-dput(plist)             #kod w R listy dwóch list
-class(plist)            #typ struktury danych - ista
-#cat(plist)             uwaga! cat z listą nie działa!
+print(plist)           #wypisz listę dwóch list
+str(plist)             #struktura listy dwóch list
+dput(plist)            #kod w R listy dwóch list
+class(plist)           #typ struktury danych - ista
+#cat(plist)            uwaga! cat z listą nie działa!
 #nadpisuje wartości dwóch elementów listy o nazwach tytul i wiek
 mlist[names(mlist) %in% c('tytul','wiek')]<-c('Nadpisany element listy',list(c(2,4,6,7)))
 lapply(mlist,FUN=length)#zastosuj funkcję length do każdego elementu listy mlist i zwróć LISTĘ długości argumentów
@@ -261,34 +260,34 @@ wiek <- c(25, 34, 28, 52)
 cukrzyca <- c('Typ1', 'Typ2', 'Typ1', 'Typ1')
 stan <- c('Kiepski', 'Poprawa', 'Wybitny', 'Kiepski')
 pacjenci <- data.frame(pacjent_id, wiek, cukrzyca, stan)
-nrow(pacjenci)        # ilość wierszy
-ncol(pacjenci)        # ilość kolumn
-dim(pacjenci)         # rozmiar to wektor z liczbą wierszy i kolumn c(nrow(pacjenci),ncol(pacjenci))
+nrow(pacjenci)         # ilość wierszy
+ncol(pacjenci)         # ilość kolumn
+dim(pacjenci)          # rozmiar to wektor z liczbą wierszy i kolumn c(nrow(pacjenci),ncol(pacjenci))
 rownames(pacjenci) <- seq_len(nrow(pacjenci)) #na wszelki wypadek nazywa wiersze ich indeksami
 # podaj wiersz lub kolumnę ramki danych
 i <- 1; j <- 2
-pacjenci[i,]               # i-ty wiersz jako ramka danych
-pacjenci[, j]              # j-ta kolumna jako wektor
-pacjenci[, 'wiek']         # kolumna 'wiek' jako wektor
-pacjenci[['wiek']]         # kolumna 'wiek' jako wektor
-pacjenci$wiek              # kolumna 'wiek' jako wektor
-pacjenci[j]                # j-ta kolumna jako ramka danych
-pacjenci['wiek']           # kolumna 'wiek' jako ramka danych
+pacjenci[i,]           # i-ty wiersz jako ramka danych
+pacjenci[, j]          # j-ta kolumna jako wektor
+pacjenci[, 'wiek']     # kolumna 'wiek' jako wektor
+pacjenci[['wiek']]     # kolumna 'wiek' jako wektor
+pacjenci$wiek          # kolumna 'wiek' jako wektor
+pacjenci[j]            # j-ta kolumna jako ramka danych
+pacjenci['wiek']       # kolumna 'wiek' jako ramka danych
 # podaj ij-ty element ramki danych
 as.integer(pacjenci[i,][j])# pacjenci[i, ][j] i-ty wiersz jta kolumna jako integer
-pacjenci[i, j]             # komórka z i tego wiersza i j-tej kolumny
-pacjenci[[i, j]]           # komórka z i tego wiersza i j-tej kolumny
-pacjenci[[j]][i]           # komórka z i tego wiersza i j-tej kolumny
-pacjenci[, j][i]           # komórka z i tego wiersza i j-tej kolumny
-pacjenci$wiek[i]           # komórka z i tego wiersza i kolumny wiek 
-pacjenci[i, 'wiek']        # i-ty wiersz kolumny wiek
-pacjenci[i, i:j]           # dwie komórki z i tego wiersza i oraz i-tej i j-tej kolumny, to NIE działa na [[i, i:j]]
-pacjenci[1:2]              # pierwsze dwie kolumny jako ramka danych
+pacjenci[i, j]         # komórka z i tego wiersza i j-tej kolumny
+pacjenci[[i, j]]       # komórka z i tego wiersza i j-tej kolumny
+pacjenci[[j]][i]       # komórka z i tego wiersza i j-tej kolumny
+pacjenci[, j][i]       # komórka z i tego wiersza i j-tej kolumny
+pacjenci$wiek[i]       # komórka z i tego wiersza i kolumny wiek 
+pacjenci[i, 'wiek']    # i-ty wiersz kolumny wiek
+pacjenci[i, i:j]       # dwie komórki z i tego wiersza i oraz i-tej i j-tej kolumny, to NIE działa na [[i, i:j]]
+pacjenci[1:2]          # pierwsze dwie kolumny jako ramka danych
 pacjenci[c('cukrzyca', 'stan')]
 index <- 2
-pacjenci[-index,]          # usuń 2 wiersz z ramki danych
+pacjenci[-index,]      # usuń 2 wiersz z ramki danych
 #Wybieranie podzbiorów
-pacjenci[1:3, ]            # trzy pierwsze wiersze - pacjenci
+pacjenci[1:3, ]        # trzy pierwsze wiersze - pacjenci
 pacjenci[which(pacjenci$stan == 'Kiepski' & pacjenci$wiek < 30), ] #pacjenci stan kiepski i wiek poniżej 30
 library(plyr); library(dplyr) # use package dplyr (install first)
 filter(pacjenci, stan == 'Kiepski' & wiek < 30) # subset()
@@ -357,14 +356,14 @@ detach(df)
 # metoda 3
 transform(df, sumx = x1 + x2, meanx = (x1 + x2) / 2)
 # metoda 4
-with(df, {               # 'with' nic nie zwraca
-wiek[x1 == 2] <- 1       # reszta jest wypełniana NA (brakiem danych z R)
+with(df, {             # 'with' nic nie zwraca
+wiek[x1 == 2] <- 1     # reszta jest wypełniana NA (brakiem danych z R)
 })
 df
-df$wiek <- NULL          # usuń wiek
+df$wiek <- NULL        # usuń wiek
 # metoda 5
-df <- within(df, {       # 'within' zwraca df
-  wiek <- NA             # utwórz nową zmienną wiek i zainicjalizuj ją NA (brakiem danych z R)
+df <- within(df, {     # 'within' zwraca df
+  wiek <- NA           # utwórz nową zmienną wiek i zainicjalizuj ją NA (brakiem danych z R)
   wiek[x1 == 2] <- 1
 })
 df
@@ -476,7 +475,7 @@ legend(
   bty = 'n'
 )
 #narysuj wiele rysunków w tym samym czasie
-plot(f)           # pierwszy rysunek
+plot(f)                # pierwszy rysunek
 dev.new()         # otwórz drugi rysunek
 plot(f(x2plot/20))# przelączanie strzałkami z klawiatury
 Sys.sleep(2)                             #pauza na 2 sekundy
