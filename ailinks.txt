@@ -42,6 +42,9 @@ http://michael.hahsler.net/research/arules_RUG_2015/demo/R_arules_demo_SQF2012.R
 
 ###Opisy metod od postaw
 http://www.r-bloggers.com/regularization-implementation-in-r-bais-and-variance-diagnosis/
+https://github.com/eddelbuettel/rcppexamples
+
+
 
 ###R webinars
 https://vimeo.com/89562453
