@@ -1,9 +1,18 @@
+# MINI KURS R w pigułce (podstawy R, struktury danych, grupowania, klasyfikacje):
+# Udostępnił i opracował na podstawie źródeł z Internetu: Piotr Wąsiewicz 
 # Zasady ogólne:
 # indeksy w R zaczynają się od 1, a nie od 0
 # wielkość liter ma znaczenie
 # w rstudio kursor myszy na nazwie funkcji i F1 wywołują opis funkcji
-#Zamieszczone przykłady dadzą się uruchomić jeśli zainstalujecie wymienione pakiety R 
-#(w linuxie na roocie w konsoli R, żeby nie instalować na lokalnym koncie):
+# Wszystkie przykłady trzeba wykonać po kolei, gdyż wykorzystują czasami dane utworzone wcześniej przez poprzednie przykłady.
+# Na windowsie samo się instaluje, tylko trzeba zainstalować R for windows server:
+# https://mran.microsoft.com/install/mro4mrs/8.0.0/MRO-3.2.2-for-RRE-8.0.0-Windows.exe
+# ze strony https://mran.microsoft.com/download/mro-for-mrs/
+# oraz rstudio:
+# https://download1.rstudio.org/RStudio-0.99.902.exe
+# ze strony https://www.rstudio.com/products/rstudio/download/
+# Zamieszczone przykłady dadzą się uruchomić pod ms windowsem jeśli zainstalujecie wymienione wyżej programy
+# (pod linuxem pakiety R najlepiej zainstalować w linuxie na roocie w konsoli R, żeby nie instalować na lokalnym koncie):
 pkglist<-c("reshape","ade4","sqldf","plyr","dplyr")
 pkglist<-c(pkglist,"party","rgl","scatterplot3d","fpc","pvclust","dendextend")
 pkglist<-c(pkglist,"nFactors","FactoMineR","randomForest","mclust")
@@ -947,8 +956,8 @@ Sys.sleep(2)                             #pauza na 2 sekundy
 #pcr(pls), plsr(pls)
 #http://machinelearningmastery.com/how-to-get-started-with-machine-learning-algorithms-in-r/
 #R webinars
-#https://vimeo.com/89562453
 #https://www.youtube.com/watch?v=7Jbb2ItbTC4 #caretwebinar
 #http://www.r-bloggers.com/caret-webinar-materials/
 #https://cran.r-project.org/web/packages/RSelenium/vignettes/OCRUG-webinar.html
+#https://vimeo.com/89562453
 
