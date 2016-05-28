@@ -4,7 +4,7 @@ https://github.com/pwasiewi/eusi/blob/master/skrypty/01stepfirst.R
 ###do projektu serwer zadań do rozwiązania z podpowiedziami 
 https://www.kaggle.com/competitions
 
-### online R pomoc
+### online R pomoc - przykładowa funkcja mvrnorm
 http://www.inside-r.org/packages/cran/rockchalk/docs/mvrnorm
 
 ###kurs maszynowego uczenia w Octave 
@@ -40,6 +40,14 @@ http://www.statmethods.net/management/reshape.html
 ###arules tutor
 http://michael.hahsler.net/research/arules_RUG_2015/demo/R_arules_demo_SQF2012.R
 
+###Opisy metod od postaw
+ - http://www.r-bloggers.com/regularization-implementation-in-r-bais-and-variance-diagnosis/
+ - https://github.com/eddelbuettel/rcppexamples
+ - http://www.svm-tutorial.com/2014/10/support-vector-regression-r/
+ - http://www.r-bloggers.com/learning-kernels-svm/
+ - http://www.r-bloggers.com/the-5th-tribe-support-vector-machines-and-caret/
+ - https://nsaunders.wordpress.com/2010/08/20/a-brief-introduction-to-apply-in-r/
+ 
 ###R webinars
 https://vimeo.com/89562453
 https://www.youtube.com/watch?v=7Jbb2ItbTC4 #caretwebinar
@@ -73,6 +81,9 @@ http://www.r-bloggers.com/in-depth-introduction-to-machine-learning-in-15-hours-
 http://www-bcf.usc.edu/~gareth/ISL/code.html 
 ###rozwiązania 
 https://github.com/asadoughi/stat-learning
+
+###deep learning
+http://caffe.berkeleyvision.org/
 
 ###neural net
 http://datascienceplus.com/fitting-neural-network-in-r/
