@@ -983,11 +983,14 @@ Sys.sleep(2)                             #pauza na 2 sekundy
 
 #UWAGA!!!! Można zauważyć, że wyniki etykietowania zbioru z nieznaną wartością fit z pvclust
 # dla różnych predrest? czasami są takie same, czasami różne
-predrest1
-predrest2
-predrest3
-predrest4
-predrest5
-predrest6
-predrest7
-predrest8
+# zbieram je do jednej ramki danych
+fit1=c();for(i in 1:nrow(predrest1))fit1=c(fit1,which(predrest1[i,]==1))
+predrest<-data.frame(as.numeric(fit1))
+predrest<-rbind(t(predrest),as.numeric(predrest2))
+predrest<-rbind(predrest,as.numeric(predrest3))
+predrest<-rbind(predrest,as.numeric(predrest4))
+predrest<-rbind(predrest,as.numeric(predrest5))
+predrest<-rbind(predrest,as.numeric(predrest6$class))
+predrest<-rbind(predrest,round(predrest7))
+predrest<-rbind(predrest,as.numeric(predrest8))
+predrest
