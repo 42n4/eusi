@@ -1,5 +1,6 @@
 #########################################################################################################################
 # MINI KURS R w pigułce (podstawy R, struktury danych, grupowania, klasyfikacje):
+#########################################################################################################################
 # Udostępnił i opracował na podstawie źródeł z Internetu: Piotr Wąsiewicz 
 # Zasady ogólne:
 # indeksy w R zaczynają się od 1, a nie od 0
@@ -18,7 +19,6 @@ pkglist<-c("reshape","ade4","sqldf","plyr","dplyr")
 pkglist<-c(pkglist,"party","rgl","scatterplot3d","fpc","pvclust","dendextend")
 pkglist<-c(pkglist,"nFactors","FactoMineR","RRF","mclust","foreach","doParallel")
 pkglist<-c(pkglist,"rpart","ipred","gbm","mda","klaR","kernlab","caret")
-pkglist<-c(pkglist,"snow","Rmpi")
 #pkglist<-c(pkglist,"MASS","RWeka")
 pkgcheck <- pkglist %in% row.names(installed.packages())
 pkglist[!pkgcheck]
