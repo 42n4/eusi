@@ -865,7 +865,7 @@ dane$grupa <- factor(dane$grupa)
 library(dplyr)
 dane_trenujace <- sample_n(dane,190)         #uczę na przykładzie wybranych wierszy
 dane_testujace <- dane[-as.numeric(rownames(dane_trenujace)),]
-etykiety_do_testu <-dane_testujace$grupa     #zapamiętuję grupę elementów testowych
+etykiety_z_grupowania <-dane_testujace$grupa     #zapamiętuję grupę elementów testowych
 dane_testujace$grupa <- NULL                 #i usuwam ją do testu
 rownames(dane_trenujace)<-seq_len(nrow(dane_trenujace))# nazywa wiersze ich indeksami
 rownames(dane_testujace)<-seq_len(nrow(dane_testujace))# nazywa wiersze ich indeksami 
@@ -1074,6 +1074,7 @@ etykiety_caret<-rbind(etykiety_caret,t(data.frame(gbm=as.numeric(etykiety))))
 #plot(traingbm)
 #ggplot(traingbm)
 
+#WYNIKI KLASYFIKACJI ZBIORU TESTOWEGO w którym usunięto etykiety, ale ich wartości są pamiętane w etykiety_z_grupowania
 #różnice wynikają z tego że algorytmy korzystają z pseudolosowych generatorów random i
 #generują za każdym razem szczególnie dla małego zbioru różne wyniki
 #wyniki z osobnych klasyfikatorów
@@ -1082,7 +1083,7 @@ etykiety_osobne_pakiety
 #czasami już tam automatycznie tuningowanych (też stąd inne wyniki)
 etykiety_caret
 #poprzednie_wyniki z grupowania (TAKIE POWINNY BYĆ WYNIKI Z KLASYFIKATORÓW)
-etykiety_do_testu
+etykiety_z_grupowania
 
 
 
