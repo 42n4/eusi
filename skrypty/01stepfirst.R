@@ -767,9 +767,9 @@ for (i in 2:15) wss[i] <- sum(kmeans(dane,centers=i)$withinss)
 #$totss = $tot.withinss + $betweenss
 plot(1:15, wss, type="b", xlab="Liczba grup", ylab="Suma wss")
 library(fpc)
-pamk(dane_scaled)$nc                          #liczba grup (klasterów) policzona automatycznie
-pamk(dane)$nc                                #liczba grup (klasterów) policzona automatycznie
-Sys.sleep(2)                                 #pauza na 2 sekundy
+pamk(dane_scaled)$nc                         # liczba grup (klasterów) policzona automatycznie
+pamk(dane)$nc                                # liczba grup (klasterów) policzona automatycznie
+Sys.sleep(2)                                 # pauza na 2 sekundy
 
 #Grupowanie klasteryzacja w R np. K-means w trzech wymiarach
 dane3kol <- dane[c('cityMpg','engineSize', 'horsepower')]      # wybieramy 3 parametry z mtcars ilość przejechanych mil na galon paliwa,
@@ -782,7 +782,7 @@ library(rgl)
 #http://www.sthda.com/english/wiki/a-complete-guide-to-3d-visualization-device-system-in-r-r-software-and-data-visualization
 r3dDefaults$windowRect <- c(0,50, 800, 800) 
 plot3d(dane3kol, col=grupowanie3_kmeans_cluster, size = 10)     #wizualizacja w 3D interaktywna
-Sys.sleep(2)                                 #pauza na 2 sekundy
+Sys.sleep(2)                                 # pauza na 2 sekundy
 
 #Grupowanie klasteryzacja w R np. K-means w trzech obliczonych wymiarach z PCA  
 #http://planspace.org/2013/02/03/pca-3d-visualization-and-clustering-in-r/
@@ -792,12 +792,12 @@ ap <- parallel(subject=nrow(dane),var=ncol(dane),
                rep=100,cent=.05)
 nS <- nScree(x=ev$values, aparallel=ap$eigen$qevpea)
 plotnScree(nS) 
-Sys.sleep(2)                                 #pauza na 2 sekundy 
+Sys.sleep(2)                                 # pauza na 2 sekundy 
 library(FactoMineR)                          # PCA Variable Factor Map
 result <- PCA(dane)                          # graphs generated automatically 
 plot(result)
-Sys.sleep(2)                                 #pauza na 2 sekundy
-pc <- princomp(dane, cor=TRUE, scores=TRUE)  #PCA obliczamy sztuczne 3 wymiary
+Sys.sleep(2)                                 # pauza na 2 sekundy
+pc <- princomp(dane, cor=TRUE, scores=TRUE)  # PCA obliczamy sztuczne 3 wymiary
 summary(pc)
 biplot(pc)
 plot(pc,type="lines")
@@ -809,14 +809,14 @@ grupowanie_pca_kmeans_cluster <- factor(grupowanie_pca_kmeans$cluster)
 scatterplot3d(mdatapc,color=grupowanie_pca_kmeans_cluster,pch=19)       #wizualizacja w 3D 
 r3dDefaults$windowRect <- c(0,50, 800, 800) 
 plot3d(mdatapc, col=grupowanie_pca_kmeans_cluster, size = 10)           #wizualizacja w 3D interaktywna
-text3d(pc$scores[,1:3],texts=rownames(dane)) #dodajemy parametry z badanych danych
+text3d(pc$scores[,1:3],texts=rownames(dane)) # dodajemy parametry z badanych danych
 text3d(pc$loadings[,1:3], texts=rownames(pc$loadings), col="red")
 coords <- NULL
 for (i in 1:nrow(pc$loadings)) {
   coords <- rbind(coords, rbind(c(0,0,0),pc$loadings[i,1:3]))
 }
 lines3d(coords, col="red", lwd=4)
-Sys.sleep(2)                                 #pauza na 2 sekundy
+Sys.sleep(2)                                 # pauza na 2 sekundy
 
 #Grupowanie klasteryzacja w R np. hierarchiczne grupowanie
 nc <- 3                                      # liczba grup
@@ -827,7 +827,7 @@ hcluster <-                                  # potnij drzewo na nc grup i przero
 plot(grupowanie_hclust, xlab="")
 rect.hclust(grupowanie_hclust, k=nc, border="red")
 groupy <- cutree(grupowanie_hclust, k=nc)    # potnij drzewo na nc grup
-Sys.sleep(2)                                 #pauza na 2 sekundy 
+Sys.sleep(2)                                 # pauza na 2 sekundy 
 
 #Grupowanie Mclust
 #https://cran.r-project.org/web/packages/mclust/vignettes/mclust.html
@@ -836,7 +836,7 @@ Sys.sleep(2)                                 #pauza na 2 sekundy
 #grupowanie_mclust <- Mclust(dane)
 #plot(grupowanie_mclust, what = "BIC") 
 #summary(grupowanie_mclust) 
-#Sys.sleep(2)                                 #pauza na 2 sekundy
+#Sys.sleep(2)                                # pauza na 2 sekundy
 
 
 #Grupowanie klasteryzacja w R: pvclust hierarchiczne grupowanie
@@ -852,8 +852,8 @@ pvgroup <- pvpick(grupowanie_pvclust, alpha=0.95)
 #for( i in seq_len(length(pvgroup$clusters))) dane[pvgroup$clusters[[i]],]$grupa = i
 #dane$grupa
 
-nc <- 3                                     # stosuje dane z hclust do generowania grup
-grupy <- cutree(grupowanie_hclust, k=nc)    # potnij drzewo na nc grup
+nc <- 3                                      # stosuje dane z hclust do generowania grup
+grupy <- cutree(grupowanie_hclust, k=nc)     # potnij drzewo na nc grup
 dane$grupa <- grupy
 dane$grupa <- factor(dane$grupa)             
 
@@ -863,10 +863,10 @@ dane$grupa <- factor(dane$grupa)
 # potem je użyj na zbiorze dane_testujace do określenia brakujących etykiet grupa
 # wybór zbiorów trenujących i testujących
 library(dplyr)
-dane_trenujace <- sample_n(dane,190)         #uczę na przykładzie wybranych wierszy
+dane_trenujace <- sample_n(dane,170)         # uczę na przykładzie wybranych wierszy
 dane_testujace <- dane[-as.numeric(rownames(dane_trenujace)),]
-etykiety_z_grupowania <-dane_testujace$grupa     #zapamiętuję grupę elementów testowych
-dane_testujace$grupa <- NULL                 #i usuwam ją do testu
+etykiety_z_grupowania <-dane_testujace$grupa #zapamiętuję grupę elementów testowych
+dane_testujace$grupa <- NULL                 # i usuwam ją do testu
 rownames(dane_trenujace)<-seq_len(nrow(dane_trenujace))# nazywa wiersze ich indeksami
 rownames(dane_testujace)<-seq_len(nrow(dane_testujace))# nazywa wiersze ich indeksami 
 
@@ -874,7 +874,7 @@ rownames(dane_testujace)<-seq_len(nrow(dane_testujace))# nazywa wiersze ich inde
 #http://www.statmethods.net/advstats/cart.html
 #http://machinelearningmastery.com/non-linear-regression-in-r-with-decision-trees/
 library(rpart)
-#?rpart.control                              #ustaw parametry rpart
+#?rpart.control                              # ustaw parametry rpart
 klasyfikator_rpart <- rpart(grupa ~ ., method="class", data=dane_trenujace, minsplit=2)
 #klasyfikator_rpart <- rpart(grupa ~ ., method="anova", data=dane)
 printcp(klasyfikator_rpart)                  # wyswietlam rezultaty
@@ -918,7 +918,7 @@ pred_etykiety3
 #Mixture Discriminant Analysis
 library(mda)
 klasyfikator_mda <- mda(grupa ~ ., data=dane_trenujace)
-print(klasyfikator_mda)                      #zobacz rezultaty
+print(klasyfikator_mda)                      # zobacz rezultaty
 summary(klasyfikator_mda)
 pred_etykiety4 <- predict(klasyfikator_mda, dane_testujace)#przewiduj etykietę zbioru z fit=NA
 pred_etykiety4
@@ -927,7 +927,7 @@ pred_etykiety4
 #Regularized Discriminant Analysis
 library(klaR)
 klasyfikator_rda <- rda(grupa ~ ., data=dane_trenujace)
-print(klasyfikator_rda)                      #zobacz rezultaty
+print(klasyfikator_rda)                      # zobacz rezultaty
 summary(klasyfikator_rda)
 pred_etykiety5 <- predict(klasyfikator_rda, dane_testujace)   #przewiduj etykietę zbioru z fit=NA
 pred_etykiety5
@@ -939,7 +939,7 @@ library(gbm)
 klasyfikator_gbm <- gbm(grupa ~ ., data=dane_trenujace, distribution="gaussian", 
               bag.fraction = 0.5, n.trees = 1000, interaction.depth =6, 
               shrinkage = 0.1, n.minobsinnode = 1)
-print(klasyfikator_gbm)                      #zobacz rezultaty
+print(klasyfikator_gbm)                      # zobacz rezultaty
 summary(klasyfikator_gbm)
 pred_etykiety6 <- predict(klasyfikator_gbm, dane_testujace,n.trees = 10)   #przewiduj etykietę zbioru z fit=NA
 round(pred_etykiety6)
@@ -990,7 +990,7 @@ library(rpart)
 #zastępujemy rpart funkcją train z pakietu caret, możemy tylko zmieniać parametr cp
 #reszta jest "zgadywana" przez caret - pełna wygoda
 klasyfikator <- train(grupa ~ ., data=dane_trenujace,method = "rpart")
-print(klasyfikator)                      # zobacz rezultaty
+print(klasyfikator)                          # zobacz rezultaty
 #summary(klasyfikator)   
 etykiety <- predict(klasyfikator, dane_testujace)#przewiduj etykietę zbioru z fit=NA
 etykiety_caret<-t(data.frame(rpart=as.numeric(etykiety)))
@@ -1005,7 +1005,7 @@ library(party)
 #zastępujemy ctree funkcją train z pakietu caret, możemy tylko zmieniać parametr mincriterion
 #reszta jest "zgadywana" przez caret - pełna wygoda
 klasyfikator <- train(grupa ~ ., data=dane_trenujace,method = "ctree")
-plot(ctree)
+plot(klasyfikator)
 etykiety <- predict(klasyfikator, dane_testujace)     #przewiduj etykietę zbioru z fit=NA
 etykiety_caret<-rbind(etykiety_caret,t(data.frame(ctree=as.numeric(etykiety))))
 
@@ -1047,7 +1047,7 @@ library(klaR)
 #zastępujemy rda funkcją train z pakietu caret, możemy tylko zmieniać parametry gamma, lambda
 #reszta jest "zgadywana" przez caret - pełna wygoda
 klasyfikator <- train(grupa ~ ., data=dane_trenujace,method = "rda")
-print(klasyfikator)                          #zobacz rezultaty
+print(klasyfikator)                          # zobacz rezultaty
 summary(klasyfikator)
 etykiety <- predict(klasyfikator, dane_testujace)   #przewiduj etykietę zbioru z fit=NA
 etykiety_caret<-rbind(etykiety_caret,t(data.frame(rda=as.numeric(etykiety))))
@@ -1066,7 +1066,7 @@ klasyfikator <- train(grupa ~ ., data=dane_trenujace,
                   verbose = FALSE,
                   trControl = ctrl,
                   tuneGrid = gbmGrid)
-print(klasyfikator)                          #zobacz rezultaty
+print(klasyfikator)                          # zobacz rezultaty
 summary(klasyfikator)
 etykiety <- predict(klasyfikator, dane_testujace,n.trees = 10) #przewiduj etykietę zbioru z fit=NA
 etykiety_caret<-rbind(etykiety_caret,t(data.frame(gbm=as.numeric(etykiety))))
@@ -1083,7 +1083,10 @@ etykiety_osobne_pakiety
 #czasami już tam automatycznie tuningowanych (też stąd inne wyniki)
 etykiety_caret
 #poprzednie_wyniki z grupowania (TAKIE POWINNY BYĆ WYNIKI Z KLASYFIKATORÓW)
-etykiety_z_grupowania
+t(data.frame(spr=as.numeric(etykiety_z_grupowania)))
+
+
+
 
 
 
