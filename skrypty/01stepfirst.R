@@ -1,3 +1,4 @@
+#########################################################################################################################
 # MINI KURS R w pigułce (podstawy R, struktury danych, grupowania, klasyfikacje):
 # Udostępnił i opracował na podstawie źródeł z Internetu: Piotr Wąsiewicz 
 # Zasady ogólne:
@@ -24,6 +25,8 @@ pkglist[!pkgcheck]
 #ZAKOMENTUJ jeśli chcesz zainstalować biblioteki pod linuxem najlepiej w konsoli tekstowej R na koncie root
 for(i in pkglist[!pkgcheck]){install.packages(i,depend=TRUE)}
 
+#########################################################################################################################
+# Podstawowe informacje
 # funkcja pomocy w R 
 #help(kmeans)                       # opisuje funkcje kmeans
 #?kmeans                            # opisuje funkcje kmeans
@@ -62,8 +65,9 @@ rm(list = ls(pattern = '^tmp'))     # usuń zmienne z nazwami zaczynającymi si�
 # quit()                            # wyjdź z rstudia (zapyta czy zapisać przestrzeń roboczą)
 
 
-
+#########################################################################################################################
 # STRUKTURY DANYCH
+#########################################################################################################################
 # WEKTORY mają tylko jeden typ danych
 # indeksy w R zaczynają się od 1, a nie od 0
 a <- c(1, 2, 5, 3, 6,-2, 4)
@@ -158,6 +162,7 @@ for( i in seq_len(length(c()))) print(i)# poprawna forma pętli odporna na błą
 for( i in seq_along(c()))       print(i)# poprawna forma pętli odporna na błąd pustego wektora
 
 
+#########################################################################################################################
 #MACIERZ: dwuwymiarowa tablica tego samego typu zmiennych
 # użyj indeksów macierzy 
 x <- matrix(1:16, nrow = 4)
@@ -221,6 +226,8 @@ diag(2)                          #macierz diagonalna identycznościowa
 det(colmatrix %*% rowmatrix)     #det(A · B) = detA · detB
 det(colmatrix) %*% det(rowmatrix)#det(A · B) = detA · detB
 
+
+#########################################################################################################################
 #TABLICA ARRAY: podobna do macierzy matrix, ale może mieć więcej wymiarów
 dim1 <- c('A1', 'A2')
 dim2 <- c('B1', 'B2', 'B3')
@@ -230,6 +237,7 @@ z
 z[1, 2, 3] #wartość komórki z jednego pola trójwymiarowej macierzy
 
 
+#########################################################################################################################
 #LISTA: uporządkowany zbiór obiektów o możliwych różnych typach
 g <- 'Moja pierwsza lista'
 h <- c(25, 26, 18, 39)
@@ -263,7 +271,7 @@ sapply(ylist, FUN=function(x,p) x^p, p=2)   #wynik potęgi do p=2 wynik to wekto
 sapply(ylist, FUN=function(x,p) x^p, p=2:3) #wynik potęgi do p=2 wynik to macierz 2 wierszowa 1,9,25,36 i 1,27,125,216
 
 
-
+#########################################################################################################################
 #RAMKA DANYCH: kolumny z różnymi typami, odpowiednik tabeli w bazie lub arkusza w excelu
 pacjent_id <- c(1, 2, 3, 4)
 wiek <- c(25, 34, 28, 52)
@@ -283,6 +291,8 @@ pacjenci[['wiek']]     # kolumna 'wiek' jako wektor
 pacjenci$wiek          # kolumna 'wiek' jako wektor
 pacjenci[j]            # j-ta kolumna jako ramka danych
 pacjenci['wiek']       # kolumna 'wiek' jako ramka danych
+pacjenci[1:2]          # pierwsze dwie kolumny jako ramka danych
+pacjenci[c('typ', 'stan')]
 # podaj ij-ty element ramki danych
 as.integer(pacjenci[i,][j])# pacjenci[i, ][j] i-ty wiersz jta kolumna jako integer
 pacjenci[i, j]         # komórka z i tego wiersza i j-tej kolumny
@@ -292,8 +302,7 @@ pacjenci[, j][i]       # komórka z i tego wiersza i j-tej kolumny
 pacjenci$wiek[i]       # komórka z i tego wiersza i kolumny wiek 
 pacjenci[i, 'wiek']    # i-ty wiersz kolumny wiek
 pacjenci[i, i:j]       # dwie komórki z i tego wiersza i oraz i-tej i j-tej kolumny, to NIE działa na [[i, i:j]]
-pacjenci[1:2]          # pierwsze dwie kolumny jako ramka danych
-pacjenci[c('typ', 'stan')]
+# usuń wiersz wskazany indeksem
 index <- 2
 pacjenci[-index,]      # usuń 2 wiersz z ramki danych
 #Wybieranie podzbiorów
@@ -399,7 +408,7 @@ df
 na.omit(df)                                  # na.omit() usuwa wiersze z NA
 df[!is.na(df$wiek),]                         # też usuwa wiersze z NA
 
-
+#########################################################################################################################
 #FAKTOR - etykiety, zmienna jakościowa (niemierzalna), czynnikowa: dyskretne lub porządkowe dane
 #zmienne jakościowe (niemierzalne) – np. kolor oczu, płeć, grupa krwi
 #porządkowe (quasi-ilościowe) – np. klasyfikacja wzrostu: (niski, średni, wysoki)
@@ -457,6 +466,7 @@ ddply(pacjenci, .(typ,stan),
 aggregate(.~stan+typ,data=pacjenci,mean)     #policz srednie dla typ i stan po innych parametrach w jednym kroku
 
 
+#########################################################################################################################
 #RYSUNEK FUNKCJI
 f <- function(x) {
   x * sin(x)
@@ -511,7 +521,7 @@ sqldf(
 )
 
 
-
+#########################################################################################################################
 #ZAPIS DO PLIKÓW
 #exportuj dane do pliku csv
 write.table(
@@ -563,7 +573,7 @@ time_elapsed
 time_elapsed <- as.numeric((t2 - t1)[3])     #okres czasu
 time_elapsed
 
-
+#########################################################################################################################
 #PROGRAMOWANIE, PĘTLE, FUNKCJE
 #kontrola przepływu danych
 #if/else, ifelse, switch
@@ -658,12 +668,13 @@ res
 #length(x), seq(from, to, by), rep(x, n), cut(x, n), pretty(x, n), cat(.., file='myfile', append=FALSE)
 
 
-
+#########################################################################################################################
 #UCZENIE SIĘ MASZYN
 set.seed(12459);                             # początkowa wartość random seed dla takich samych wyników za każdym razem
 dev.off()                                    # na wszelki wypadek wyłączamy drugi rysunek
 
-#Analiza Danych - korelacje i podobieństwa
+#########################################################################################################################
+#ANALIZA DANYCH - korelacje i podobieństwa
 #Wybór danych do grupowania i klasyfikacji brakujących etykiet lub testowych zbiorów
 #tu wybieramy inne dane dla lepszych i bardziej powtarzalnych wyników
 #najpierw wypisujemy dostępne przykładowe dane poleceniem:
@@ -716,6 +727,8 @@ round(clusterRsquared(dane),2)
 #round(clusterRsquared(dane3kol),2)
 #Sys.sleep(2)                                #pauza na 2 sekundy
 
+
+#########################################################################################################################
 #GRUPOWANIE czyli KLASTERYZACJA
 #https://cran.r-project.org/web/views/Cluster.html
 #Grupowanie klasteryzacja w R np. K-means w dwóch wymiarach
@@ -852,14 +865,18 @@ pvgroup <- pvpick(grupowanie_pvclust, alpha=0.95)
 #for( i in seq_len(length(pvgroup$clusters))) dane[pvgroup$clusters[[i]],]$grupa = i
 #dane$grupa
 
+
+
+#DRZEWA DECYZYJNE 
+###################################################################################################
+#dodajemy etykietę grupy z grupowania hclust oraz uczymy klasyfikatory na części danych
+#a testujemy na pozostałej pozbawionej etykiet 
+#dodawanie etykiety
 nc <- 3                                      # stosuje dane z hclust do generowania grup
 grupy <- cutree(grupowanie_hclust, k=nc)     # potnij drzewo na nc grup
 dane$grupa <- grupy
 dane$grupa <- factor(dane$grupa)             
-
-
-#DRZEWA DECYZYJNE 
-# hoduj drzewo na zbiorze trenującym dane_trenujace z etykietami fit 
+# twórz drzewo na zbiorze trenującym dane_trenujace z etykietami grupa
 # potem je użyj na zbiorze dane_testujace do określenia brakujących etykiet grupa
 # wybór zbiorów trenujących i testujących
 library(dplyr)
@@ -970,7 +987,7 @@ etykiety_osobne_pakiety<-rbind(etykiety_osobne_pakiety,rda=as.numeric(pred_etyki
 etykiety_osobne_pakiety<-rbind(etykiety_osobne_pakiety,gbm=round(pred_etykiety6))
 etykiety_osobne_pakiety
 
-##############################################################
+#########################################################################################################################
 #Klasyfikator ogólny wrapper dla 170 metod - CARET
 #lista około 170 klasyfikatorów i regresji
 #http://topepo.github.io/caret/modelList.html
@@ -1084,8 +1101,8 @@ etykiety_osobne_pakiety
 etykiety_caret
 #poprzednie_wyniki z grupowania (TAKIE POWINNY BYĆ WYNIKI Z KLASYFIKATORÓW)
 t(data.frame(spr=as.numeric(etykiety_z_grupowania)))
-
-
+#ZAWODY KLASYFIKATORÓW WYGRYWA przeważnie GBM!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#########################################################################################################################
 
 
 
