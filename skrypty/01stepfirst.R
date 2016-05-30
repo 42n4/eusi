@@ -15,8 +15,9 @@
 # (pod linuxem pakiety R najlepiej zainstalować w linuxie na roocie w konsoli R, żeby nie instalować na lokalnym koncie):
 pkglist<-c("reshape","ade4","sqldf","plyr","dplyr")
 pkglist<-c(pkglist,"party","rgl","scatterplot3d","fpc","pvclust","dendextend")
-pkglist<-c(pkglist,"nFactors","FactoMineR","randomForest","mclust")
+pkglist<-c(pkglist,"nFactors","FactoMineR","RRF","mclust","foreach","doParallel")
 pkglist<-c(pkglist,"rpart","ipred","gbm","mda","klaR","kernlab","caret")
+pkglist<-c(pkglist,"snow","Rmpi")
 #pkglist<-c(pkglist,"MASS","RWeka")
 pkgcheck <- pkglist %in% row.names(installed.packages())
 pkglist[!pkgcheck]
@@ -266,9 +267,9 @@ sapply(ylist, FUN=function(x,p) x^p, p=2:3) #wynik potęgi do p=2 wynik to macie
 #RAMKA DANYCH: kolumny z różnymi typami, odpowiednik tabeli w bazie lub arkusza w excelu
 pacjent_id <- c(1, 2, 3, 4)
 wiek <- c(25, 34, 28, 52)
-cukrzyca <- c('Typ1', 'Typ2', 'Typ1', 'Typ1')
+typ <- c('Typ1', 'Typ2', 'Typ1', 'Typ1')
 stan <- c('Kiepski', 'Poprawa', 'Wybitny', 'Kiepski')
-pacjenci <- data.frame(pacjent_id, wiek, cukrzyca, stan)
+pacjenci <- data.frame(pacjent_id, wiek, typ, stan)
 nrow(pacjenci)         # ilość wierszy
 ncol(pacjenci)         # ilość kolumn
 dim(pacjenci)          # rozmiar to wektor z liczbą wierszy i kolumn c(nrow(pacjenci),ncol(pacjenci))
@@ -292,7 +293,7 @@ pacjenci$wiek[i]       # komórka z i tego wiersza i kolumny wiek
 pacjenci[i, 'wiek']    # i-ty wiersz kolumny wiek
 pacjenci[i, i:j]       # dwie komórki z i tego wiersza i oraz i-tej i j-tej kolumny, to NIE działa na [[i, i:j]]
 pacjenci[1:2]          # pierwsze dwie kolumny jako ramka danych
-pacjenci[c('cukrzyca', 'stan')]
+pacjenci[c('typ', 'stan')]
 index <- 2
 pacjenci[-index,]      # usuń 2 wiersz z ramki danych
 #Wybieranie podzbiorów
@@ -303,42 +304,42 @@ filter(pacjenci, stan == 'Kiepski' & wiek < 30) # subset()
 subset(pacjenci, wiek >= 35 | wiek < 24, select = c(wiek, stan))
 subset(pacjenci, stan == 'Kiepski' & wiek < 30, select = pacjent_id:date)
 #Sortowanie
-pacjenci[order(pacjenci$wiek), ]                  # sortuj wiersze od najmłodszych do najstarszych, domyślnie rosnąco
+pacjenci[order(pacjenci$wiek), ]             # sortuj wiersze od najmłodszych do najstarszych, domyślnie rosnąco
 attach(pacjenci)
-spacjenci <- pacjenci[rev(order(cukrzyca, wiek)),]# sortuj wiersze w porządku malejącym 'rev' po typie, od najstarszych do najmłodszych
+spacjenci <- pacjenci[rev(order(typ, wiek)),]# sortuj wiersze w porządku malejącym 'rev' po typie, od najstarszych do najmłodszych
 detach(pacjenci)
 spacjenci
 attach(pacjenci)
-spacjenci <- pacjenci[order(cukrzyca,-wiek),]     # sortuj wiersze po typie, od najstarszych do najmłodszych
+spacjenci <- pacjenci[order(typ,-wiek),]     # sortuj wiersze po typie, od najstarszych do najmłodszych
 detach(pacjenci)
 spacjenci
 #Łączenie danych: dodawanie wierszy
-new_row <-                                        #nowy wiersz
+new_row <-                                   # nowy wiersz
   data.frame(
     pacjent_id = 5,
     wiek = 10,
-    cukrzyca = 'Typ3',
+    typ = 'Typ3',
     stan = 'Zdrowy'
   )
-pacjenci <- rbind(pacjenci, new_row)             # RBIND dodaje nowy wiersz do ramki danych
-spacjenci<- rbind(spacjenci, new_row)            # to samo z kopią posortowanych - spacjenci
+pacjenci <- rbind(pacjenci, new_row)         # RBIND dodaje nowy wiersz do ramki danych
+spacjenci<- rbind(spacjenci, new_row)        # to samo z kopią posortowanych - spacjenci
 spacjenci$pacjent_id <- spacjenci$pacjent_id + 10#inne identyfikatory w spacjenci
-rbind(pacjenci, spacjenci)                       # połącz dwie ramki z tą samą liczbą kolumn
+rbind(pacjenci, spacjenci)                   # połącz dwie ramki z tą samą liczbą kolumn
 #Łączenie danych: dodawanie kolumn 
-pacjenci$new_col <- c(2:6)                       # dodaj kolumnę do ramki danych: metoda 1
-pacjenci$new_col <- NULL                         # usuń kolumnę z ramki danych: metoda 1
+pacjenci$new_col <- c(2:6)                   # dodaj kolumnę do ramki danych: metoda 1
+pacjenci$new_col <- NULL                     # usuń kolumnę z ramki danych: metoda 1
 pacjenci <- transform(pacjenci, new_col = c(2:6))# dodaj kolumnę do ramki danych: metoda 2
-pacjenci <- within(pacjenci, {new_col = NULL})   # usuń kolumnę z ramki danych: metoda 3
-merge(pacjenci, spacjenci, by = "pacjent_id")    # połącz kolumnami pacjenci i spacjenci po ID
+pacjenci <- within(pacjenci, {new_col = NULL})# usuń kolumnę z ramki danych: metoda 3
+merge(pacjenci, spacjenci, by = "pacjent_id")# połącz kolumnami pacjenci i spacjenci po ID
 merge(pacjenci, spacjenci, 
-      by = c('pacjent_id', 'cukrzyca'))          # połącz kolumnami pacjenci i spacjenci po ID i Country
-cbind(pacjenci, spacjenci)                       # CBIND połącz kolumnami pacjenci i spacjenci muszą mieć tą samą ilość wierszy
+      by = c('pacjent_id', 'typ'))           # połącz kolumnami pacjenci i spacjenci po ID i Country
+cbind(pacjenci, spacjenci)                   # CBIND połącz kolumnami pacjenci i spacjenci muszą mieć tą samą ilość wierszy
 #Usuwanie kolumn
-myvars <- names(spacjenci) %in% c('wiek', 'cukrzyca')# wyodrębnianie zmiennych (kolumn) wiek, cukrzyca z ramki 
+myvars <- names(spacjenci) %in% c('wiek', 'typ')# wyodrębnianie zmiennych (kolumn) wiek, typ z ramki 
 myvars
-spacjenci[!myvars]                               # usuń zmienne wiek, cukrzyca
-spacjenci$wiek <- spacjenci$cukrzyca <- NULL     # usuń zmienne wiek, cukrzyca
-spacjenci[c(-2,-3)]                              # usuń 2 i 3-ą kolumnę
+spacjenci[!myvars]                           # usuń zmienne wiek, typ
+spacjenci$wiek <- spacjenci$typ <- NULL      # usuń zmienne wiek, typ
+spacjenci[c(-2,-3)]                          # usuń 2 i 3-ą kolumnę
 #Dodawanie dat
 #Sys.Date() zwraca dzisiejszą datę w postaci obiektu Date, date() zwraca datę i czas w postaci łańcucha znaków
 pacjenci$date <- Sys.Date()
@@ -365,14 +366,14 @@ detach(df)
 # metoda 3
 transform(df, sumx = x1 + x2, meanx = (x1 + x2) / 2)
 # metoda 4
-with(df, {             # 'with' nic nie zwraca
-wiek[x1 == 2] <- 1     # reszta jest wypełniana NA (brakiem danych z R)
+with(df, {                                   # 'with' nic nie zwraca
+wiek[x1 == 2] <- 1                           # reszta jest wypełniana NA (brakiem danych z R)
 })
 df
-df$wiek <- NULL        # usuń wiek
+df$wiek <- NULL                              # usuń wiek
 # metoda 5
-df <- within(df, {     # 'within' zwraca df
-  wiek <- NA           # utwórz nową zmienną wiek i zainicjalizuj ją NA (brakiem danych z R)
+df <- within(df, {                           # 'within' zwraca df
+  wiek <- NA                                 # utwórz nową zmienną wiek i zainicjalizuj ją NA (brakiem danych z R)
   wiek[x1 == 2] <- 1
 })
 df
@@ -381,22 +382,22 @@ df
 #library(reshape)
 df <- rename(df, c(sumx = "suma"))
 df
-names(df)[4] <- "srednia"      # names(df) zwraca wektor nazw zmiennych lub użyj fix(df) aby zmienić nazwy w gui
+names(df)[4] <- "srednia"                    # names(df) zwraca wektor nazw zmiennych lub użyj fix(df) aby zmienić nazwy w gui
 #Manipulacja NA
-df$wiek[df$wiek == 1] <- NA    # zamienia 1 na NA w kolumnie wiek
+df$wiek[df$wiek == 1] <- NA                  # zamienia 1 na NA w kolumnie wiek
 df
-df$wiek[is.na(df$wiek)] <- 55  # zamienia NA na 55 w kolumnie wiek
+df$wiek[is.na(df$wiek)] <- 55                # zamienia NA na 55 w kolumnie wiek
 df$wiek <-
-  ifelse(is.na(df$wiek), 55, df$wiek)# też zamienia NA na 55 w kolumnie wiek
+  ifelse(is.na(df$wiek), 55, df$wiek)        # też zamienia NA na 55 w kolumnie wiek
 df
-x <- c(1, 2, NA, 3)            # wektor z NA
-y <- x[1] + x[2] + x[3] + x[4] # y równa się NA
-z <- sum(x)                    # y równa się NA
-z <- sum(x, na.rm = TRUE)      # na.rm=TRUE usuwa wiersze z brakującymi danymi czyli NA
+x <- c(1, 2, NA, 3)                          # wektor z NA
+y <- x[1] + x[2] + x[3] + x[4]               # y równa się NA
+z <- sum(x)                                  # y równa się NA
+z <- sum(x, na.rm = TRUE)                    # na.rm=TRUE usuwa wiersze z brakującymi danymi czyli NA
 df$wiek[df$suma == 6] <- NA
 df
-na.omit(df)                    # na.omit() usuwa wiersze z NA
-df[!is.na(df$wiek),]           # też usuwa wiersze z NA
+na.omit(df)                                  # na.omit() usuwa wiersze z NA
+df[!is.na(df$wiek),]                         # też usuwa wiersze z NA
 
 
 #FAKTOR - etykiety, zmienna jakościowa (niemierzalna), czynnikowa: dyskretne lub porządkowe dane
@@ -406,54 +407,54 @@ df[!is.na(df$wiek),]           # też usuwa wiersze z NA
 #mapa wektorów dyskretnych wartości [1...k]
 #nie można faktorów dodawać, mnożyć
 #nie działa operator $, używa się pojedyńczych [] z indeksem np. levels(x)[1]
-cukrzyca <- c('Typ1', 'Typ2', 'Typ1', 'Typ1')
-cukrzyca <- factor(cukrzyca)          # Levels: Typ1 Typ2
-cukrzyca
+typ <- c('Typ1', 'Typ2', 'Typ1', 'Typ1')
+typ <- factor(typ)                           # Levels: Typ1 Typ2
+typ
 stan <- c('Kiepski', 'Poprawa', 'Wybitny', 'Kiepski')
 stan <-
-  factor(stan, ordered = TRUE)        # Wybitny-3 Poprawa-2 Kiepski-1
+  factor(stan, ordered = TRUE)               # Wybitny-3 Poprawa-2 Kiepski-1
 stan
-levels(stan)                          #pokazuje poziomy dyskretnej zmiennej stan
+levels(stan)                                 #pokazuje poziomy dyskretnej zmiennej stan
 stan2 <-
-  factor(stan,
-         levels = c('Wybitny', 'Poprawa', 'Kiepski')) # Wybitny-1 Poprawa-2 Kiepski-3
+factor(stan,
+levels = c('Wybitny', 'Poprawa', 'Kiepski')) # Wybitny-1 Poprawa-2 Kiepski-3
 stan2
-levels(stan2)                         #pokazuje poziomy dyskretnej zmiennej stan2, odwrotnie uporządkowane niż stan
+levels(stan2)                                #pokazuje poziomy dyskretnej zmiennej stan2, odwrotnie uporządkowane niż stan
 stan2 <- factor(c(as.character(stan2), 'Zalosny')) #dodaje nowy stan nie zdefiniowany
-levels(stan2)                         #widać w poziomach nowy stan
+levels(stan2)                                #widać w poziomach nowy stan
 #Dyskretyzacja zmiennej do poziomów
-i<-1:50+rnorm(50,0,5); i              #zmienna i
-k<-cut(i,5); k                        #generuje ze zmiennej i pięć poziomów zmiennej dyskretnej k
-levels(k)<-seq_len(length(levels(k))) #zmienia nazwy poziomów na bardziej czytelne
+i<-1:50+rnorm(50,0,5); i                     #zmienna i
+k<-cut(i,5); k                               #generuje ze zmiennej i pięć poziomów zmiennej dyskretnej k
+levels(k)<-seq_len(length(levels(k)))        #zmienia nazwy poziomów na bardziej czytelne
 levels(k)
 # przykład pokazujący faktory - zmienne jakościowe w ramce danych
 # definiują automatycznie przy tworzeniu ramki danych, jednak porządek będzie alfabetyczny
 pacjenci
 str(pacjenci)
 summary(pacjenci)
-table(pacjenci$cukrzyca, pacjenci$stan)        #wygeneruj statystyki przecięcia dwóch kolumn
+table(pacjenci$typ, pacjenci$stan)           #wygeneruj statystyki przecięcia dwóch kolumn
 #Liczenie średnich po kolumnach i ich złączeniach
 #library(reshape)
 #melt i cast lub w jednym recast, ddply, aggregate czyli 4 METODY agregacji
 library(reshape)
 pacjenci$date <- NULL
-# dla każdej wartosci pary cukrzyca, stan wypisz w jednej kolumnie variable inne kolumny i ich wartości
-md <- melt(pacjenci, id = (c('cukrzyca', 'stan'))) 
+# dla każdej wartosci pary typ, stan wypisz w jednej kolumnie variable inne kolumny i ich wartości
+md <- melt(pacjenci, id = (c('typ', 'stan'))) 
 md
-cast(md, stan ~ variable, mean)               #policz srednie dla stanów po wartościach z variable
-cast(md, cukrzyca ~ variable, mean)           #policz srednie dla cukrzyca po wartościach z variable
-cast(md, cukrzyca + stan ~ variable, mean)    #policz srednie dla cukrzyca i stan po wartościach z variable
-recast(pacjenci, cukrzyca + stan ~ variable, 
-       mean, id.var = c('cukrzyca', 'stan'))  #policz srednie dla cukrzyca i stan po wartościach z variable w jednym kroku
-ddply(pacjenci, ~cukrzyca + stan, 
+cast(md, stan ~ variable, mean)              #policz srednie dla stanów po wartościach z variable
+cast(md, typ ~ variable, mean)               #policz srednie dla typ po wartościach z variable
+cast(md, typ + stan ~ variable, mean)        #policz srednie dla typ i stan po wartościach z variable
+recast(pacjenci, typ + stan ~ variable, 
+       mean, id.var = c('typ', 'stan'))      #policz srednie dla typ i stan po wartościach z variable w jednym kroku
+ddply(pacjenci, ~typ + stan, 
       summarise, N=length(wiek), 
       sredniaid=mean(pacjent_id),
-      sredniawiek=mean(wiek))                 #policz srednie dla cukrzyca i stan po innych parametrach w jednym kroku
-ddply(pacjenci, .(cukrzyca,stan), 
+      sredniawiek=mean(wiek))                #policz srednie dla typ i stan po innych parametrach w jednym kroku
+ddply(pacjenci, .(typ,stan), 
       summarise, N=length(wiek), 
       sredniaid=mean(pacjent_id),
-      sredniawiek=mean(wiek))                 #policz srednie dla cukrzyca i stan po innych parametrach w jednym kroku
-aggregate(.~stan+cukrzyca,data=pacjenci,mean) #policz srednie dla cukrzyca i stan po innych parametrach w jednym kroku
+      sredniawiek=mean(wiek))                #policz srednie dla typ i stan po innych parametrach w jednym kroku
+aggregate(.~stan+typ,data=pacjenci,mean)     #policz srednie dla typ i stan po innych parametrach w jednym kroku
 
 
 #RYSUNEK FUNKCJI
@@ -484,22 +485,22 @@ legend(
   bty = 'n'
 )
 #narysuj wiele rysunków w tym samym czasie
-plot(f)                # pierwszy rysunek
-dev.new()         # otwórz drugi rysunek
-plot(f(x2plot/20))# przelączanie strzałkami z klawiatury
-Sys.sleep(2)                             #pauza na 2 sekundy
-dev.off()         # zamknij drugi rysunek
+plot(f)                                      # pierwszy rysunek
+dev.new()                                    # otwórz drugi rysunek
+plot(f(x2plot/20))                           # przelączanie strzałkami z klawiatury
+Sys.sleep(2)                                 #pauza na 2 sekundy
+dev.off()                                    # zamknij drugi rysunek
 # attach, detach
 # attach, detach nie pracują na tych samych nazwach zmiennych, użyj "with"
 summary(mtcars$mpg)
 plot(mtcars$mpg, mtcars$disp)
 plot(mtcars$mpg, mtcars$wt)
-attach(mtcars) # dodaj zbiór danych do ścieżki R wyszukiwania
+attach(mtcars)                               # dodaj zbiór danych do ścieżki R wyszukiwania
 summary(mpg)
 plot(mpg, disp)
 plot(mpg, wt)
-detach(mtcars) # usuń zbiór danych do ścieżki R wyszukiwania
-Sys.sleep(2)                             #pauza na 2 sekundy
+detach(mtcars)                               # usuń zbiór danych do ścieżki R wyszukiwania
+Sys.sleep(2)                                 #pauza na 2 sekundy
 
 #używanie sqla
 library(sqldf)
@@ -557,9 +558,9 @@ for (i in 1:1000) {
   cat('.')
 }
 t2 <- proc.time()
-time_elapsed <- (t2 - t1)[[3]] # okres czasu
+time_elapsed <- (t2 - t1)[[3]]               # okres czasu
 time_elapsed
-time_elapsed <- as.numeric((t2 - t1)[3]) # okres czasu
+time_elapsed <- as.numeric((t2 - t1)[3])     #okres czasu
 time_elapsed
 
 
@@ -574,22 +575,22 @@ if (score > 0.5) {
 }
 outcome <- ifelse(score > 0.5, 'passed', 'not passed')
 #FOR, WHILE, SAPPLY
-for (i in 1:10) {                  #for (var in seq) statement
-  print('witaj')                   #wypisze 10 razy 'witaj'
+for (i in 1:10) {                            #for (var in seq) statement
+  print('witaj')                             #wypisze 10 razy 'witaj'
 }
-sapply(1:10, function(i) {         #sapply - alternatywa dla for - wypisze 10 razy 'witaj'
-  print('witaj')                   #wypisze 10 razy 'witaj'
+sapply(1:10, function(i) {                   #sapply - alternatywa dla for - wypisze 10 razy 'witaj'
+  print('witaj')                             #wypisze 10 razy 'witaj'
 })
-for (i in 1:10) {                  #pętla for wypisze od 1 do 10
+for (i in 1:10) {                            #pętla for wypisze od 1 do 10
   print(i)
 }
-sapply(1:10,function(i){print(i)}) #sapply - alternatywa dla for - wypisze od 1 do 10
-i <- 10                            #while (cond) statement - zaczyna od i=10
-while (i >= 0) {                   #wypisze 10 razy 'witaj'
+sapply(1:10,function(i){print(i)})           #sapply - alternatywa dla for - wypisze od 1 do 10
+i <- 10                                      #while (cond) statement - zaczyna od i=10
+while (i >= 0) {                             #wypisze 10 razy 'witaj'
   print('witaj')
   i <- i - 1
 }
-for(i in seq_len(nrow(pacjenci)))  #odporna na pustą ramkę pętla z seq_len(nrow)
+for(i in seq_len(nrow(pacjenci)))            #odporna na pustą ramkę pętla z seq_len(nrow)
   print(pacjenci$wiek[i])
 #FUNKCJE
 #mojafunkcja <- function(arg1, arg2, ...) {
@@ -659,34 +660,50 @@ res
 
 
 #UCZENIE SIĘ MASZYN
-set.seed(12459);                         #początkowa wartość random seed dla takich samych wyników
-dev.off()                                # na wszelki wypadek wyłączamy drugi rysunek
+set.seed(12459);                             # początkowa wartość random seed dla takich samych wyników za każdym razem
+dev.off()                                    # na wszelki wypadek wyłączamy drugi rysunek
 
 #Analiza Danych - korelacje i podobieństwa
-mydata<-mtcars
-cor(mydata)                              #korelacje między zmiennymi
-round(cor(mydata), 2)                    # sprawdzamy korelację wybranych kolumn, widać dużą korelację
-                                         # tzn. wybrane parametry razem się zmniejszają lub zwiększają
-                                         # jeśli korelacja jest DODATNIA
-                                         # jeśli jest UJEMNA, to przy zwiększaniu jednej, druga maleje
-#image(cor(mtcars))
-# standaryzuj zmienne ciągłe
-scaledcars <- na.omit(mtcars)            # usuń niepełne wiersze z NA
-scaledcars[c('mpg','disp', 'hp','drat', 'wt','qsec' )] <- scale(scaledcars[c('mpg','disp', 'hp','drat', 'wt','qsec' )])
+#Wybór danych do grupowania i klasyfikacji brakujących etykiet lub testowych zbiorów
+#tu wybieramy inne dane dla lepszych i bardziej powtarzalnych wyników
+#najpierw wypisujemy dostępne przykładowe dane poleceniem:
+#data()
+#potem odpytujemy pomoc poleceniem
+#?nazwa_danych
+#wybieramy:
+ndata <- "imports85"
+data(list=ndata)
+dane<-get(ndata)
+dane<-dane[sapply(dane, is.numeric)]         # pobierz tylko dane liczbowe
+dane$normalizedLosses<-NULL                  # usuń nieprzydatne wiersze
+dane$symbolic<-NULL
+dane <- na.omit(dane)                        # usuń niepełne wiersze z NA
+rownames(dane) <- seq_len(nrow(dane))        # nazywa wiersze ich indeksami
+#scale(x) oznacza (x - mean(x)) / sd(x) ważne kiedy dane w kolumnach mają różne bardzo dziedziny w rodzaju (0,1) oraz (0,10000)
+dane_scaled <- dane
+dane_scaled[sapply(dane, is.numeric)] <- scale(dane_scaled[sapply(dane, is.numeric)])
+
+dane$grupa<-NULL
+cor(dane)                                    # korelacje między zmiennymi
+round(cor(dane), 2)                          # sprawdzamy korelację wybranych kolumn, widać dużą korelację
+                                             # tzn. wybrane parametry razem się zmniejszają lub zwiększają
+                                             # jeśli korelacja jest DODATNIA
+                                             # jeśli jest UJEMNA, to przy zwiększaniu jednej, druga maleje
+#image(cor(dane))
 #heatmap z odległości między wierszami
-distMatrix <- as.matrix(dist(scaledcars))
+distMatrix <- as.matrix(dist(dane_scaled))
 heatmap(distMatrix)
-Sys.sleep(2)                             #pauza na 2 sekundy
+Sys.sleep(2)                                 #pauza na 2 sekundy
 #heatmap z korelacji
 #https://planspacedotorg.wordpress.com/2013/07/24/clustered-r-squared-heat-maps-in-r/
-dissimilarity <- 1 - cor(mtcars)^2       #miara niepodobnych 1 - korelacja do kwadratu
+dissimilarity <- 1 - cor(dane)^2             #miara niepodobnych 1 - korelacja do kwadratu
 clustering <- hclust(as.dist(dissimilarity), method="ward.D2")
-plot(clustering)                         #grupowanie po niepodobieństwach
+plot(clustering)                             #grupowanie po niepodobieństwach
 order <- clustering$order
 oldpar <- par(no.readonly=TRUE); par(mar=c(0,0,0,0))
 image(dissimilarity[order, rev(order)], axes=FALSE)
 par(oldpar)
-clusterRsquared <- function(dataframe) { #funkcja z miar niepodobieństw
+clusterRsquared <- function(dataframe) {     #funkcja z miar niepodobieństw
   dissimilarity <- 1 - cor(dataframe)^2
   clustering <- hclust(as.dist(dissimilarity))
   order <- clustering$order
@@ -695,17 +712,18 @@ clusterRsquared <- function(dataframe) { #funkcja z miar niepodobieństw
   par(oldpar)
   return(1 - dissimilarity[order, order])
 }
-round(clusterRsquared(mtcars),2)
-Sys.sleep(2)                             #pauza na 2 sekundy
-#round(clusterRsquared(mdata3),2)
-#Sys.sleep(2)                            #pauza na 2 sekundy
+round(clusterRsquared(dane),2)
+#round(clusterRsquared(dane3kol),2)
+#Sys.sleep(2)                                #pauza na 2 sekundy
 
+#GRUPOWANIE czyli KLASTERYZACJA
+#https://cran.r-project.org/web/views/Cluster.html
 #Grupowanie klasteryzacja w R np. K-means w dwóch wymiarach
-mydata <- mtcars[c('disp', 'hp')]        # wybieramy 2 parametry mtcars pojemność silnika i konie mechaniczne
-round(cor(mydata), 2)                    # sprawdzamy korelację wybranych kolumn, widać dużą korelację 
-kmeans.res <- kmeans(mydata, 3)          # 3 zbiory odrębnych danych
-plot(                                    #wizualizacja w 2D z plot, abline, ade4 s.class
-  mydata,
+dane2kol <- dane[c('engineSize', 'horsepower')]#wybieramy 2 parametry mtcars pojemność silnika i konie mechaniczne
+round(cor(dane2kol), 2)                      #sprawdzamy korelację wybranych kolumn, widać dużą korelację 
+grupowanie_kmeans <- kmeans(dane2kol, 3)     #3 zbiory odrębnych danych
+plot(                                        #wizualizacja w 2D z plot, abline, ade4 s.class
+  dane2kol,
   xaxt = 'n',
   yaxt = 'n',
   xlab = "X",
@@ -714,33 +732,32 @@ plot(                                    #wizualizacja w 2D z plot, abline, ade4
 axis(1, pos = 0)
 axis(2, pos = 0)
 abline(v = 0, h = 0)
-kmeans.cluster <- factor(kmeans.res$cluster)
+grupowanie_kmeans_cluster <- factor(grupowanie_kmeans$cluster)
 # zainstaluj 'ade4', aby zwizualizować zbiory
 library(ade4)
 s.class(
-  mydata,
-  fac = kmeans.cluster,
+  dane2kol,
+  fac = grupowanie_kmeans_cluster,
   add.plot = TRUE,
-  col = seq(1, nlevels(kmeans.cluster), 1)
+  col = seq(1, nlevels(grupowanie_kmeans_cluster), 1)
 )
-aggregate(mydata,by=list(kmeans.res$cluster),FUN=mean) # średnie w grupach widać zróżnicowanie
-groupk2 <- data.frame(mydata, kmeans.res$cluster) 
-Sys.sleep(2)                             #pauza na 2 sekundy
+aggregate(dane2kol,by=list(grupowanie_kmeans$cluster),FUN=mean) # średnie w grupach widać zróżnicowanie
+groupk2 <- data.frame(dane2kol, grupowanie_kmeans$cluster) 
+Sys.sleep(2)                                 #pauza na 2 sekundy
 library(cluster)
-clusplot(mydata, kmeans.res$cluster, color=TRUE, shade=TRUE,
+clusplot(dane2kol, grupowanie_kmeans$cluster, color=TRUE, shade=TRUE,
          labels=2, lines=0)
-Sys.sleep(2)                             #pauza na 2 sekundy
+Sys.sleep(2)                                 #pauza na 2 sekundy
 library(fpc)
-plotcluster(mydata, kmeans.res$cluster) 
-#library(fpc)                 # porównanie dwóch grupowań
-#cluster.stats(mydata, fit$cluster, fit2$cluster) 
-Sys.sleep(2)                             #pauza na 2 sekundy
+plotcluster(dane2kol, grupowanie_kmeans$cluster) 
+#library(fpc)                                # porównanie dwóch grupowań
+#cluster.stats(dane, fit$cluster, fit2$cluster) 
+Sys.sleep(2)                                 #pauza na 2 sekundy
 
 #Grupowanie klasteryzacja w R : określanie ilości grup
 #http://www.statmethods.net/advstats/cluster.html
-mydata <- mtcars
-wss <- (nrow(mydata)-1)*sum(apply(mydata,2,var))   #oceń liczbę grup (klasterów)
-for (i in 2:15) wss[i] <- sum(kmeans(mydata,centers=i)$withinss)
+wss <- (nrow(dane)-1)*sum(apply(dane,2,var)) #oceń liczbę grup (klasterów)
+for (i in 2:15) wss[i] <- sum(kmeans(dane,centers=i)$withinss)
 #$betweenss: suma kwadratów odległośći między clusterami. 
 #To jest średnia dystansów pomiędzy centrami klasterów
 #Jeśli chcemy osobno leżące klustery, wartość betweenss musi być jak największa.
@@ -750,200 +767,183 @@ for (i in 2:15) wss[i] <- sum(kmeans(mydata,centers=i)$withinss)
 #$totss = $tot.withinss + $betweenss
 plot(1:15, wss, type="b", xlab="Liczba grup", ylab="Suma wss")
 library(fpc)
-pamk(scaledcars)$nc   #liczba grup (klasterów) policzona automatycznie
-pamk(mydata)$nc       #liczba grup (klasterów) policzona automatycznie
-Sys.sleep(2)                             #pauza na 2 sekundy
+pamk(dane_scaled)$nc                          #liczba grup (klasterów) policzona automatycznie
+pamk(dane)$nc                                #liczba grup (klasterów) policzona automatycznie
+Sys.sleep(2)                                 #pauza na 2 sekundy
 
 #Grupowanie klasteryzacja w R np. K-means w trzech wymiarach
-mdata3 <- mtcars[c('mpg','disp', 'hp')]  # wybieramy 3 parametry z mtcars ilość przejechanych mil na galon paliwa,
-mtcars[c('mpg','disp', 'hp')]            # a także pojemność silnika i konie mechaniczne (miary z USA)
-kmeans3.res <- kmeans(mdata3, 3)         # 3 zbiory odrębnych danych
-kmeans3.cluster <- factor(kmeans3.res$cluster)
+dane3kol <- dane[c('cityMpg','engineSize', 'horsepower')]      # wybieramy 3 parametry z mtcars ilość przejechanych mil na galon paliwa,
+dane[c('cityMpg','engineSize', 'horsepower')]                  # a także pojemność silnika i konie mechaniczne (miary z USA)
+grupowanie3_kmeans <- kmeans(dane3kol, 3)    # 3 zbiory odrębnych danych
+grupowanie3_kmeans_cluster <- factor(grupowanie3_kmeans$cluster)
 library(scatterplot3d)
-scatterplot3d(mdata3,color=kmeans3.cluster,pch=19) #wizualizacja w 3D 
+scatterplot3d(dane3kol,color=grupowanie3_kmeans_cluster,pch=19) #wizualizacja w 3D 
 library(rgl)
 #http://www.sthda.com/english/wiki/a-complete-guide-to-3d-visualization-device-system-in-r-r-software-and-data-visualization
 r3dDefaults$windowRect <- c(0,50, 800, 800) 
-plot3d(mdata3, col=kmeans3.cluster, size = 10)     #wizualizacja w 3D interaktywna
-Sys.sleep(2)                                       #pauza na 2 sekundy
+plot3d(dane3kol, col=grupowanie3_kmeans_cluster, size = 10)     #wizualizacja w 3D interaktywna
+Sys.sleep(2)                                 #pauza na 2 sekundy
 
 #Grupowanie klasteryzacja w R np. K-means w trzech obliczonych wymiarach z PCA  
 #http://planspace.org/2013/02/03/pca-3d-visualization-and-clustering-in-r/
-mydata<-mtcars
 library(nFactors)
-ev <- eigen(cor(mydata)) # get eigenvalues
-ap <- parallel(subject=nrow(mydata),var=ncol(mydata),
+ev <- eigen(cor(dane)) # get eigenvalues
+ap <- parallel(subject=nrow(dane),var=ncol(dane),
                rep=100,cent=.05)
 nS <- nScree(x=ev$values, aparallel=ap$eigen$qevpea)
 plotnScree(nS) 
-Sys.sleep(2)                             #pauza na 2 sekundy 
-library(FactoMineR)                      # PCA Variable Factor Map
-result <- PCA(mydata)                    # graphs generated automatically 
+Sys.sleep(2)                                 #pauza na 2 sekundy 
+library(FactoMineR)                          # PCA Variable Factor Map
+result <- PCA(dane)                          # graphs generated automatically 
 plot(result)
-Sys.sleep(2)                             #pauza na 2 sekundy
-pc <- princomp(mydata, cor=TRUE, scores=TRUE) #PCA obliczamy sztuczne 3 wymiary
+Sys.sleep(2)                                 #pauza na 2 sekundy
+pc <- princomp(dane, cor=TRUE, scores=TRUE)  #PCA obliczamy sztuczne 3 wymiary
 summary(pc)
 biplot(pc)
 plot(pc,type="lines")
-mdatapc<-pc$scores[,1:2]
+mdatapc<-pc$scores[,1:3]
 str(mdatapc)
 class(mdatapc)
-kmeanspc.res <- kmeans(mdatapc, 4)       # 4 zbiory odrębnych danych
-kmeanspc.cluster <- factor(kmeanspc.res$cluster)
-scatterplot3d(mdatapc,color=kmeanspc.cluster,pch=19)#wizualizacja w 3D 
+grupowanie_pca_kmeans <- kmeans(mdatapc, 4)  # 4 zbiory odrębnych danych
+grupowanie_pca_kmeans_cluster <- factor(grupowanie_pca_kmeans$cluster)
+scatterplot3d(mdatapc,color=grupowanie_pca_kmeans_cluster,pch=19)       #wizualizacja w 3D 
 r3dDefaults$windowRect <- c(0,50, 800, 800) 
-plot3d(mdatapc, col=kmeanspc.cluster, size = 10)    #wizualizacja w 3D interaktywna
-text3d(pc$scores[,1:2],texts=rownames(mtcars))  #dodajemy parametry z mtcars
-text3d(pc$loadings[,1:2], texts=rownames(pc$loadings), col="red")
+plot3d(mdatapc, col=grupowanie_pca_kmeans_cluster, size = 10)           #wizualizacja w 3D interaktywna
+text3d(pc$scores[,1:3],texts=rownames(dane)) #dodajemy parametry z badanych danych
+text3d(pc$loadings[,1:3], texts=rownames(pc$loadings), col="red")
 coords <- NULL
 for (i in 1:nrow(pc$loadings)) {
   coords <- rbind(coords, rbind(c(0,0,0),pc$loadings[i,1:3]))
 }
 lines3d(coords, col="red", lwd=4)
-table(kmeans.cluster, kmeanspc.cluster)
-Sys.sleep(2)                             #pauza na 2 sekundy
+Sys.sleep(2)                                 #pauza na 2 sekundy
 
 #Grupowanie klasteryzacja w R np. hierarchiczne grupowanie
-nc <- 5
-di <- dist(mtcars, method="euclidean")
-tree <- hclust(di, method="ward.D2")
-hcluster <- as.factor((cutree(tree, k=nc)-2) %% nc +1)
-groups <- cutree(fit, k=nc)              # potnij drzewo na nc grup
-plot(tree, xlab="")
-rect.hclust(tree, k=nc, border="red")
-table(hcluster, kmeanspc.cluster)
-Sys.sleep(2)                             #pauza na 2 sekundy 
+nc <- 3                                      # liczba grup
+di <- dist(dane, method="euclidean")
+grupowanie_hclust <- hclust(di, method="ward.D2")
+hcluster <-                                  # potnij drzewo na nc grup i przerotuj numery
+    as.factor((cutree(grupowanie_hclust,k=nc)-2)%%nc+1)
+plot(grupowanie_hclust, xlab="")
+rect.hclust(grupowanie_hclust, k=nc, border="red")
+groupy <- cutree(grupowanie_hclust, k=nc)    # potnij drzewo na nc grup
+Sys.sleep(2)                                 #pauza na 2 sekundy 
 
 #Grupowanie Mclust
 #https://cran.r-project.org/web/packages/mclust/vignettes/mclust.html
-mydata <- scaledcars
-library(mclust)
-fit <- Mclust(mydata)
-plot(fit, what = "BIC") 
-summary(fit) 
-Sys.sleep(2)                             #pauza na 2 sekundy
+#dane <- dane_scaled
+#library(mclust)
+#grupowanie_mclust <- Mclust(dane)
+#plot(grupowanie_mclust, what = "BIC") 
+#summary(grupowanie_mclust) 
+#Sys.sleep(2)                                 #pauza na 2 sekundy
+
 
 #Grupowanie klasteryzacja w R: pvclust hierarchiczne grupowanie
 #wyniki wykorzystane w poniżej wyjaśnionych drzewach decyzyjnych i klasyfikatorach
-mydata <- scaledcars
+#dane <- dane_scaled
 #http://www.sigmath.es.osaka-u.ac.jp/shimo-lab/prog/pvclust/
-library(pvclust)
-fitpv <- pvclust(t(mydata), method.dist="euclidean", method.hclust="ward.D2", nboot=1000)
-plot(fitpv)
-pvrect(fitpv, alpha=.9) 
-pvgroup <- pvpick(fitpv, alpha=0.9) 
-mydata$fit <- NA
-for( i in seq_len(length(pvgroup$clusters))) mydata[pvgroup$clusters[[i]],]$fit = i
-mydata$fit
-Sys.sleep(2)                             #pauza na 2 sekundy
-#http://www.sthda.com/english/wiki/beautiful-dendrogram-visualizations-in-r-5-must-known-methods-unsupervised-machine-learning
-#pvclust and dendextend
-#plot(fit)
-#fit %>% as.dendrogram %>% 
-#  set("branches_k_color", k = 2, value = c("purple", "orange")) %>%
-#  plot
-#fit %>% text
-#fit %>% pvrect
+library("pvclust")
+grupowanie_pvclust <- pvclust(t(dane), method.dist="euclidean", method.hclust="average", nboot=30)
+plot(grupowanie_pvclust)
+pvrect(grupowanie_pvclust, alpha=0.95) 
+pvgroup <- pvpick(grupowanie_pvclust, alpha=0.95) 
+#dane$grupa <- NA
+#for( i in seq_len(length(pvgroup$clusters))) dane[pvgroup$clusters[[i]],]$grupa = i
+#dane$grupa
+
+nc <- 3                                     # stosuje dane z hclust do generowania grup
+grupy <- cutree(grupowanie_hclust, k=nc)    # potnij drzewo na nc grup
+dane$grupa <- grupy
+dane$grupa <- factor(dane$grupa)             
+
+
+#DRZEWA DECYZYJNE 
+# hoduj drzewo na zbiorze trenującym dane_trenujace z etykietami fit 
+# potem je użyj na zbiorze dane_testujace do określenia brakujących etykiet grupa
+# wybór zbiorów trenujących i testujących
+library(dplyr)
+dane_trenujace <- sample_n(dane,190)         #uczę na przykładzie wybranych wierszy
+dane_testujace <- dane[-as.numeric(rownames(dane_trenujace)),]
+etykiety_do_testu <-dane_testujace$grupa     #zapamiętuję grupę elementów testowych
+dane_testujace$grupa <- NULL                 #i usuwam ją do testu
+rownames(dane_trenujace)<-seq_len(nrow(dane_trenujace))# nazywa wiersze ich indeksami
+rownames(dane_testujace)<-seq_len(nrow(dane_testujace))# nazywa wiersze ich indeksami 
 
 #Drzewa decyzyjne rpart
 #http://www.statmethods.net/advstats/cart.html
 #http://machinelearningmastery.com/non-linear-regression-in-r-with-decision-trees/
 library(rpart)
-# hoduj drzewo na zbiorze trenującym mydatatr z etykietami fit 
-# potem je użyj na zbiorze mydatana do określenia brakujących etykiet fit
-mydata$fit <- factor(mydata$fit)         #stosuje mydata z pvclust poprzedni przykład
-mydatana <- mydata[is.na(mydata$fit),]   #zbiór z fit=NA z pvclust przycięcia
-mydatatr <- na.omit(mydata)              #uczę na przykładzie z etykietą fit != NA
-#?rpart.control                          #ustaw parametry rpart
-fitree <- rpart(fit ~ ., method="class", data=mydatatr, minsplit=2)
-#fitree <- rpart(fit ~ ., method="anova", data=mydata)
-printcp(fitree)                          # wyswietlam rezultaty
-plotcp(fitree)                           # vizualizuję krossvalidację
-summary(fitree)                          # podsumowanie
+#?rpart.control                              #ustaw parametry rpart
+klasyfikator_rpart <- rpart(grupa ~ ., method="class", data=dane_trenujace, minsplit=2)
+#klasyfikator_rpart <- rpart(grupa ~ ., method="anova", data=dane)
+printcp(klasyfikator_rpart)                  # wyswietlam rezultaty
+plotcp(klasyfikator_rpart)                   # vizualizuję krossvalidację
+summary(klasyfikator_rpart)                  # podsumowanie
 # utwórz rysunek
 par(mar=c(0,5,3,5))
-plot(fitree, uniform=TRUE,
+plot(klasyfikator_rpart, uniform=TRUE,
      main="Decyzyjne drzewo dla mtcars z etykietą fit (pvclust)")
-text(fitree, use.n=TRUE, all=TRUE, cex=.8)
+text(klasyfikator_rpart, use.n=TRUE, all=TRUE, cex=.8)
 #zapisz rysunek do pliku
-post(fitree, file = "treerpart1.pdf",
+post(klasyfikator_rpart, file = "treerpart1.pdf",
      title = "Decyzyjne drzewo dla mtcars z etykietą fit (pvclust)")
-Sys.sleep(2)                             #pauza na 2 sekundy
-# przytnij drzewo
-pfitree<- prune(fitree, cp=   fit$cptable[which.min(fitree$cptable[,"xerror"]),"CP"])
-# utwórz rysunek
-plot(pfitree, uniform=TRUE,
-     main="Przycięte decyzyjne drzewo dla mtcars z etykietą fit (pvclust)")
-text(pfitree, use.n=TRUE, all=TRUE, cex=.8)
-#zapisz rysunek do pliku
-post(pfitree, file = "treerpart2.pdf",
-     title = "Przycięte decyzyjne drzewo dla mtcars z etykietą fit (pvclust)")
-predrest1 <- predict(fitree, mydatana)   #przewiduj etykietę zbioru z fit=NA
-predrest1
-Sys.sleep(2)                             #pauza na 2 sekundy
+pred_etykiety1 <- predict(klasyfikator_rpart, dane_testujace)   #przewiduj etykietę zbioru z fit=NA
+pred_etykiety1
 
 #Drzewa Decyzyjne ctree
 library(party)
-ctree <- ctree(fit ~ ., data=mydatatr, controls = 
+klasyfikator_ctree <- ctree(grupa ~ ., data=dane_trenujace, controls = 
     ctree_control(mincriterion = 0,minbucket = 0,minsplit = 0,maxdepth = 100,savesplitstats = TRUE))
-plot(ctree)
+plot(klasyfikator_ctree)
 pdf('treec.pdf')
-plot(ctree)
+plot(klasyfikator_ctree)
 dev.off()
-#plot(ctree, type="simple")
-predrest2 <- predict(ctree, mydatana)    #przewiduj etykietę zbioru z fit=NA
-predrest2
-Sys.sleep(2)                             #pauza na 2 sekundy
+#plot(klasyfikator_ctree, type="simple")
+pred_etykiety2 <- predict(klasyfikator_ctree, dane_testujace)    #przewiduj etykietę zbioru z fit=NA
+pred_etykiety2
+
 
 #Drzewa Decyzyjne randomForest - wiele drzew i głosowanie
 #zmienna liczba atrybutów dla każdej próby tworzenia drzewa
-library(randomForest)
-fitforest <- randomForest(fit ~ ., data=mydatatr)
-print(fitforest)                         # zobacz rezultaty
-#summary(fitforest)
-importance(fitforest)                    # importance of each predictor 
-predrest3 <- predict(fitforest, mydatana)#przewiduj etykietę zbioru z fit=NA
-predrest3
-Sys.sleep(2)                             #pauza na 2 sekundy
+library(RRF)
+klasyfikator_rrf <- RRF(grupa ~ ., data=dane_trenujace)
+print(klasyfikator_rrf)                      # zobacz rezultaty
+#summary(klasyfikator_rrf)
+importance(klasyfikator_rrf)                 # importance of each predictor 
+pred_etykiety3 <- predict(klasyfikator_rrf, dane_testujace)#przewiduj etykietę zbioru z fit=NA
+pred_etykiety3
 
-#Bootstrapped Aggregation (Bagging) drzewa na różnych próbkach i głosowanie
-library(ipred)
-fitbag <- bagging(fit~., data=mydatatr, control=rpart.control(minsplit=5))
-print(fitbag)                            #zobacz rezultaty
-#summary(fitbag)                         #zbyt duży zbiór to zakomentowane
-predrest4 <- predict(fitbag, mydatana)   #przewiduj etykietę zbioru z fit=NA
-predrest4
-Sys.sleep(2)                             #pauza na 2 sekundy
 
 #Mixture Discriminant Analysis
 library(mda)
-fitmda <- mda(fit~., data=mydatatr)
-print(fitmda)                            #zobacz rezultaty
-summary(fitmda)
-predrest5 <- predict(fitmda, mydatana)#przewiduj etykietę zbioru z fit=NA
-predrest5
-Sys.sleep(2)                             #pauza na 2 sekundy
+klasyfikator_mda <- mda(grupa ~ ., data=dane_trenujace)
+print(klasyfikator_mda)                      #zobacz rezultaty
+summary(klasyfikator_mda)
+pred_etykiety4 <- predict(klasyfikator_mda, dane_testujace)#przewiduj etykietę zbioru z fit=NA
+pred_etykiety4
+
 
 #Regularized Discriminant Analysis
 library(klaR)
-fitrda <- rda(fit~., data=mydatatr)
-print(fitrda)                            #zobacz rezultaty
-summary(fitrda)
-predrest6 <- predict(fitrda, mydatana)   #przewiduj etykietę zbioru z fit=NA
-predrest6
-Sys.sleep(2)                             #pauza na 2 sekundy
+klasyfikator_rda <- rda(grupa ~ ., data=dane_trenujace)
+print(klasyfikator_rda)                      #zobacz rezultaty
+summary(klasyfikator_rda)
+pred_etykiety5 <- predict(klasyfikator_rda, dane_testujace)   #przewiduj etykietę zbioru z fit=NA
+pred_etykiety5
+
 
 #Gradient Boosted Machine 
 #http://www.listendata.com/2015/07/gbm-boosted-models-tuning-parameters.html
 library(gbm)
-fitgbm <- gbm(fit~., data=mydatatr, distribution="gaussian", 
+klasyfikator_gbm <- gbm(grupa ~ ., data=dane_trenujace, distribution="gaussian", 
               bag.fraction = 0.5, n.trees = 1000, interaction.depth =6, 
               shrinkage = 0.1, n.minobsinnode = 1)
-print(fitgbm)                            #zobacz rezultaty
-summary(fitgbm)
-predrest7 <- predict(fitgbm, mydatana,n.trees = 10)   #przewiduj etykietę zbioru z fit=NA
-round(predrest7)
-Sys.sleep(2)                             #pauza na 2 sekundy
+print(klasyfikator_gbm)                      #zobacz rezultaty
+summary(klasyfikator_gbm)
+pred_etykiety6 <- predict(klasyfikator_gbm, dane_testujace,n.trees = 10)   #przewiduj etykietę zbioru z fit=NA
+round(pred_etykiety6)
+
 
 
 #Niesprawdzone w tym skrypcie funkcje funkcja(pakiet) m.in:
@@ -951,46 +951,139 @@ Sys.sleep(2)                             #pauza na 2 sekundy
 #J48(RWeka), PART(RWeka), C5.0(C50), vglm(VGAM), lda(MASS), plsda(caret)
 #earth(earth), knnreg(caret), glmnet(glmnet), lars(lars), glmnet(glmnet)
 #pcr(pls), plsr(pls)
+#i wiele innych: http://topepo.github.io/caret/modelList.html
 #http://machinelearningmastery.com/how-to-get-started-with-machine-learning-algorithms-in-r/
 #R webinars
 #https://cran.r-project.org/web/packages/RSelenium/vignettes/OCRUG-webinar.html
 #https://vimeo.com/89562453
 
-#Klasyfikator ogólny dla 170 metod - CARET
+
+#UWAGA!!!! Można zauważyć, że wyniki etykietowania zbioru z nieznaną wartością fit z pvclust
+# dla różnych etykiety_osobne_pakiety* czasami są takie same, czasami różne
+# zbieram je do jednej ramki danych
+fit1=c();for(i in 1:nrow(pred_etykiety1))fit1=c(fit1,which(pred_etykiety1[i,]==1))
+etykiety_osobne_pakiety<-t(data.frame(rpart=as.numeric(fit1)))
+etykiety_osobne_pakiety<-rbind(etykiety_osobne_pakiety,ctree=as.numeric(pred_etykiety2))
+etykiety_osobne_pakiety<-rbind(etykiety_osobne_pakiety,rrf=as.numeric(pred_etykiety3))
+etykiety_osobne_pakiety<-rbind(etykiety_osobne_pakiety,mda=as.numeric(pred_etykiety4))
+etykiety_osobne_pakiety<-rbind(etykiety_osobne_pakiety,rda=as.numeric(pred_etykiety5$class))
+etykiety_osobne_pakiety<-rbind(etykiety_osobne_pakiety,gbm=round(pred_etykiety6))
+etykiety_osobne_pakiety
+
+##############################################################
+#Klasyfikator ogólny wrapper dla 170 metod - CARET
+#lista około 170 klasyfikatorów i regresji
+#http://topepo.github.io/caret/modelList.html
+#przyładowy model
 #http://topepo.github.io/caret/training.html
 #https://www.youtube.com/watch?v=7Jbb2ItbTC4 #caretwebinar
 #http://www.r-bloggers.com/caret-webinar-materials/
 library(caret)
+
+#Drzewa decyzyjne rpart opakowane pakietem caret
+#z listy około 170 klasyfikatorów i regresji
+#http://topepo.github.io/caret/modelList.html
+#http://www.statmethods.net/advstats/cart.html
+#http://machinelearningmastery.com/non-linear-regression-in-r-with-decision-trees/
+library(rpart)
+#klasyfikator_rpart <- rpart(grupa ~ ., method="class", data=dane_trenujace, minsplit=2)
+#zastępujemy rpart funkcją train z pakietu caret, możemy tylko zmieniać parametr cp
+#reszta jest "zgadywana" przez caret - pełna wygoda
+klasyfikator <- train(grupa ~ ., data=dane_trenujace,method = "rpart")
+print(klasyfikator)                      # zobacz rezultaty
+#summary(klasyfikator)   
+etykiety <- predict(klasyfikator, dane_testujace)#przewiduj etykietę zbioru z fit=NA
+etykiety_caret<-t(data.frame(rpart=as.numeric(etykiety)))
+
+
+#Drzewa Decyzyjne ctree opakowane pakietem caret
+#z listy około 170 klasyfikatorów i regresji
+#http://topepo.github.io/caret/modelList.html
+library(party)
+#ctree <- ctree(grupa ~ ., data=dane_trenujace, controls = 
+#                 ctree_control(mincriterion = 0,minbucket = 0,minsplit = 0,maxdepth = 100,savesplitstats = TRUE))
+#zastępujemy ctree funkcją train z pakietu caret, możemy tylko zmieniać parametr mincriterion
+#reszta jest "zgadywana" przez caret - pełna wygoda
+klasyfikator <- train(grupa ~ ., data=dane_trenujace,method = "ctree")
+plot(ctree)
+etykiety <- predict(klasyfikator, dane_testujace)     #przewiduj etykietę zbioru z fit=NA
+etykiety_caret<-rbind(etykiety_caret,t(data.frame(ctree=as.numeric(etykiety))))
+
+
+#Drzewa Decyzyjne randomForest RRF (wiele drzew i głosowanie -
+#zmienna liczba atrybutów dla każdej próby tworzenia drzewa) opakowane pakietem caret
+#z listy około 170 klasyfikatorów i regresji
+#http://topepo.github.io/caret/modelList.html
+#klasyfikator_rrf <- RRF(grupa ~ ., data=dane_trenujace)
+#zastępujemy RRF funkcją train z pakietu caret, możemy tylko zmieniać parametry mtry, coefReg, coefImp
+#reszta jest "zgadywana" przez caret - pełna wygoda
+klasyfikator <- train(grupa ~ ., data=dane_trenujace,method = "RRF")
+print(klasyfikator)                          # zobacz rezultaty
+#summary(klasyfikator)
+etykiety <- predict(klasyfikator, dane_testujace)  #przewiduj etykietę zbioru z fit=NA
+etykiety_caret<-rbind(etykiety_caret,t(data.frame(rrf=as.numeric(etykiety))))
+
+
+
+#Mixture Discriminant Analysis opakowane pakietem caret
+#z listy około 170 klasyfikatorów i regresji
+#http://topepo.github.io/caret/modelList.html
+library(mda)
+#klasyfikator_mda <- mda(grupa ~ ., data=dane_trenujace)
+#zastępujemy mda funkcją train z pakietu caret, możemy tylko zmieniać parametr subclasses
+#reszta jest "zgadywana" przez caret - pełna wygoda
+klasyfikator <- train(grupa ~ ., data=dane_trenujace,method = "mda")
+print(klasyfikator)                          #zobacz rezultaty
+summary(klasyfikator)
+etykiety <- predict(klasyfikator, dane_testujace)#przewiduj etykietę zbioru z fit=NA
+etykiety_caret<-rbind(etykiety_caret,t(data.frame(mda=as.numeric(etykiety))))
+
+
+#Regularized Discriminant Analysis opakowane pakietem caret
+#z listy około 170 klasyfikatorów i regresji
+#http://topepo.github.io/caret/modelList.html
+library(klaR)
+#klasyfikator_rda <- rda(grupa ~ ., data=dane_trenujace)
+#zastępujemy rda funkcją train z pakietu caret, możemy tylko zmieniać parametry gamma, lambda
+#reszta jest "zgadywana" przez caret - pełna wygoda
+klasyfikator <- train(grupa ~ ., data=dane_trenujace,method = "rda")
+print(klasyfikator)                          #zobacz rezultaty
+summary(klasyfikator)
+etykiety <- predict(klasyfikator, dane_testujace)   #przewiduj etykietę zbioru z fit=NA
+etykiety_caret<-rbind(etykiety_caret,t(data.frame(rda=as.numeric(etykiety))))
+
+
+#Gradient Boosted Machine opakowane pakietem caret
+#z listy około 170 klasyfikatorów i regresji
+#http://topepo.github.io/caret/modelList.html
+#http://www.listendata.com/2015/07/gbm-boosted-models-tuning-parameters.html
 ctrl <- trainControl(method = "repeatedcv", repeats = 2, 
                      classProbs = FALSE)
 gbmGrid <-  expand.grid(interaction.depth = 9, 
-                         n.trees = 100, shrinkage = 0.1, n.minobsinnode = 2)
-traingbm <- train(fit~., data=mydatatr,
-                 method = "gbm",
-                 verbose = FALSE,
-                 trControl = ctrl,
-                 tuneGrid = gbmGrid)
-print(traingbm)                          #zobacz rezultaty
-summary(traingbm)
-predrest8 <- predict(traingbm, mydatana,n.trees = 10) #przewiduj etykietę zbioru z fit=NA
-predrest8
-trellis.par.set(caretTheme())
+                        n.trees = 100, shrinkage = 0.1, n.minobsinnode = 2)
+klasyfikator <- train(grupa ~ ., data=dane_trenujace,
+                  method = "gbm",
+                  verbose = FALSE,
+                  trControl = ctrl,
+                  tuneGrid = gbmGrid)
+print(klasyfikator)                          #zobacz rezultaty
+summary(klasyfikator)
+etykiety <- predict(klasyfikator, dane_testujace,n.trees = 10) #przewiduj etykietę zbioru z fit=NA
+etykiety_caret<-rbind(etykiety_caret,t(data.frame(gbm=as.numeric(etykiety))))
+#trellis.par.set(caretTheme())
 #plot(traingbm)
 #ggplot(traingbm)
-Sys.sleep(2)                             #pauza na 2 sekundy
+
+#różnice wynikają z tego że algorytmy korzystają z pseudolosowych generatorów random i
+#generują za każdym razem szczególnie dla małego zbioru różne wyniki
+#wyniki z osobnych klasyfikatorów
+etykiety_osobne_pakiety
+#wyniki z tych samych klasyfikatorów, ale opakowanych w pakiecie caret i 
+#czasami już tam automatycznie tuningowanych (też stąd inne wyniki)
+etykiety_caret
+#poprzednie_wyniki z grupowania (TAKIE POWINNY BYĆ WYNIKI Z KLASYFIKATORÓW)
+etykiety_do_testu
 
 
 
-#UWAGA!!!! Można zauważyć, że wyniki etykietowania zbioru z nieznaną wartością fit z pvclust
-# dla różnych predrest? czasami są takie same, czasami różne
-# zbieram je do jednej ramki danych
-fit1=c();for(i in 1:nrow(predrest1))fit1=c(fit1,which(predrest1[i,]==1))
-predrest<-data.frame(as.numeric(fit1))
-predrest<-rbind(t(predrest),as.numeric(predrest2))
-predrest<-rbind(predrest,as.numeric(predrest3))
-predrest<-rbind(predrest,as.numeric(predrest4))
-predrest<-rbind(predrest,as.numeric(predrest5))
-predrest<-rbind(predrest,as.numeric(predrest6$class))
-predrest<-rbind(predrest,round(predrest7))
-predrest<-rbind(predrest,as.numeric(predrest8))
-predrest
+
