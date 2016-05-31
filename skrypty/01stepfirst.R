@@ -25,7 +25,8 @@ pkgcheck <- pkglist %in% row.names(installed.packages())
 pkglist[!pkgcheck]
 #ZAKOMENTUJ jeśli chcesz zainstalować biblioteki pod linuxem najlepiej w konsoli tekstowej R na koncie root
 for(i in pkglist[!pkgcheck]){install.packages(i,depend=TRUE)}
-
+#wczytanie wszystkich bibliotek - to konieczne, aby uniknąć błędów
+for(i in pkglist) library(i, character.only = TRUE);
 #########################################################################################################################
 # Podstawowe informacje
 # funkcja pomocy w R 
@@ -876,13 +877,13 @@ pvgroup <- pvpick(grupowanie_pvclust, alpha=0.95)
 #dodawanie etykiety
 nc <- 3                                      # stosuje dane z hclust do generowania grup
 grupy <- cutree(grupowanie_hclust, k=nc)     # potnij drzewo na nc grup
-dane$grupa <- grupy
+dane$grupa <- as.numeric(grupy)
 dane$grupa <- factor(dane$grupa)             
 # twórz drzewo na zbiorze trenującym dane_trenujace z etykietami grupa
 # potem je użyj na zbiorze dane_testujace do określenia brakujących etykiet grupa
 # wybór zbiorów trenujących i testujących
 library(dplyr)
-dane_trenujace <- sample_n(dane,170)         # uczę na przykładzie wybranych wierszy
+dane_trenujace <- sample_n(dane,180)         # uczę na przykładzie wybranych wierszy
 dane_testujace <- dane[-as.numeric(rownames(dane_trenujace)),]
 etykiety_z_grupowania <-dane_testujace$grupa #zapamiętuję grupę elementów testowych
 dane_testujace$grupa <- NULL                 # i usuwam ją do testu
