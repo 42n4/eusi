@@ -100,6 +100,7 @@
 #####książka po angielsku o uczeniu się maszyn w R - Brett Lantz
 - https://www.packtpub.com/big-data-and-business-intelligence/machine-learning-r
 - https://github.com/dataspelunking/MLwR
+- https://www.packtpub.com/sites/default/files/downloads/Machine_Learning_With_R_Second_Edition_ColoredImages.pdf
 
 #####Dokumentacja R
 - https://www.r-project.org/other-docs.html
