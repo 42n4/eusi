@@ -19,11 +19,11 @@ pkglist<-c("reshape","ade4","sqldf","plyr","dplyr")
 pkglist<-c(pkglist,"party","rgl","scatterplot3d","fpc","pvclust","dendextend")
 pkglist<-c(pkglist,"nFactors","FactoMineR","RRF","mclust","foreach","doParallel")
 pkglist<-c(pkglist,"rpart","ipred","gbm","mda","klaR","kernlab","caret")
-pkglist<-c(pkglist,"tseries","fUnitRoots","forecast")
+pkglist<-c(pkglist,"tseries","fUnitRoots","forecast","sets")
 #pkglist<-c(pkglist,"MASS","RWeka")
 pkgcheck <- pkglist %in% row.names(installed.packages())
 pkglist[!pkgcheck]
-#ZAKOMENTUJ jeśli chcesz zainstalować biblioteki pod linuxem najlepiej w konsoli tekstowej R na koncie root
+#ZAKOMENTUJ jeśli chcesz zainstalować biblioteki pod linuxem w konsoli tekstowej R na koncie root
 for(i in pkglist[!pkgcheck]){install.packages(i,depend=TRUE)}
 #wczytanie wszystkich bibliotek - to konieczne, aby uniknąć błędów
 for(i in pkglist) library(i, character.only = TRUE);
@@ -671,7 +671,11 @@ res
 
 
 #########################################################################################################################
-#UCZENIE SIĘ MASZYN
+#UCZENIE SIĘ MASZYN - ODZYSKIWANIE WIEDZY
+#########################################################################################################################
+#https://en.wikibooks.org/wiki/Data_Mining_Algorithms_In_R
+#########################################################################################################################
+
 set.seed(12459);                             # początkowa wartość random seed dla takich samych wyników za każdym razem
 dev.off()                                    # na wszelki wypadek wyłączamy drugi rysunek
 
@@ -869,9 +873,8 @@ pvgroup <- pvpick(grupowanie_pvclust, alpha=0.95)
 #dane$grupa
 
 
-
-#DRZEWA DECYZYJNE 
 ###################################################################################################
+#DRZEWA DECYZYJNE 
 #dodajemy etykietę grupy z grupowania hclust oraz uczymy klasyfikatory na części danych
 #a testujemy na pozostałej pozbawionej etykiet 
 #dodawanie etykiety
@@ -991,9 +994,11 @@ etykiety_osobne_pakiety<-rbind(etykiety_osobne_pakiety,gbm=round(pred_etykiety6)
 etykiety_osobne_pakiety
 
 #########################################################################################################################
-#Klasyfikator ogólny wrapper dla 170 metod - CARET
+#CARET - Klasyfikator ogólny wrapper dla około 170 metod
+#https://cran.r-project.org/web/packages/caret/vignettes/caret.pdf
 #lista około 170 klasyfikatorów i regresji
 #http://topepo.github.io/caret/modelList.html
+#http://topepo.github.io/caret/bytag.html
 #przyładowy model
 #http://topepo.github.io/caret/training.html
 #https://www.youtube.com/watch?v=7Jbb2ItbTC4 #caretwebinar
@@ -1112,6 +1117,7 @@ Sys.sleep(5)                                 #pauza na 5 sekund
 #########################################################################################################################
 #TIME SERIES - przewiduje trendy w szeregach czasowych
 #http://www.analyticsvidhya.com/blog/2015/12/complete-tutorial-time-series-modeling/
+#http://a-little-book-of-r-for-time-series.readthedocs.io/en/latest/src/timeseries.html
 ndata <- "AirPassengers"                     #dane liczby pasażerów w miesiącu w okresie kilku lat
 data(list=ndata)
 dane<-get(ndata)
@@ -1155,6 +1161,4 @@ predict(b,10)
 #http://www.r-bloggers.com/additive-modelling-global-temperature-time-series-revisited/
 #http://www.r-bloggers.com/additive-modelling-and-the-hadcrut3v-global-mean-temperature-series-2/
 #########################################################################################################################
-
-
 
