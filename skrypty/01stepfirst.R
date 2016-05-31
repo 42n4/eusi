@@ -19,6 +19,7 @@ pkglist<-c("reshape","ade4","sqldf","plyr","dplyr")
 pkglist<-c(pkglist,"party","rgl","scatterplot3d","fpc","pvclust","dendextend")
 pkglist<-c(pkglist,"nFactors","FactoMineR","RRF","mclust","foreach","doParallel")
 pkglist<-c(pkglist,"rpart","ipred","gbm","mda","klaR","kernlab","caret")
+pkglist<-c(pkglist,"tseries","fUnitRoots","forecast")
 #pkglist<-c(pkglist,"MASS","RWeka")
 pkgcheck <- pkglist %in% row.names(installed.packages())
 pkglist[!pkgcheck]
@@ -682,6 +683,7 @@ dev.off()                                    # na wszelki wypadek wyłączamy dr
 #potem odpytujemy pomoc poleceniem
 #?nazwa_danych
 #wybieramy:
+library(RRF)
 ndata <- "imports85"
 data(list=ndata)
 dane<-get(ndata)
@@ -1103,8 +1105,55 @@ etykiety_caret
 t(data.frame(spr=as.numeric(etykiety_z_grupowania)))
 #ZAWODY KLASYFIKATORÓW WYGRYWA przeważnie GBM!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #########################################################################################################################
+Sys.sleep(5)                                 #pauza na 5 sekund
 
 
+#########################################################################################################################
+#TIME SERIES - przewiduje trendy w szeregach czasowych
+#http://www.analyticsvidhya.com/blog/2015/12/complete-tutorial-time-series-modeling/
+ndata <- "AirPassengers"                     #dane liczby pasażerów w miesiącu w okresie kilku lat
+data(list=ndata)
+dane<-get(ndata)
+dane                                         # badane dane
+start(dane)                                  # początkowa data
+end(dane)                                    # końcowa data
+frequency(dane)                              # liczba powtórzeń w okresie czasu (wierszu)
+time(dane)                                   # wspólny wektor wszystkich powtórzeń
+cycle(dane)                                  # cykl - numeracja powtórzeń w obrębie czasu
+summary(dane)                                # średnie w podsumowaniu
+plot(as.vector(time(dane)), as.vector(dane), type = "l")#wykres danych
+plot(dane)                          
+abline(reg=lm(dane~time(dane)))              # krzywa regresji
+plot(aggregate(dane,FUN=mean))               # średnie na rok
+boxplot(dane~cycle(dane))                    # sezonowy efekt
+library(tseries)
+adf.test(diff(log(dane)), alternative="stationary", k=0)#Augmented Dickey-Fuller Test
+library(fUnitRoots);
+adfTest(dane);
+adfTest(log(dane));
+adfTest(diff(dane));
+acf(log(dane))                               # Total Correlation Chart (Auto – correlation Function / ACF)
+acf(diff(log(dane)))                         # acf z różnicy
+pacf(diff(log(dane)))                        # partial correlation function (PACF) z różnicy 
+fit <- arima(log(dane), c(0, 1, 1),seasonal = list(order = c(0, 1, 1), period = 12))
+predyktor <- predict(fit, n.ahead = 10*12)   # na 10 lat wprzód przewidzieć trend
+ts.plot(dane,2.718^predyktor$pred, log = "y", lty = c(1,3))#krzywa predykcji 
+Sys.sleep(2)                                 #pauza na 2 sekund
+
+library(forecast)
+a=ets(dane)                                  # w pełni automatyczny model predykcji
+plot(forecast(a))                            # wykres z marginesami niepewności w predykcji
+Sys.sleep(2)                                 #pauza na 2 sekund
+predict(a,10)                                
+b=auto.arima(dane)                           # ARIMA model 
+plot(forecast(b,h=48))                       # wykres na 48 miesięcy w przód, widać zwiększający się margines błędu
+Sys.sleep(2)                                 #pauza na 2 sekund
+predict(b,10)
+
+#ciekawostki z time series
+#http://www.r-bloggers.com/additive-modelling-global-temperature-time-series-revisited/
+#http://www.r-bloggers.com/additive-modelling-and-the-hadcrut3v-global-mean-temperature-series-2/
+#########################################################################################################################
 
 
 
