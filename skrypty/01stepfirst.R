@@ -19,7 +19,7 @@ pkglist<-c("reshape","ade4","sqldf","plyr","dplyr")
 pkglist<-c(pkglist,"party","rgl","scatterplot3d","fpc","pvclust","dendextend")
 pkglist<-c(pkglist,"nFactors","FactoMineR","RRF","mclust","foreach","doParallel")
 pkglist<-c(pkglist,"rpart","ipred","gbm","mda","klaR","kernlab","caret")
-pkglist<-c(pkglist,"tseries","fUnitRoots","forecast","sets")
+pkglist<-c(pkglist,"tseries","fUnitRoots","forecast","sets","TTR")
 #pkglist<-c(pkglist,"MASS","RWeka")
 pkgcheck <- pkglist %in% row.names(installed.packages())
 pkglist[!pkgcheck]
@@ -1109,13 +1109,14 @@ etykiety_osobne_pakiety
 etykiety_caret
 #poprzednie_wyniki z grupowania (TAKIE POWINNY BYĆ WYNIKI Z KLASYFIKATORÓW)
 t(data.frame(spr=as.numeric(etykiety_z_grupowania)))
-#ZAWODY KLASYFIKATORÓW WYGRYWA przeważnie GBM!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#ZAWODY KLASYFIKATORÓW WYGRYWA dla dużych zbiorów testujących przeważnie GBM!
 #########################################################################################################################
 Sys.sleep(5)                                 #pauza na 5 sekund
 
 
 #########################################################################################################################
 #TIME SERIES - przewiduje trendy w szeregach czasowych
+#forecast to prognoza, predykcja to także dopasowanie modelu do bieżących danych
 #http://www.analyticsvidhya.com/blog/2015/12/complete-tutorial-time-series-modeling/
 #http://a-little-book-of-r-for-time-series.readthedocs.io/en/latest/src/timeseries.html
 ndata <- "AirPassengers"                     #dane liczby pasażerów w miesiącu w okresie kilku lat
@@ -1130,32 +1131,100 @@ cycle(dane)                                  # cykl - numeracja powtórzeń w ob
 summary(dane)                                # średnie w podsumowaniu
 plot(as.vector(time(dane)), as.vector(dane), type = "l")#wykres danych
 plot(dane)                          
+plot(log(dane))
 abline(reg=lm(dane~time(dane)))              # krzywa regresji
 plot(aggregate(dane,FUN=mean))               # średnie na rok
 boxplot(dane~cycle(dane))                    # sezonowy efekt
+dane_decomp<-decompose(dane)                 # dekompozycja na regularne i nieregularne trendy
+str(dane_decomp)
+plot(dane_decomp)                            # widać trend, regularności i nieregularności
+plot(dane - dane_decomp[['seasonal']])       # dane bez sezonowego efektu (regularności)
+
 library(tseries)
-adf.test(diff(log(dane)), alternative="stationary", k=0)#Augmented Dickey-Fuller Test
+adf.test(dane, "stationary", k=0)            #Augmented Dickey-Fuller Test na stacjonarność
+adf.test(log(dane), "stationary", k=0)       #nie sprawdza się
+adf.test(diff(dane), "stationary", k=0)      #trzeba wykonać testy z pakietu fUnitRoots
+adf.test(diff(log(dane)), "stationary", k=0) #TE NIE DZIAŁAJĄ!
 library(fUnitRoots);
-adfTest(dane);
-adfTest(log(dane));
-adfTest(diff(dane));
-acf(log(dane))                               # Total Correlation Chart (Auto – correlation Function / ACF)
-acf(diff(log(dane)))                         # acf z różnicy
-pacf(diff(log(dane)))                        # partial correlation function (PACF) z różnicy 
-fit <- arima(log(dane), c(0, 1, 1),seasonal = list(order = c(0, 1, 1), period = 12))
-predyktor <- predict(fit, n.ahead = 10*12)   # na 10 lat wprzód przewidzieć trend
+adfTest(dane);                               # ADF Test dla p<0.01 wskazuje na odpowiednie dane 
+adfTest(log(dane));                          # do modelu arima
+adfTest(diff(dane));                         # dla różnicy 
+adfTest(diff(log(dane)));                    # różnica z logarytmu danych - najlepszy wynik    
+acf(dane)                                    # Total Correlation Chart (Auto – correlation Function / ACF) 
+                                             # dla kolejnych korelacji  x(t) z  x(t-1) , x(t-2)
+pacf(dane)                                   # partial correlation function (PACF) poniżej linii AR
+acf(log(dane))                               # acf z log
+pacf(log(dane))                              # pacf z log
+acf(diff(dane))                              # acf z różnicy
+pacf(diff(dane))                             # pacf z różnicy
+acf(diff(log(dane)))                         # acf z różnicy z logarytmu
+pacf(diff(log(dane)))                        # pacf z różnicy z logarytmu
+acf(diff(dane,diff=2))                       # acf z różnicy podwójnej
+pacf(diff(dane,diff=2))                      # pacf z różnicy podwójnej
+acf(diff(log(dane),diff=2))                  # acf z różnicy podwójnej z logarytmu
+pacf(diff(log(dane),diff=2))                 # pacf z różnicy podwójnej z logarytmu
+
+#dla Auto-Regressive (AR) PACF się zmniejsza po różnicy czasów na osi x - dla wpływów x(t) na x(t+N) N>>0
+#dla Moving Average (MA) ACF się zmniejsza - to dla nieregularnych losowych - dla wpływów x(t) na x(t+N) N~1
+#c(p,d,q) p związane z AR oraz q związane z MA, d to stopień diff zastosowany
+#w modelu minimalizujemy aic 
+model_arima <- arima(log(dane), c(0, 1, 1), seasonal = list(order = c(0, 1, 1), period = 12)) # 2 podwójna różnica
+predyktor <- 
+  predict(model_arima, n.ahead = 10*12)      # na 10 lat wprzód przewidzieć trend
 ts.plot(dane,2.718^predyktor$pred, log = "y", lty = c(1,3))#krzywa predykcji 
-Sys.sleep(2)                                 #pauza na 2 sekund
+prognoza<-forecast.Arima(model_arima, h=48)  # prognoza z arimy na 48 okresów
+plot(prognoza)                               # rysunek
+acf(prognoza$residuals, lag.max=20)          # sprawdzanie prognozy, czy można ją poprawić (zbyt duże korelacje błedów)
+Box.test(prognoza$residuals, lag=20, type="Ljung-Box")# dla p<<0 są autokorelacje zły predyktor dla MA i diff lepszy
+Sys.sleep(2)                                 # pauza na 2 sekund
+
+
+#predyktor <- HoltWinters(dane, beta=FALSE, gamma=FALSE)# gamma = FALSE nie okresowy model
+#predyktor <- HoltWinters(dane, beta=FALSE)  # beta=FALSE wygładanie exponens
+#predyktor <- HoltWinters(dane)               # 
+predyktor <- HoltWinters(dane, seasonal = "mult")# okresowy "multiplicative", domyślny additive
+plot(predyktor)                              # linia czerwona to predykcja 
+predyktor$SSE                                # jakość predykcji
+prognoza<-forecast.HoltWinters(predyktor,h=8)# predykcja prognoza na 8 okresów
+plot(prognoza)
+acf(prognoza$residuals, lag.max=20)          # sprawdzanie prognozy, czy można ją poprawić (zbyt duże korelacje błedów)
+Box.test(prognoza$residuals, lag=20, type="Ljung-Box")# dla p<<0 są autokorelacje zły predyktor
+plot.ts(prognoza$residuals)                  # wykres błedów badamy jego wariancję
+plotForecastErrors<-function(forecasterrors) # funkcja wpasowująca rozkład błedów w rozkład normalny
+{
+  # histogram błedów prognozy
+  mybinsize <- IQR(forecasterrors)/4
+  mysd   <- sd(forecasterrors)
+  mymin  <- min(forecasterrors) - mysd*5
+  mymax  <- max(forecasterrors) + mysd*3
+  # normalny rozkład z średnią 0 i odchylemiem standardowym mysd
+  mynorm <- rnorm(10000, mean=0, sd=mysd)
+  mymin2 <- min(mynorm)
+  mymax2 <- max(mynorm)
+  if (mymin2 < mymin) { mymin <- mymin2 }
+  if (mymax2 > mymax) { mymax <- mymax2 }
+  # czerwony hostogram błedów z linią rozkładu normalnego
+  mybins <- seq(mymin, mymax, mybinsize)
+  hist(forecasterrors, col="red", freq=FALSE, breaks=mybins)
+  # dla freq=FALSE pole pod histogramem = 1
+  # normalny rozkład z średnią 0 i odchylemiem standardowym mysd
+  myhist <- hist(mynorm, plot=FALSE, breaks=mybins)
+  # niebieska linia rozkładu normalnego
+  points(myhist$mids, myhist$density, type="l", col="blue", lwd=2)
+}
+plotForecastErrors(prognoza$residuals)       # czy jest zbliżony do normalnego rozkład błedów
 
 library(forecast)
-a=ets(dane)                                  # w pełni automatyczny model predykcji
-plot(forecast(a))                            # wykres z marginesami niepewności w predykcji
-Sys.sleep(2)                                 #pauza na 2 sekund
-predict(a,10)                                
-b=auto.arima(dane)                           # ARIMA model 
-plot(forecast(b,h=48))                       # wykres na 48 miesięcy w przód, widać zwiększający się margines błędu
-Sys.sleep(2)                                 #pauza na 2 sekund
+predykcja=ets(dane)                          # w pełni automatyczny model predykcji
+plot(forecast(predykcja))                    # wykres z marginesami niepewności w predykcji
+Sys.sleep(2)                                 # pauza na 2 sekund
+predict(a,10)                                # na 10 miesięcy w przód
+model_autoarima<-auto.arima(dane)            # ARIMA model 
+predyktor<-forecast(model_autoarima,h=48)
+plot(predyktor)                              # wykres na 48 miesięcy w przód, widać zwiększający się margines błędu
+Sys.sleep(2)                                 # pauza na 2 sekund
 predict(b,10)
+
 
 #ciekawostki z time series
 #http://www.r-bloggers.com/additive-modelling-global-temperature-time-series-revisited/
