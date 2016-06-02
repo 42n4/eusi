@@ -1119,6 +1119,7 @@ Sys.sleep(5)                                 #pauza na 5 sekund
 #forecast to prognoza, predykcja to także dopasowanie modelu do bieżących danych
 #http://www.analyticsvidhya.com/blog/2015/12/complete-tutorial-time-series-modeling/
 #http://a-little-book-of-r-for-time-series.readthedocs.io/en/latest/src/timeseries.html
+#https://www.otexts.org/fpp/8/9
 ndata <- "AirPassengers"                     #dane liczby pasażerów w miesiącu w okresie kilku lat
 data(list=ndata)
 dane<-get(ndata)
@@ -1145,6 +1146,7 @@ adf.test(dane, "stationary", k=0)            #Augmented Dickey-Fuller Test na st
 adf.test(log(dane), "stationary", k=0)       #nie sprawdza się
 adf.test(diff(dane), "stationary", k=0)      #trzeba wykonać testy z pakietu fUnitRoots
 adf.test(diff(log(dane)), "stationary", k=0) #TE NIE DZIAŁAJĄ!
+
 library(fUnitRoots);
 adfTest(dane);                               # ADF Test dla p<0.01 wskazuje na odpowiednie dane 
 adfTest(log(dane));                          # do modelu arima
@@ -1164,31 +1166,52 @@ pacf(diff(dane,diff=2))                      # pacf z różnicy podwójnej
 acf(diff(log(dane),diff=2))                  # acf z różnicy podwójnej z logarytmu
 pacf(diff(log(dane),diff=2))                 # pacf z różnicy podwójnej z logarytmu
 
+library(forecast)
+tsdisplay(dane)                              # tsdisplay pokazuje acf i pacf jednocześnie 
+tsdisplay(log(dane));                        # wystające piki poza niebieskie linie 
+tsdisplay(diff(dane,12));                    # wskazują w PACF elementy AR komponenty 
+tsdisplay(diff(log(dane,12)));               # w ACF MA komponenty MA(1) ostatni wystający pik 
+                                             # na 1 miejscu licząc od początku
+
 #dla Auto-Regressive (AR) PACF się zmniejsza po różnicy czasów na osi x - dla wpływów x(t) na x(t+N) N>>0
 #dla Moving Average (MA) ACF się zmniejsza - to dla nieregularnych losowych - dla wpływów x(t) na x(t+N) N~1
 #c(p,d,q) p związane z AR oraz q związane z MA, d to stopień diff zastosowany
+#piki na okresowej krotności pozycji są do opcji seasonal
+#najlepiej tsdisplay(forecast(auto.arima(dane),20)$residuals) z pakietu forecast sprawdzić i dodać AR i MV 
+library(forecast)
+model_autoarima<-auto.arima(dane)            # ARIMA model 
+model_autoarima                              # parametry z ACF i PACF uzyskane automatycznie
+prognoza<-forecast(model_autoarima,h=20)
+plot(prognoza)                               # wykres na 20 miesięcy w przód, widać zwiększający się margines błędu
+Sys.sleep(2)                                 # pauza na 2 sekund
+tsdisplay(prognoza$residuals)                # pokaż analizę błędów widzimy w ACF pik na 23 pozycji dodajemy MA(11)
+# to zmienia model z ARIMA(0,1,1)(0,1,0)[12] na ARIMA(0,1,1)(0,1,11)[12]
+Box.test(prognoza$residuals, lag=12, type="Ljung-Box")
+predict(model_autoarima,20)                  # na 20 okresów w przód
 #w modelu minimalizujemy aic 
-model_arima <- arima(log(dane), c(0, 1, 1), seasonal = list(order = c(0, 1, 1), period = 12)) # 2 podwójna różnica
+model_arima <- arima(log(dane), c(0, 1, 1), seasonal = list(order = c(0, 1, 11), period = 12)) # 2 podwójna różnica
 predyktor <- 
   predict(model_arima, n.ahead = 10*12)      # na 10 lat wprzód przewidzieć trend
 ts.plot(dane,2.718^predyktor$pred, log = "y", lty = c(1,3))#krzywa predykcji 
-prognoza<-forecast.Arima(model_arima, h=48)  # prognoza z arimy na 48 okresów
+prognoza<-forecast.Arima(model_arima, h=24)  # prognoza z arimy na 24 okresów
 plot(prognoza)                               # rysunek
 acf(prognoza$residuals, lag.max=20)          # sprawdzanie prognozy, czy można ją poprawić (zbyt duże korelacje błedów)
-Box.test(prognoza$residuals, lag=20, type="Ljung-Box")# dla p<<0 są autokorelacje zły predyktor dla MA i diff lepszy
+tsdisplay(prognoza$residuals)
+# w Box.test lag = 2 * period lub prognozy horyzont
+Box.test(prognoza$residuals, lag=24, type="Ljung-Box")# dla p<<0 są autokorelacje zły predyktor dla MA i diff lepszy
 Sys.sleep(2)                                 # pauza na 2 sekund
 
 
-#predyktor <- HoltWinters(dane, beta=FALSE, gamma=FALSE)# gamma = FALSE nie okresowy model
-#predyktor <- HoltWinters(dane, beta=FALSE)  # beta=FALSE wygładanie exponens
-#predyktor <- HoltWinters(dane)               # 
-predyktor <- HoltWinters(dane, seasonal = "mult")# okresowy "multiplicative", domyślny additive
-plot(predyktor)                              # linia czerwona to predykcja 
-predyktor$SSE                                # jakość predykcji
-prognoza<-forecast.HoltWinters(predyktor,h=8)# predykcja prognoza na 8 okresów
+#model_predykcji <- HoltWinters(dane, beta=FALSE, gamma=FALSE)# gamma = FALSE nie okresowy model
+#model_predykcji <- HoltWinters(dane, beta=FALSE)  # beta=FALSE wygładanie exponens
+#model_predykcji <- HoltWinters(dane)        # 
+model_predykcji <- HoltWinters(dane, seasonal = "mult")# okresowy "multiplicative", domyślny additive
+plot(model_predykcji)                        # linia czerwona to predykcja 
+model_predykcji$SSE                          # jakość predykcji
+prognoza<-forecast.HoltWinters(model_predykcji,h=8)# predykcja prognoza na 8 okresów
 plot(prognoza)
 acf(prognoza$residuals, lag.max=20)          # sprawdzanie prognozy, czy można ją poprawić (zbyt duże korelacje błedów)
-Box.test(prognoza$residuals, lag=20, type="Ljung-Box")# dla p<<0 są autokorelacje zły predyktor
+Box.test(prognoza$residuals, lag=24, type="Ljung-Box")# dla p<<0 są autokorelacje zły predyktor
 plot.ts(prognoza$residuals)                  # wykres błedów badamy jego wariancję
 plotForecastErrors<-function(forecasterrors) # funkcja wpasowująca rozkład błedów w rozkład normalny
 {
@@ -1215,16 +1238,18 @@ plotForecastErrors<-function(forecasterrors) # funkcja wpasowująca rozkład bł
 plotForecastErrors(prognoza$residuals)       # czy jest zbliżony do normalnego rozkład błedów
 
 library(forecast)
-predykcja=ets(dane)                          # w pełni automatyczny model predykcji
-plot(forecast(predykcja))                    # wykres z marginesami niepewności w predykcji
+model_predykcji=ets(dane)                    # w pełni automatyczny model predykcji
+plot(forecast(model_predykcji))              # wykres z marginesami niepewności w predykcji
 Sys.sleep(2)                                 # pauza na 2 sekund
-predict(a,10)                                # na 10 miesięcy w przód
-model_autoarima<-auto.arima(dane)            # ARIMA model 
-predyktor<-forecast(model_autoarima,h=48)
-plot(predyktor)                              # wykres na 48 miesięcy w przód, widać zwiększający się margines błędu
-Sys.sleep(2)                                 # pauza na 2 sekund
-predict(b,10)
+predict(model_predykcji,10)                        # na 10 okresów w przód
 
+#Sieci neuronowe w predykcji i prognozie
+model_predykcji <- nnetar(dane)              # specjalne sieci neuronowe do prognozowania trendów
+prognoza <- forecast(model_predykcji)        # prognoza  
+plot(prognoza)                               # rysunek na niebiesko prognoza
+Sys.sleep(2)                                 # pauza na 2 sekund
+tsdisplay(prognoza$residuals)                # pokaż analizę błędów 
+Box.test(prognoza$residuals, lag=12, type="Ljung-Box")
 
 #ciekawostki z time series
 #http://www.r-bloggers.com/additive-modelling-global-temperature-time-series-revisited/
