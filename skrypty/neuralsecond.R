@@ -18,12 +18,12 @@ pkgcheck <- pkglist %in% row.names(installed.packages())
 
 library(clusterGeneration)
 library(corrplot)
-#import the function from Github
+#importuj funkcję wizualizacji sieci neuronowej z Githuba
 library(devtools)
 source_url(
   'https://gist.github.com/fawda123/7471137/raw/cd6e6a0b0bdb4e065c597e52165e5ac887f5fe95/nnet_plot_update.r'
 )
-#nnet function from nnet package
+#biblioteka nnet
 library(nnet)
 
 #ustawienie początkowego stanu generatora losowego, aby wyniki za każdym razem były te same
