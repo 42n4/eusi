@@ -129,8 +129,8 @@ Propagacja wsteczna – podstawowy algorytm uczenia nadzorowanego wielowarstwowy
     \node[annot,left of=hl] {Wejściowa warstwa};
     \node[annot,right of=hl] {Wyjściowa warstwa};
 \end{tikzpicture}
-\begin{figure}[]
-  \centering
+
+
 <<fig=false,width=4,height=4,echo=false>>=
 pkglist<-c("clusterGeneration","corrplot","nnet","neuralnet","RSNNS","reshape","rockchalk","fifer","ade4","sqldf","plyr","dplyr")
 pkgcheck <- pkglist %in% row.names(installed.packages())
@@ -145,9 +145,6 @@ sigmoid <- function(x) {
 x <- (c(1:200)-100)/10
 plot(x,sigmoid(x))
 @
-  \caption[gh]{Funkcja sigmoidalna $f_m$}
-  \label{fig_sigmoid}
-\end{figure}
 
 \item[]
 \underline{Funkcja błędu aproksymacji:}
