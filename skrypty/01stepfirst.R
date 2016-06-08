@@ -1082,8 +1082,16 @@ etykiety_caret<-rbind(etykiety_caret,t(data.frame(rda=as.numeric(etykiety))))
 #z listy około 170 klasyfikatorów i regresji
 #http://topepo.github.io/caret/modelList.html
 #http://www.listendata.com/2015/07/gbm-boosted-models-tuning-parameters.html
-ctrl <- trainControl(method = "repeatedcv", repeats = 2, 
+#ZA POMOCĄ trainControl możemy dodać k-krotną walidację
+#https://pl.wikipedia.org/wiki/Sprawdzian_krzy%C5%BCowy#K-krotna_walidacja
+#3-krotna walidacja (z uśrednianiem) powtórzona dwa razy
+ctrl <- trainControl(method = "repeatedcv", number = 3, repeats = 2, 
                      classProbs = FALSE)
+
+#odrzucamy hipotezę zerową gdy jest ona prawdziwa - błąd I rodzaju (zdrowy jako chory)
+#przyjmujemy hipotezę zerową gdy jest ona fałszywa - błąd II rodzaju.
+#błąd trzeciego rodzaju to zbytnie dopasowanie do modelu (udzielenie właściwej odpowiedzi na niewłaściwe pytanie)
+
 gbmGrid <-  expand.grid(interaction.depth = 9, 
                         n.trees = 100, shrinkage = 0.1, n.minobsinnode = 2)
 klasyfikator <- train(grupa ~ ., data=dane_trenujace,
