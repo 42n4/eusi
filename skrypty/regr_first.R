@@ -106,7 +106,7 @@ y <- x + rnorm(1000) + 3
 res <- lm( y ~ x )                           # wygeneruj model regresji liniowej
 
 # rysunek danych i modelu
-plot(x,y, col=rgb(0.2,0.4,0.6,0.4), main='Linear regression')
+plot(x,y, col=rgb(0.2,0.4,0.6,0.4), main='Regresja liniowa')
 abline(res, col='blue')
 Sys.sleep(2)                                 #pauza na 2 sekundy
 
@@ -132,7 +132,7 @@ for (i in 1:num_iters) {                     # spadek gradientu dla sumy kwadrat
 }
 
 # rysunek danych i próby optymalizacji 
-plot(x,y, col=rgb(0.2,0.4,0.6,0.4), main='regresja liniowa przez spadek gradientu')
+plot(x,y, col=rgb(0.2,0.4,0.6,0.4), main='Regresja liniowa przez spadek gradientu')
 for (i in c(1,3,6,10,14,seq(20,num_iters,by=10))) {
   abline(coef=theta_history[[i]], col=rgb(0.8,0,0,0.3))
 }
