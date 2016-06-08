@@ -1,5 +1,5 @@
 #########################################################################################################################
-#R sieć neuronowa
+#R sieć neuronowa - najprostsza forma backpropagation na macierzach - nauka funkcji XOR
 #https://en.wikipedia.org/wiki/Backpropagation
 #https://aimatters.wordpress.com/2015/12/19/a-simple-neural-network-in-octave-part-1/
 #Zamieszczone przykłady dadzą się uruchomić jeśli zainstalujecie pakiety R 
@@ -162,7 +162,9 @@ cat('Błąd uczenia się funkcji XOR przez moją sieć neuronową', pierwkwadsum
 Sys.sleep(2)                                 # pauza na 2 sekund
 
 
+
 #########################################################################################################################
+#R sieć neuronowa z pakietu nnet - nauka funkcji XOR na oficjalnej sieci neuronowej z R
 library(clusterGeneration)
 library(corrplot)
 #importuj funkcję wizualizacji sieci neuronowej z Githuba
