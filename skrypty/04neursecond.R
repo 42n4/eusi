@@ -1,3 +1,6 @@
+#########################################################################################################################
+#R sieć neuronowa z pakietu nnet - nauka funkcji sinus w 20 punktach i aproksymacja reszty zakresu
+
 pkglist <- c(
   "clusterGeneration",
   "corrplot",
@@ -30,17 +33,15 @@ library(nnet)
 seed.val <- 86644
 set.seed(seed.val)
 
-#co który element z 200 pomiarów w dziedzinie od 0 do 20 przekazać do nauki sieci
-div <- 3
 #ilość punktów z x do nauki
-num.obs <- 200 / div
+num.obs <- 20
 #ilość neuronów w pierwszej i jedynej warstwie sieci
-max.neurons <- 100
+max.neurons <- 200
 
-#do nauki sieci
-x1 <- seq(1, num.obs, div) / 10 * div
+#do nauki sieci 20 punktów co jeden
+x1 <- seq(1, num.obs, 1)
 #gęstsze próbkowanie do sprawdzenia działania sieci, jej aproksymacji między punktami uczenia
-xx1 <- seq(1, num.obs) / 10 * div
+xx1 <- seq(1, num.obs, 0.3)
 
 #dane do nauki, na końcowym wykresie czerwone punkty
 y1 <- sin(x1)
@@ -81,8 +82,9 @@ kwadroznicy <- (yy1 - ypred) ^ 2
 #suma kwadratów różnic
 sumkwadrozn <- sum((yy1 - ypred) ^ 2)
 #pierwiastek z sumy - końcowy błąd sieci neuronowej
-pierwkwadsumkwadrozn <- sqrt(sumkwadrozn)
-pierwkwadsumkwadrozn
+error1 <- sqrt(sumkwadrozn)
+error1
+Sys.sleep(2)                                 # pauza na 2 sekund
 
 #pusta lista
 errorlist <- list()
@@ -108,7 +110,7 @@ for (i in 4:max.neurons) {
 }
 #przetworzenie listy do wektora
 errorvector <- rapply(errorlist, c)
-#wyrysowanie wektora na wykresie
+#wyrysowanie wektora na wykresie - nie widać tendencji malejących lub rosnących
 plot(errorvector)
 #minimalny błąd
 minerror <- min(errorvector)
@@ -117,6 +119,7 @@ minerror
 #i jego indeks czyli liczba neuronów zmniejszona o 3 gdyż pętla for zaczynała od liczby neuronów 4
 optimsize <- match(min(errorvector), errorvector)
 optimsize
+Sys.sleep(2)                                 # pauza na 2 sekund
 
 #ustawienie początkowego stanu generatora losowego, aby wyniki za każdym razem były te same
 set.seed(seed.val)
@@ -132,9 +135,9 @@ mod1 <-
   )
 #sprawdzenie działania sieci na gęstszej próbce xx1
 ypred <- predict(mod1, cbind(xx1)) #uwaga xx1 , a nie x1
-error <- sqrt(sum((yy1 - ypred) ^ 2))
+error2 <- sqrt(sum((yy1 - ypred) ^ 2))
 #powinien być ten sam błąd co dla indeksu optimise minerror
-error
+error2
 
 #końcowy wykres
 #dane do nauki, na końcowym wykresie czerwone punkty
@@ -144,7 +147,7 @@ error
 par(mfrow = c(3, 1))
 #plot each model
 plot.nnet(mod1)
-plot(x1, y1, col = "red")
-lines(xx1, yy1, col = "green")
-lines(xx1, ypred)
+plot(x1, y1, col = "red")       # czerwone punkty nauki funkcji sinus
+lines(xx1, yy1, col = "green")  # zielona prawdziwa funkcja sinus 
+lines(xx1, ypred)               # czarna aproksymowana przez nauczoną sieć funkcja sinus
 plot(errorvector)
