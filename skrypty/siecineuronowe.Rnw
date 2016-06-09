@@ -1,6 +1,5 @@
 \documentclass{article}
-
-
+%zbiór wzorów z wstecznej propagacji błędu
 %http://www.r-bloggers.com/sweave-tutorial-1-using-sweave-r-and-make-to-generate-a-pdf-of-multiple-choice-questions/
 \usepackage[table,dvipsnames]{xcolor}
 %\usepackage[polish]{babel}
