@@ -5,65 +5,11 @@
 #http://www.r-bloggers.com/fuzzy-string-matching-a-survival-skill-to-tackle-unstructured-information/
 #https://en.wikibooks.org/wiki/Data_Mining_Algorithms_In_R/Clustering/Fuzzy_Clustering_-_Fuzzy_C-means
 library(sets)
-# set universe
-sets_options("universe", seq(from = 0, to = 25, by = 0.1))
-
-## set up fuzzy variables
-variables <-
-  set(
-    service = fuzzy_partition(
-      varnames = c(
-        poor = 0,
-        good = 5,
-        excellent = 10
-      ),
-      sd = 1.5
-    ),
-    food = fuzzy_variable(
-      rancid = fuzzy_trapezoid(corners = c(-2, 0, 2, 4)),
-      delicious = fuzzy_trapezoid(corners = c(7, 9, 11, 13))
-    ),
-    tip = fuzzy_partition(
-      varnames = c(
-        cheap = 5,
-        average = 12.5,
-        generous = 20
-      ),
-      FUN = fuzzy_cone,
-      radius = 5
-    )
-  )
-
-## set up rules
-rules <-
-  set(
-    fuzzy_rule(service %is% poor || food %is% rancid, tip %is% cheap),
-    fuzzy_rule(service %is% good, tip %is% average),
-    fuzzy_rule(service %is% excellent ||
-                 food %is% delicious, tip %is% generous)
-  )
-
-## combine to a system
-system <- fuzzy_system(variables, rules)
-print(system)
-plot(system) ## plots variables
-
-## do inference
-fi <- fuzzy_inference(system, list(service = 3, food = 8))
-
-## plot resulting fuzzy set
-plot(fi)
-
-## defuzzify
-gset_defuzzify(fi, "centroid")
-
-## reset universe
-sets_options("universe", NULL)
 ##########################################################################################################
-
-
-#IF Oprocentowanie jest bardzo wysokie AND KaraOdejscia jest niska THEN ProcentOdejścia jest wysoki
-#IF Oprocentowanie jest niskie AND KaraOdejscia jest średnia THEN ProcentOdejścia jest niski
+# Fuzzy reguły wpływu oprocentowania i bezrobocia na rezygnację z polisy ubezpieczeniowej
+##########################################################################################################
+#IF Oprocentowanie jest bardzo wysokie AND Bezrobocie jest niska THEN Rezygnacja jest wysoki
+#IF Oprocentowanie jest niskie AND Bezrobocie jest średnia THEN Rezygnacja jest niski
 
 library(sets)
 sets_options('universe', seq(from = 1, to = 9, by = .5))
@@ -74,40 +20,104 @@ vars <- set(
     wysokie = 6,
     gigant = 8
   ), sd = 1),
-  kara = fuzzy_partition(varnames = c(
+  bezrobocie = fuzzy_partition(varnames = c(
     niskie = 3,
     norm = 4,
     wysokie = 5,
     gigant = 6
   ), sd = .8),
-  lapse = fuzzy_partition(varnames = c(
+  rezygnacja = fuzzy_partition(varnames = c(
     niskie = 3, med = 5, wysokie = 9
   ), sd = 2)
 )
 rules <- set(
-  fuzzy_rule(oprocentowanie %is% niskie && kara %is% niskie, lapse %is% niskie),
+  fuzzy_rule(oprocentowanie %is% niskie && bezrobocie %is% niskie, rezygnacja %is% niskie),
   fuzzy_rule((oprocentowanie %is% wysokie ||
-                oprocentowanie %is% gigant) && (kara %is% wysokie || kara %is% gigant),
-             lapse %is% niskie
+                oprocentowanie %is% gigant) && (bezrobocie %is% wysokie || bezrobocie %is% gigant),
+             rezygnacja %is% niskie
   )
 )
 sys <- fuzzy_system(vars, rules)
 plot(sys)
-fz_inf <- fuzzy_inference(sys, list(oprocentowanie = 2.5, kara = 3))
+fz_inf <- fuzzy_inference(sys, list(oprocentowanie = 2.5, bezrobocie = 3))
+plot(fz_inf)
+#defuzzyfikacja to odpowiedź (szacowana wartość rezygnacji od najmniejszej do największej poprzez średnią)
+#na zadane oprocentowanie i bezrobocie
+gset_defuzzify(fz_inf, 'centroid')
+gset_defuzzify(fz_inf, 'meanofmax')
+gset_defuzzify(fz_inf, 'smallestofmax')
+gset_defuzzify(fz_inf, 'largestofmax')
+fz_inf <- fuzzy_inference(sys, list(oprocentowanie = 7, bezrobocie = 5))
 plot(fz_inf)
 gset_defuzzify(fz_inf, 'centroid')
 gset_defuzzify(fz_inf, 'meanofmax')
 gset_defuzzify(fz_inf, 'smallestofmax')
 gset_defuzzify(fz_inf, 'largestofmax')
-fz_inf <- fuzzy_inference(sys, list(oprocentowanie = 7, kara = 5))
-plot(fz_inf)
-gset_defuzzify(fz_inf, 'centroid')
-gset_defuzzify(fz_inf, 'meanofmax')
-gset_defuzzify(fz_inf, 'smallestofmax')
-gset_defuzzify(fz_inf, 'largestofmax')
+## resetuj domenę
+sets_options("universe", NULL)
+
 
 ##########################################################################################################
-library(sets)
+# Fuzzy reguły wpływu jakości jedzenia i obsługi na wysokość napiwku
+##########################################################################################################
+
+# ustaw domenę
+sets_options("universe", seq(from = 0, to = 25, by = 0.1))
+
+## ustaw zmnienne fuzzy jedzenie w formie trapezów, usługa rozkładów normalnych, napiwek trójkątów
+variables <-
+  set(
+    usluga = fuzzy_partition(
+      varnames = c(
+        kiepska = 0,
+        dobra = 5,
+        wybitna = 10
+      ),
+      sd = 1.5
+    ),
+    jedzenie = fuzzy_variable(
+      zepsute = fuzzy_trapezoid(corners = c(-2, 0, 2, 4)),
+      smaczne = fuzzy_trapezoid(corners = c(7, 9, 11, 13))
+    ),
+    napiwek = fuzzy_partition(
+      varnames = c(
+        mały = 5,
+        przecietny = 12.5,
+        wysoki = 20
+      ),
+      FUN = fuzzy_cone,
+      radius = 5
+    )
+  )
+
+## reguły
+rules <-
+  set(
+    fuzzy_rule(usluga %is% kiepska || jedzenie %is% zepsute, napiwek %is% mały),
+    fuzzy_rule(usluga %is% dobra, napiwek %is% przecietny),
+    fuzzy_rule(usluga %is% wybitna || jedzenie %is% smaczne, napiwek %is% wysoki)
+  )
+
+## uruchom i wypisz system ekspertowy
+system <- fuzzy_system(variables, rules)
+print(system)
+plot(system) ## wykres zmiennych
+
+## odpal regułę ze zmiennymi z zakresu universe
+fi <- fuzzy_inference(system, list(usluga = 3, jedzenie = 8))
+
+## wynikowy zbiór fuzzy określający za pomocą defuzzify zakres wynikowej zmiennej będącej w konkluzji reguły
+plot(fi)
+
+## defuzzify
+gset_defuzzify(fi, "centroid")
+
+## resetuj universe
+sets_options("universe", NULL)
+
+
+##########################################################################################################
+# Fuzzy reguły wpływu jakości codu, pasma, przyspieszenia na wykonanie
 ##########################################################################################################
 U1 <- seq(from = 0, to = 1, by = 0.0001)
 #DIMENSIONS

@@ -18,14 +18,17 @@ set.seed(seed.val)
 sigmoid <- function(x) {
   1.0 / (1.0 + exp(-x))
 }
-#generuje x od -100 do 100 i dzielę przez 10, aby mieć od -10 do 10 z gęstszym upakowaniem 
-x <- (c(1:200)-100)/10
+#generuje x od -10 do 10 co 0.1
+x <- seq(-10,10,0.1)
 plot(x,sigmoid(x))
 
 #ustawiamy początek pseudolosowego generatora, aby zawsze mieć te same wyniki
 set.seed(1235)
 
+#wejście do sieci neuronowej BIAS=1, X1=0, X2=0, gdzie bias dodatkowa zmienna równa 1 tylko jej waga się zmienia
 A1=c(1,0,0)
+#zakładane wyjśćie y - tego dla X=(0,0) będziemy uczyć sieć neuronową
+y <- 0
 #dwa sposoby na generację macierzy dwuwymiarowej
 # w tym przypadku wszystkich połaczeń między wejściem X1 i X2 oraz 3 neuronami warstwy środkowej
 nkolumn=3
@@ -45,7 +48,6 @@ h  <- sigmoid(Z3)
 h
 
 alfa<-1
-y <- 0
 J <- ((y * log(h)) + ((1 - y) * log(1 - h))) * -1
 delta3 = h - y
 #pochodna sigmoid(Z) równa się sigmoid(Z)*(1-sigmoid(Z))
@@ -349,3 +351,4 @@ plot(x1, y1, col = "red")       # czerwone punkty nauki funkcji sinus
 lines(xx1, yy1, col = "green")  # zielona prawdziwa funkcja sinus 
 lines(xx1, ypred)               # czarna aproksymowana przez nauczoną sieć funkcja sinus
 plot(errorvector)
+
