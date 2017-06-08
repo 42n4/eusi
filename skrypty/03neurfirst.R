@@ -11,7 +11,7 @@ pkglist[!pkgcheck]
 for(i in pkglist[!pkgcheck]){install.packages(i,depend=TRUE)}
 
 #ustawienie początkowego stanu generatora losowego, aby wyniki za każdym razem były te same
-seed.val <- 32487893
+seed.val <- 1234567890
 set.seed(seed.val)
 
 #funkcja progowa sigmoidalna
@@ -70,8 +70,8 @@ set.seed(seed.val)
 # APROKSYMACJA FUNKCJI XOR W 4 PUNKTACH ##############################################################################
 #########################################################################################################################
 # funkcja ucząca sieć neuronową funkcji XOR
-init_w = 1; learn  = 1; alpha  = 0.01
-xor_nn <- function(XOR,
+xor_nn <-
+  function(XOR,
            W1,
            W2,
            init_w = 0,
@@ -80,7 +80,7 @@ xor_nn <- function(XOR,
     # sprawdź, czy to inicjalizacja sieci
     if (init_w == 1) {
       W1 <- matrix(runif(mwierszy * nkolumn), ncol = nkolumn)
-      W2 <- matrix(runif(mwierszy2 * nkolumn2), ncol = nkolumn)
+      W2 <- matrix(runif(mwierszy2 * nkolumn2), ncol = nkolumn2)
     }
     # sumatory korekcji wag z całego zbioru trenującego
     T1_DELTA = array(0L, dim(W1))
@@ -128,7 +128,7 @@ xor_nn <- function(XOR,
       cat('J: ', J, '\n')
     }
     list(W1,W2,wynik)
-}
+  }
 
 #funkcja XOR do nauki dwa pierwsze to wejścia, a trzeci to wyjście
 XOR <- rbind(c(0, 0, 0), c(0, 1, 1), c(1, 0, 1), c(1, 1, 0))
@@ -149,7 +149,7 @@ list <- structure(NA, class = "result")
 }
 
 #wywołanie z inicjalizacją i uczeniem
-list[W1, W2,] <- xor_nn(XOR, W1, W2, 1, 1, 0.01)
+list[W1, W2,] <- xor_nn(XOR, W1, W2, 1, 1, 0.05)
 
 for (i in 1:50000) {
   #wywołanie bez inicjalizacji i z uczeniem
