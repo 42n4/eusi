@@ -2,8 +2,16 @@
 #R sieć neuronowa - najprostsza forma backpropagation na macierzach - nauka funkcji XOR
 #https://en.wikipedia.org/wiki/Backpropagation
 #https://aimatters.wordpress.com/2015/12/19/a-simple-neural-network-in-octave-part-1/
+#https://yihui.name/knitr/
+#library(knitr)
+#knit('yourfile.Rnw')
+#DEEP LEARNING
+#https://www.r-bloggers.com/deep-learning-in-r-2/
+#http://www.deeplearningbook.org/contents/mlp.html
+#http://deeplearning.net/reading-list/
 #Zamieszczone przykłady dadzą się uruchomić jeśli zainstalujecie pakiety R 
 #(w linuxie na roocie w konsoli R, żeby nie instalować na lokalnym koncie):
+
 
 pkglist<-c("clusterGeneration","corrplot","nnet","neuralnet","RSNNS","reshape","rockchalk","fifer","ade4","sqldf","plyr","dplyr")
 pkgcheck <- pkglist %in% row.names(installed.packages())
@@ -54,7 +62,12 @@ alfa<-20
 J <- ((y * log(h)) + ((1 - y) * log(1 - h))) * -1
 delta3 = (h - y)*h*(1-h)
 #pochodna sigmoid(Z) równa się sigmoid(Z)*(1-sigmoid(Z))
+#two ways of computing the next layer error derivative
+#this one does not work in functions
+#delta2<-(delta3 * t(W2) * A2 * (1 - A2))[-1]
+#that one is more robust
 delta2<-(t(W2) %*% delta3 * A2 * (1 - A2))[-1]
+
 W2<-W2-alfa*delta3%*%t(A2)
 W1<-W1-alfa*delta2%*%t(A1)
 #FORWARD PROPAGATION OF A
