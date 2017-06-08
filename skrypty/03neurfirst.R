@@ -50,9 +50,9 @@ h
 
 #THE NEXT LOOPS
 #ERROR BACKPROPAGATION
-alfa<-100
+alfa<-20
 J <- ((y * log(h)) + ((1 - y) * log(1 - h))) * -1
-delta3 = (h - y)h(1-h)
+delta3 = (h - y)*h*(1-h)
 #pochodna sigmoid(Z) równa się sigmoid(Z)*(1-sigmoid(Z))
 delta2<-(t(W2) %*% delta3 * A2 * (1 - A2))[-1]
 W2<-W2-alfa*delta3%*%t(A2)
