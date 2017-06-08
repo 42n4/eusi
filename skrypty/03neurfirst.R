@@ -30,35 +30,38 @@ A1=c(1,0,0)
 #zakładane wyjśćie y - tego dla X=(0,0) będziemy uczyć sieć neuronową
 y <- 0
 #dwa sposoby na generację macierzy dwuwymiarowej
-# w tym przypadku wszystkich połaczeń między wejściem X1 i X2 oraz 3 neuronami warstwy środkowej
+# w tym przypadku wszystkich połaczeń między wejściem X1, X2 i b oraz 3 neuronami warstwy środkowej
 nkolumn=3
-mwierszy=2 
-THETA1<-t(replicate(mwierszy, runif(nkolumn,-1,1)))
-THETA1<-matrix(runif(mwierszy*nkolumn), ncol=nkolumn)
+mwierszy=3 
+W1<-t(replicate(mwierszy, runif(nkolumn,-1,1)))
+W1<-matrix(runif(mwierszy*nkolumn), ncol=nkolumn)
 
-# w tym przypadku wszystkich połaczeń między wyjściem z sieci neuronowej oraz neuronem na wyjściu
-nkolumn=3
+# w tym przypadku wszystkich połaczeń między wyjściem z sieci neuronowej plus b oraz neuronem na wyjściu
+nkolumn2=4
 mwierszy2=1 
-THETA2<-matrix(runif(mwierszy2*nkolumn), ncol=nkolumn)
+W2<-matrix(runif(mwierszy2*nkolumn2), ncol=nkolumn2)
 
-Z2 <- THETA1 %*% A1
-A2 <- c(1, sigmoid(Z2))
-Z3 <- c(THETA2 %*% A2)
-h  <- sigmoid(Z3)
+#THE FIRST LOOP - FORWARD PROPAGATION OF A
+N2 <- W1 %*% A1
+A2 <- c(1, sigmoid(N2))
+N3 <- c(W2 %*% A2)
+h <- A3 <- sigmoid(N3)
 h
 
-alfa<-1
+#THE NEXT LOOPS
+#ERROR BACKPROPAGATION
+alfa<-100
 J <- ((y * log(h)) + ((1 - y) * log(1 - h))) * -1
-delta3 = h - y
+delta3 = (h - y)h(1-h)
 #pochodna sigmoid(Z) równa się sigmoid(Z)*(1-sigmoid(Z))
-delta2<-(t(THETA2) %*% delta3 * A2 * (1 - A2))[-1]
-THETA2<-THETA2-alfa*delta3%*%t(A2)
-THETA1<-THETA1-alfa*delta2%*%t(A1)
-
-Z2 <- THETA1 %*% A1
-A2 <- c(1, sigmoid(Z2))
-Z3 <- c(THETA2 %*% A2)
-h <- sigmoid(Z3)
+delta2<-(t(W2) %*% delta3 * A2 * (1 - A2))[-1]
+W2<-W2-alfa*delta3%*%t(A2)
+W1<-W1-alfa*delta2%*%t(A1)
+#FORWARD PROPAGATION OF A
+N2 <- W1 %*% A1
+A2 <- c(1, sigmoid(N2))
+N3 <- c(W2 %*% A2)
+h <- A3 <- sigmoid(N3)
 h
 
 #ustawienie początkowego stanu generatora losowego, aby wyniki za każdym razem były te same
@@ -67,21 +70,21 @@ set.seed(seed.val)
 # APROKSYMACJA FUNKCJI XOR W 4 PUNKTACH ##############################################################################
 #########################################################################################################################
 # funkcja ucząca sieć neuronową funkcji XOR
-xor_nn <-
-  function(XOR,
-           THETA1,
-           THETA2,
+init_w = 1; learn  = 1; alpha  = 0.01
+xor_nn <- function(XOR,
+           W1,
+           W2,
            init_w = 0,
            learn  = 0,
            alpha  = 0.01) {
     # sprawdź, czy to inicjalizacja sieci
     if (init_w == 1) {
-      THETA1 <- matrix(runif(mwierszy * nkolumn), ncol = nkolumn)
-      THETA2 <- matrix(runif(mwierszy2 * nkolumn), ncol = nkolumn)
+      W1 <- matrix(runif(mwierszy * nkolumn), ncol = nkolumn)
+      W2 <- matrix(runif(mwierszy2 * nkolumn2), ncol = nkolumn)
     }
     # sumatory korekcji wag z całego zbioru trenującego
-    T1_DELTA = array(0L, dim(THETA1))
-    T2_DELTA = array(0L, dim(THETA2))
+    T1_DELTA = array(0L, dim(W1))
+    T2_DELTA = array(0L, dim(W2))
     # przejdź przez cały zbiór trenujący
     m <- 0
     # funkcja kosztu
@@ -92,18 +95,18 @@ xor_nn <-
     for (i in 1:nrow(XOR)) {
       # propagacja sygnału do przodu ku wyjściu i=1
       A1 = c(1, XOR[i, 1:2])
-      Z2 <- THETA1 %*% A1
-      A2 <- c(1, sigmoid(Z2))
-      Z3 <- THETA2 %*% A2
-      h <- sigmoid(Z3)
+      N2 <- W1 %*% A1
+      A2 <- c(1, sigmoid(N2))
+      N3 <- W2 %*% A2
+      h <- sigmoid(N3)
       J <- J + (XOR[i, 3] * log(h)) + ((1 - XOR[i, 3]) * log(1 - h))
       m <- m + 1
       
       # liczymy korekcję t2_delta i t1_delta, aby skorygować błąd
       if (learn == 1) {
-        delta3 = h - XOR[i, 3]
+        delta3 = (h - XOR[i, 3])*h*(1-h)
         #pochodna sigmoid(Z) równa się sigmoid(Z)*(1-sigmoid(Z))
-        delta2 <- (t(THETA2) %*% delta3 * A2 * (1 - A2))[-1]
+        delta2 <- (t(W2) %*% delta3 * A2 * (1 - A2))[-1]
         # sumuj korekcje dla każdego elementu zbioru uczącego
         T2_DELTA <- T2_DELTA + delta3 %*% t(A2)
         T1_DELTA <- T1_DELTA + delta2 %*% t(A1)
@@ -116,16 +119,16 @@ xor_nn <-
     J <- J / -m
     #cat('delta3: ', delta3, '\n')
     if (learn == 1) {
-      THETA2 <- THETA2 - alfa * (T2_DELTA / m)
-      THETA1 <- THETA1 - alfa * (T1_DELTA / m)
-      #cat(THETA2,'\n');
-      #cat(THETA1,'\n');
+      W2 <- W2 - alfa * (T2_DELTA / m)
+      W1 <- W1 - alfa * (T1_DELTA / m)
+      #cat(W2,'\n');
+      #cat(W1,'\n');
     }
     else{
       cat('J: ', J, '\n')
     }
-    list(THETA1,THETA2,wynik)
-  }
+    list(W1,W2,wynik)
+}
 
 #funkcja XOR do nauki dwa pierwsze to wejścia, a trzeci to wyjście
 XOR <- rbind(c(0, 0, 0), c(0, 1, 1), c(1, 0, 1), c(1, 1, 0))
@@ -146,15 +149,15 @@ list <- structure(NA, class = "result")
 }
 
 #wywołanie z inicjalizacją i uczeniem
-list[THETA1, THETA2,] <- xor_nn(XOR, THETA1, THETA2, 1, 1, 0.05)
+list[W1, W2,] <- xor_nn(XOR, W1, W2, 1, 1, 0.01)
 
 for (i in 1:50000) {
   #wywołanie bez inicjalizacji i z uczeniem
-  list[THETA1, THETA2,] <- xor_nn(XOR, THETA1, THETA2, 0, 1, 0.05)
+  list[W1, W2,] <- xor_nn(XOR, W1, W2, 0, 1, 0.05)
   if (i %% 1000 == 0) {
     cat('Iteracja : ', i, '\n')
     #wywołanie bez inicjalizacji i bez uczenia, zwykła wyuczona odpowiedź sieci neuronowej
-    list[THETA1, THETA2,nauczone_xor] <- xor_nn(XOR, THETA1, THETA2)
+    list[W1, W2,nauczone_xor] <- xor_nn(XOR, W1, W2)
   }
 }
 #powinno być 
